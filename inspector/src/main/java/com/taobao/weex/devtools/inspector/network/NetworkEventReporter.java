@@ -19,11 +19,11 @@ import javax.annotation.Nullable;
  * the WebKit Inspector.
  *
  * <pre>
- * requestWillBeSent +---> responseHeadersReceived +---> interpretResponseStream
- *                   |           |                 |
- *                   |           `---> dataSent    |
- *                   |                             |
- *                   `-----------------------------`--------> httpExchangeFailed
+ * requestWillBeSent +--- responseHeadersReceived +--- interpretResponseStream
+ *                   |           |                |
+ *                   |           `--- dataSent    |
+ *                   |                            |
+ *                   `----------------------------`-------- httpExchangeFailed
  * </pre>
  *
  * Note that {@link #interpretResponseStream} combined with {@link DefaultResponseHandler}

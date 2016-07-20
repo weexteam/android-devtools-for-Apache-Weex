@@ -29,7 +29,7 @@ import java.util.Iterator;
 
 /**
  * Generates an hprof on the sdcard and returns to the client the absolute path to the file.
- * <p/>
+ * <p>
  * For convenient usage, see: {@code scripts/hprof_dump.sh}
  */
 public class HprofDumperPlugin implements DumperPlugin {

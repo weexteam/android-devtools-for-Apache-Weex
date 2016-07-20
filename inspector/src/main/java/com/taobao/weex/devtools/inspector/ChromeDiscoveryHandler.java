@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 /**
  * Provides sufficient responses to convince Chrome's {@code chrome://inspect/devices} that we're
  * "one of them".  Note that we are being discovered automatically by the name of our socket
- * as defined in {@link LocalSocketHttpServer}.  After discovery, we're required to provide
+ * as defined in LocalSocketHttpServer.  After discovery, we're required to provide
  * some context on how exactly to display and inspect what we have.
  */
 public class ChromeDiscoveryHandler implements HttpHandler {

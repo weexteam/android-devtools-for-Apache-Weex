@@ -19,7 +19,7 @@ import java.io.PrintStream;
  * stream throws an {@link IOException} to indicate the pipe is broken.
  * Dumpapp uses a {@link PrintStream} to wrap the underlying {@link OutputStream}
  * though, and {@link PrintStream} silently swallows {@link IOException}.
- * <p/>
+ * <p>
  * While streaming dumpers can/should check {@link PrintStream#checkError},
  * this is used in cases where we know the stream has gone bad to force flow
  * control out of the dumper and back into the calling machinery that controls

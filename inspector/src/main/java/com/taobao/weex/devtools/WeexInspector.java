@@ -69,11 +69,11 @@ import javax.annotation.Nullable;
 /**
  * Initialization and configuration entry point for the WeexInspector debugging system.  Simple usage with
  * default plugins and features enabled:
- * <p />
+ * <p>
  * <pre>
  *   WeexInspector.initializeWithDefaults(context)
  * </pre>
- * <p />
+ * <p>
  * For more advanced configuration, see {@link #newInitializerBuilder(Context)} or
  * the {@code stetho-sample} for more information.
  */
@@ -85,7 +85,7 @@ public class WeexInspector {
    * Construct a simple initializer helper which allows you to customize stetho behaviour
    * with additional features, plugins, etc.  See {@link DefaultDumperPluginsBuilder} and
    * {@link DefaultInspectorModulesBuilder} for more information.
-   * <p />
+   * <p>
    * For simple use cases, consider {@link #initializeWithDefaults(Context)}.
    */
   public static InitializerBuilder newInitializerBuilder(Context context) {
@@ -248,7 +248,7 @@ public class WeexInspector {
      * Provide a custom document provider factory which can operate on the logical DOM exposed to
      * Chrome in the Elements tab.  An Android View hierarchy instance is provided by
      * default if this method is not called.
-     * <p />
+     * <p>
      * <i>Experimental.</i>  This API may be changed or removed in the future.
      */
     public DefaultInspectorModulesBuilder documentProvider(DocumentProviderFactory factory) {
@@ -260,7 +260,7 @@ public class WeexInspector {
      * Provide a custom runtime REPL (read-eval-print loop) implementation for the Console tab.
      * By default an implementation will be provided for you that automatically detects
      * the existence of {@code stetho-js-rhino} (Mozilla's Rhino engine) and uses it if available.
-     * <p />
+     * <p>
      * To customize the Rhino implementation, see {@code stetho-js-rhino} documentation.
      */
     public DefaultInspectorModulesBuilder runtimeRepl(RuntimeReplFactory factory) {

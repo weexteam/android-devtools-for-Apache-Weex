@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Manages temporary files created by {@link ChromeHttpFlowObserver} to serve request bodies.
+ * Manages temporary files created by {ChromeHttpFlowObserver} to serve request bodies.
  */
 public class ResponseBodyFileManager {
   private static final String TAG = "ResponseBodyFileManager";

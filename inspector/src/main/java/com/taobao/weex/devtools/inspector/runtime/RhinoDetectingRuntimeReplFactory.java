@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
  * Attempts to locate stetho-js-rhino in the classpath and use it if available.  Otherwise falls
  * back to a no-op version which informs folks that they can include stetho-js-rhino for more
  * advanced functionality.
- * <p />
+ * <p>
  * Eventually we should develop a kind of service locator somehow to make this more discoverable
  * and generalized.  For now with only one official implementation however it seems like overkill.
  */

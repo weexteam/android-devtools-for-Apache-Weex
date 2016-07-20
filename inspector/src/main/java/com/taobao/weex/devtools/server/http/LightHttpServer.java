@@ -255,7 +255,7 @@ public class LightHttpServer {
   /**
    * Similar in spirit to {@link HttpMessageReader} which assumes ASCII for all messages as
    * a performance optimization.  Caller is responsible for flushing the writer.
-   * <p />
+   * <p>
    * Exposed publicly as a hack to support WebSocket upgrade.
    */
   public static class HttpMessageWriter {

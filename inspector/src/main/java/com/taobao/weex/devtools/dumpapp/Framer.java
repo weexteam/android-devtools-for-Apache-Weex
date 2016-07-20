@@ -25,10 +25,10 @@ import javax.annotation.Nullable;
 /**
  * Implements framing protocol that allows us to implement a command-line protocol via
  * sockets complete with stdin/stdout/stderr, exit codes, and input arguments.
- * <p />
+ * <p>
  * This is the server handler of that protocol, with the client handler in WeexInspector's {@code dumpapp}
  * script.
- * <p />
+ * <p>
  * The framing protocol involves 5-byte fixed headers, possibly followed by a variable
  * size content body.
  * The grammar is:
@@ -49,10 +49,10 @@ import javax.annotation.Nullable;
  * The BIG_ENDIAN_INT in STDIN/STDOUT/STDERR_FRAME specifies the size (in bytes) of
  * the immediately following BLOB.  For STDIN_REQUEST_FRAME it represents a request
  * for that much data.
- * <p />
+ * <p>
  * The BIG_ENDIAN_INT in ENTER_FRAME specifies the number of arguments, with that number of string
  * to follow.
- * <p />
+ * <p>
  * The BIG_ENDIAN_INT in EXIT_FRAME specifies the exit code.
  */
 class Framer {

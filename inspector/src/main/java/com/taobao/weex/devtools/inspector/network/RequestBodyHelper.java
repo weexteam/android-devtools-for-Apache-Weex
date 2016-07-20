@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
  * Helper which manages provides computed request sizes as well as transparent decompression.
  * Note that request compression is not officially part of the HTTP standard however it is
  * commonly in use and can be conveniently supported here.
- * <p />
+ * <p>
  * To use, invoke {@link #createBodySink} to prepare an output stream where the raw body can be
  * written.  Then invoke {@link #getDisplayBody()} to retrieve the possibly decoded body.
  * Finally, {@link #reportDataSent()} can be called to report to WeexInspector the raw and decompressed

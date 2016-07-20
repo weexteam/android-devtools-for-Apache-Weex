@@ -18,18 +18,18 @@ import javax.annotation.Nullable;
 
 /**
  * This class derives from {@link Descriptor} and provides a canonical implementation of
- * {@link ChainedDescriptor}.<p/>
+ * {@link ChainedDescriptor}.<p>
  *
  * This class implements the thread safety enforcement policy prescribed by
  * {@link ThreadBound}. Namely, that {@link #verifyThreadAccess()}} needs to be called in the
  * prologue for every method. Your derived class SHOULD NOT call {@link #verifyThreadAccess()}} in
- * any of its on___() methods.<p/>
+ * any of its on___() methods.<p>
  *
  * (NOTE: As an optimization, {@link #verifyThreadAccess()} is not actually called in the
  * prologue for every method. Instead, we rely on {@link DocumentProvider#getNodeDescriptor(Object)}
  * calling it in order to get most of our enforcement coverage. We still call
  * {@link #verifyThreadAccess()} in a few important methods such as {@link #hook(Object)} and
- * {@link #unhook(Object)} (anything that writes or is potentially really dangerous if misused).<p/>
+ * {@link #unhook(Object)} (anything that writes or is potentially really dangerous if misused).<p>
  *
  * @param <E> the class that this descriptor will be describing for {@link DocumentProvider},
  * {@link Document}, and ultimately {@link DOM}.

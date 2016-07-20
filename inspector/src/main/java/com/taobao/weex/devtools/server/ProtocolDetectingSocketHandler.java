@@ -22,7 +22,7 @@ import java.util.Arrays;
  * in the connection to figure out which real handler to route to.  This is used for performance
  * and backwards compatibility reasons to maintain WeexInspector having just one actual socket
  * connection despite dumpapp and DevTools now diverging in protocol.
- * <p />
+ * <p>
  * Note this trick is only possible if the protocol requires that the client initiate the
  * conversation.  Otherwise, the server would be expected to say something before we know what
  * protocol the client is speaking.

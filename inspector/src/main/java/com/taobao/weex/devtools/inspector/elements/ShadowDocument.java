@@ -59,7 +59,7 @@ public final class ShadowDocument implements DocumentView {
      * We use a {@link LinkedHashMap} to preserve ordering between
      * {@link UpdateBuilder#setElementChildren(Object, List)} and
      * {@link Update#getChangedElements(Accumulator)}. This isn't needed for correctness but it
-     * significantly improves performance.<p/>
+     * significantly improves performance.<p>
      *
      * Transmitting DOM updates to Chrome works best if we can do it in top-down order because it
      * allows us to skip processing (and, more importantly, transmission) of an element that was
@@ -67,7 +67,7 @@ public final class ShadowDocument implements DocumentView {
      * transmission of E2 if it was already bundled up in E1's event, where E2 is any element in
      * E1's sub-tree). DOM.childNodeInserted transmits the node being inserted by-value, so it takes
      * time and space proportional to the size of that node's sub-tree. This means the difference
-     * between O(n^2) and O(n) time for transmitting updates to Chrome.<p/>
+     * between O(n^2) and O(n) time for transmitting updates to Chrome.<p>
      *
      * We currently only have one implementation of {@link DocumentProvider},
      * {@link com.taobao.weex.devtools.inspector.elements.android.AndroidDocumentProvider}, and it
@@ -76,16 +76,16 @@ public final class ShadowDocument implements DocumentView {
      * put them in that order. If we reach a point where we can't or shouldn't rely on elements
      * being forwarded to us in top-down order, then we should change this field to an
      * {@link IdentityHashMap} and sort them before relaying them via
-     * {@link Update#getChangedElements(Accumulator)}.<p/>
+     * {@link Update#getChangedElements(Accumulator)}.<p>
      *
      * When a large sub-tree is added (e.g. starting a new {@link Activity}), the use of
      * {@link LinkedHashMap} instead of {@link IdentityHashMap} can mean the difference between an
-     * update taking 500ms versus taking more than 30 seconds.<p/>
+     * update taking 500ms versus taking more than 30 seconds.<p>
      *
      * Technically we actually want something like a LinkedIdentityHashMap because we do want
      * to key off of object identity instead of allowing for the possibility of value identity.
      * Given the difference in performance, however, the risk of potential protocol abuse seems
-     * reasonable.<p/>
+     * reasonable.<p>
      */
     private final Map<Object, ElementInfo> mElementToInfoChangesMap = new LinkedHashMap<>();
 

@@ -133,6 +133,8 @@ public class LogUtil {
    * {@link Log#isLoggable(String, int)} interface from blocking important messages while still
    * offering users of WeexInspector to suppress our error/warning logs via
    * {@link LogRedirector#setLogger(LogRedirector.Logger)}.
+   *
+   * @return loggable
    */
   public static boolean isLoggable(int priority) {
     switch (priority) {

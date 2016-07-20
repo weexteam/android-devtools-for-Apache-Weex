@@ -25,7 +25,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * support library's fragments and the built-in framework version.  Note: both versions
  * can be live at the same time in a single application and even on a single object
  * instance.
- * <p/>
+ * <p>
  * Type safety is enforced via generics internal to the implementation but treated
  * as opaque from the outside.
  *

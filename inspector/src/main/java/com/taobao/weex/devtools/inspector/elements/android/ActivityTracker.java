@@ -33,7 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * all versions of Android but it is possible to manually track activities using the {@link #add}
  * and {@link #remove} methods exposed below.  Be aware that this is an easy opportunity to
  * cause serious memory leaks in your application however.  Use with caution.
- * <p/>
+ * <p>
  * Most callers can and should ignore this class, though it is necessary if you are implementing
  * Activity tracking pre-ICS.
  */

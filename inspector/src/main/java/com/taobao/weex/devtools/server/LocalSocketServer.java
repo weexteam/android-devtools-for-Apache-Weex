@@ -58,7 +58,7 @@ public class LocalSocketServer {
 
   /**
    * Binds to the address and listens for connections.
-   * <p/>
+   * <p>
    * If successful, this thread blocks forever or until {@link #stop} is called, whichever
    * happens first.
    *

@@ -51,10 +51,8 @@ public class ObjectMapper {
 
   /**
    * Support mapping between arbitrary classes and {@link JSONObject}.
-   * <note>
    *   It is possible for a {@link Throwable} to be propagated out of this class if there is an
    *   {@link InvocationTargetException}.
-   * </note>
    * @param fromValue
    * @param toValueType
    * @param <T>
