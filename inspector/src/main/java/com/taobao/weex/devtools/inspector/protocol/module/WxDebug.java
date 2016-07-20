@@ -1,5 +1,6 @@
 package com.taobao.weex.devtools.inspector.protocol.module;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
@@ -29,7 +30,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
     @ChromeDevtoolsMethod
     public void enable(JsonRpcPeer peer, JSONObject params) {
-        Context context = WXEnvironment.getApplication();
+        Application context = WXEnvironment.getApplication();
         if (context != null) {
             WXSDKEngine.reload(context, true);
             context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
@@ -38,7 +39,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
     @ChromeDevtoolsMethod
     public void disable(JsonRpcPeer peer, JSONObject params) {
-        Context context = WXEnvironment.getApplication();
+        Application context = WXEnvironment.getApplication();
         if (context != null) {
             WXSDKEngine.reload(context, false);
             context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
