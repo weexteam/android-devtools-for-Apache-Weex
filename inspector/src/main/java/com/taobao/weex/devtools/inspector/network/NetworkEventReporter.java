@@ -156,7 +156,7 @@ public interface NetworkEventReporter {
     /**
      * Unique identifier for this request.  This identifier must be used in all other network
      * events corresponding to this request.  Identifiers may be re-used after
-     * {@link NetworkEventReporter#httpExchangeFailed} or {@link NetworkEventReporter#loadingFinished}
+     * {@link NetworkEventReporter#httpExchangeFailed} or {NetworkEventReporter#loadingFinished}
      * are invoked.
      */
     String id();
