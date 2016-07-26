@@ -127,7 +127,7 @@ public class WeexInspector {
           "ActivityTracker methods manually!");
     }
 
-    initializer.start();
+    // initializer.start();
   }
 
   public static DumperPluginsProvider defaultDumperPluginsProvider(final Context context) {
