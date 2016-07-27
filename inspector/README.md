@@ -1,4 +1,4 @@
-### Weex devtools
+# Weex Devtools
 
 Weex devtools is a custom devtools for weex that implements [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol) inspired by [Stetho](https://github.com/facebook/stetho), it is designed to help you quickly inspect your app and debug your JS bundle source in a chrome web page.At present The devtools consist of two part : `Inspector` and `Debugger`. If you want it work well, you must install a `weex-devtool` as debug server.
 
@@ -22,12 +22,23 @@ If you are a green hand to the debug of weex, we recommend you to try your first
 ###### Enable devtools in your own app
 Of course you can reuse the code of playground to build your own app, that is the simplest way to let your app's js code debuggable. On the other hand QR code is not necessary, if your review the source code you can draw a conclusion that QR CODE is just a way to set `devtools server` address. following those steps you can do the same thing.
 
-- gradle dependency on inspector.
-````
-dependencies {
-        compile(:inspector)
-}
-````
+- gradle dependency on inspector. 
+There are two choices to set the dependency, the Choice A is recommanded if you have no change to weex_sdk or inspector, while if you use your own custom weex_sdk or inspector Choice B is suitable.
+ 
+  * *CHOICE A : aar dependency from jcenter*.
+  ````
+  dependencies {
+          compile 'com.taobao.android:weex_inspector:x.x.x.x'
+  }
+  ````
+  * *CHOICE B : source code dependency.*
+
+  you need to copy the dir of inspector to the same dir of your app and add `include ":inspector"`in your project's `settings.gradle` file just like playground have done, then add dependency in your app's `build.gralde`.
+  ````
+  dependencies {
+          compile project(:inspector)
+  }
+  ````
 
 - initialize in your XXXApplication file.
 ````
