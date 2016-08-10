@@ -10,12 +10,16 @@
 package com.taobao.weex.devtools.inspector.elements;
 
 import android.os.SystemClock;
+import android.util.Log;
+import android.view.View;
 
+import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.inspector.helper.ObjectIdMapper;
 import com.taobao.weex.devtools.inspector.helper.ThreadBoundProxy;
+import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -170,6 +174,57 @@ public final class Document extends ThreadBoundProxy {
     }
 
     return rootElement;
+  }
+
+  public void findMatchingElements(int x, int y, Accumulator<Integer> matchedIds) {
+    verifyThreadAccess();
+
+    final Object rootElement = mDocumentProvider.getRootElement();
+    findMatches(rootElement, x, y, matchedIds);
+  }
+
+  private void findMatches(Object element, int x, int y, Accumulator<Integer> matchedIds) {
+    final ElementInfo info = mShadowDocument.getElementInfo(element);
+
+    for (int i = 0, size = info.children.size(); i < size; i++) {
+      final Object childElement = info.children.get(i);
+
+      if (doesElementMatch(childElement, x, y)) {
+        matchedIds.store(mObjectIdMapper.getIdForObject(childElement));
+      }
+
+      findMatches(childElement, x, y, matchedIds);
+    }
+  }
+
+  private boolean doesElementMatch(Object element, int x, int y) {
+    View view = null;
+    if (WeexInspector.isNativeMode()) {
+      if (element instanceof View) {
+        view = (View)element;
+      }
+    } else {
+      if (element instanceof WXComponent) {
+        view = ((WXComponent) element).getHostView();
+      }
+    }
+
+    return view != null && view.isShown() && isPointInsideView(x, y, view);
+  }
+
+  public static boolean isPointInsideView(float x, float y, View view){
+    int location[] = new int[2];
+    view.getLocationOnScreen(location);
+    int viewX = location[0];
+    int viewY = location[1];
+
+    //point is inside view bounds
+    if(( x > viewX && x < (viewX + view.getWidth())) &&
+            ( y > viewY && y < (viewY + view.getHeight()))){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void findMatchingElements(String query, Accumulator<Integer> matchedIds) {

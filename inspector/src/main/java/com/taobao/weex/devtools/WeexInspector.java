@@ -80,6 +80,15 @@ import javax.annotation.Nullable;
 public class WeexInspector {
   private WeexInspector() {
   }
+  private static boolean sNativeMode = false;
+
+  private static void setNativeMode(boolean isNativeMode) {
+    sNativeMode = isNativeMode;
+  }
+
+  public static boolean isNativeMode() {
+    return sNativeMode;
+  }
 
   /**
    * Construct a simple initializer helper which allows you to customize stetho behaviour
@@ -234,6 +243,7 @@ public class WeexInspector {
   public static final class DefaultInspectorModulesBuilder {
     private final Application mContext;
     private final PluginBuilder<ChromeDevtoolsDomain> mDelegate = new PluginBuilder<>();
+
 
     @Nullable private DocumentProviderFactory mDocumentProvider;
     @Nullable private RuntimeReplFactory mRuntimeRepl;

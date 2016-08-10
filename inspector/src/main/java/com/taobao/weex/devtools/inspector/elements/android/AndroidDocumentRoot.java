@@ -11,15 +11,21 @@ package com.taobao.weex.devtools.inspector.elements.android;
 
 import android.app.Application;
 
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.inspector.elements.AbstractChainedDescriptor;
 import com.taobao.weex.devtools.inspector.elements.NodeType;
+import com.taobao.weex.ui.WXRenderManager;
+
+import java.util.List;
 
 // For the root, we use 1 object for both element and descriptor.
 
-final class AndroidDocumentRoot extends AbstractChainedDescriptor<AndroidDocumentRoot> {
-  private final Application mApplication;
+public final class AndroidDocumentRoot extends AbstractChainedDescriptor<AndroidDocumentRoot> {
+  private Application mApplication;
 
   public AndroidDocumentRoot(Application application) {
     mApplication = Util.throwIfNull(application);
@@ -37,6 +43,18 @@ final class AndroidDocumentRoot extends AbstractChainedDescriptor<AndroidDocumen
 
   @Override
   protected void onGetChildren(AndroidDocumentRoot element, Accumulator<Object> children) {
-    children.store(mApplication);
+    if (WeexInspector.isNativeMode()) {
+      children.store(mApplication);
+    } else {
+      WXRenderManager renderManager = WXSDKManager.getInstance().getWXRenderManager();
+      if (renderManager != null) {
+        List<WXSDKInstance> instances = renderManager.getAllInstances();
+        if (instances != null && !instances.isEmpty()) {
+          for(WXSDKInstance instance : instances) {
+            children.store(instance);
+          }
+        }
+      }
+    }
   }
 }

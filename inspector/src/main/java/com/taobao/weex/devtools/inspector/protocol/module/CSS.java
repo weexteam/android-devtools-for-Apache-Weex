@@ -145,10 +145,13 @@ public class CSS implements ChromeDevtoolsDomain {
     final GetMatchedStylesForNodeResult result = new GetMatchedStylesForNodeResult();
 
     final RuleMatch match = new RuleMatch();
-
-    result.matchedCSSRules = ListUtil.newImmutableList(match);
-
-    match.matchingSelectors = ListUtil.newImmutableList(0);
+    initMatch(match, "local");
+    final RuleMatch match1 = new RuleMatch();
+    initMatch(match1, "virtual");
+    List<RuleMatch> matches = new ArrayList<>();
+    matches.add(match);
+    matches.add(match1);
+    result.matchedCSSRules = matches;// ListUtil.newImmutableList(match);
 
     Selector selector = new Selector();
     selector.value = "<this_element>";
@@ -189,6 +192,10 @@ public class CSS implements ChromeDevtoolsDomain {
                   property.value = value;
 
                   match.rule.style.cssProperties.add(property);
+                  CSSProperty property1 = new CSSProperty();
+                  property1.name = "*-" + name;
+                  property1.value = value;
+                  match1.rule.style.cssProperties.add(property1);
                 }
               }
             });
@@ -377,5 +384,26 @@ public class CSS implements ChromeDevtoolsDomain {
 
     @JsonProperty
     public List<InheritedStyleEntry> inherited;
+  }
+
+  void initMatch(RuleMatch match, String value) {
+    match.matchingSelectors = ListUtil.newImmutableList(0);
+
+    Selector selector = new Selector();
+    selector.value = value;
+
+    CSSRule rule = new CSSRule();
+
+    rule.origin = Origin.REGULAR;
+    rule.selectorList = new SelectorList();
+
+    rule.selectorList.selectors = ListUtil.newImmutableList(selector);
+
+    rule.style = new CSSStyle();
+    rule.style.cssProperties = new ArrayList<>();
+
+    match.rule = rule;
+
+    rule.style.shorthandEntries = Collections.emptyList();
   }
 }
