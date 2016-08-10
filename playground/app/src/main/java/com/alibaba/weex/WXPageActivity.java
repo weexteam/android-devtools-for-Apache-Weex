@@ -180,7 +180,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
         mConfigMap.put("bundleUrl", mUri.toString());
         String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
-        mInstance.render(TAG, WXFileUtils.loadFileContent(path, WXPageActivity.this),
+        mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
                 mConfigMap, null,
                 ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil
                         .getDisplayHeight(WXPageActivity.this),

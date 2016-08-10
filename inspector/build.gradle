@@ -23,7 +23,7 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -44,8 +44,7 @@ dependencies {
     }
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-
-    provided 'com.taobao.android:weex_sdk:0.6.1+'
+    provided 'com.taobao.android:weex_sdk:0.7.0'
     provided 'com.alibaba:fastjson:1.1.45+'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
