@@ -50,26 +50,26 @@ public class WXVContainerDescriptor extends AbstractChainedDescriptor<WXVContain
 
     }
 
-    @Override
-    protected void onGetAttributes(WXVContainer element, AttributeAccumulator attributes) {
-        ViewGroup view = element.getRealView();
-        if (view != null) {
-            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-            if (layoutParams != null) {
-                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
-                    ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) layoutParams;
-                    if (margins.leftMargin != 0
-                            || margins.rightMargin != 0
-                            || margins.topMargin != 0
-                            || margins.bottomMargin != 0) {
-                        attributes.store(W3CStyleConstants.MARGIN_LEFT, String.valueOf(margins.leftMargin));
-                        attributes.store(W3CStyleConstants.MARGIN_TOP, String.valueOf(margins.topMargin));
-                        attributes.store(W3CStyleConstants.MARGIN_RIGHT, String.valueOf(margins.rightMargin));
-                        attributes.store(W3CStyleConstants.MARGIN_BOTTOM, String.valueOf(margins.bottomMargin));
-                    }
-
-                }
-            }
-        }
-    }
+//    @Override
+//    protected void onGetAttributes(WXVContainer element, AttributeAccumulator attributes) {
+//        ViewGroup view = element.getRealView();
+//        if (view != null) {
+//            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//            if (layoutParams != null) {
+//                if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+//                    ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) layoutParams;
+//                    if (margins.leftMargin != 0
+//                            || margins.rightMargin != 0
+//                            || margins.topMargin != 0
+//                            || margins.bottomMargin != 0) {
+//                        attributes.store(W3CStyleConstants.MARGIN_LEFT, String.valueOf(margins.leftMargin));
+//                        attributes.store(W3CStyleConstants.MARGIN_TOP, String.valueOf(margins.topMargin));
+//                        attributes.store(W3CStyleConstants.MARGIN_RIGHT, String.valueOf(margins.rightMargin));
+//                        attributes.store(W3CStyleConstants.MARGIN_BOTTOM, String.valueOf(margins.bottomMargin));
+//                    }
+//
+//                }
+//            }
+//        }
+//    }
 }

@@ -121,34 +121,72 @@ public class WXComponentDescriptor extends AbstractChainedDescriptor<WXComponent
         return map;
     }
 
+    private static boolean filter(String key) {
+        boolean result = false;
+        if (key != null) {
+            String exp = key.toLowerCase();
+            result = !exp.contains("padding") && !exp.contains("margin")
+                    && !exp.contains("width") && !exp.contains("height")
+                    && !exp.contains("left")
+                    && !exp.contains("right")
+                    && !exp.contains("top")
+                    && !exp.contains("bottom");
+        }
+        return result;
+    }
+
     @Override
     protected void onGetStyles(WXComponent element, StyleAccumulator accumulator) {
         HashMap<String, String> map = getStyles(element);
         if (map != null && map.size() > 0) {
             for (HashMap.Entry<String, String> entry : map.entrySet()) {
-                accumulator.store(entry.getKey(), entry.getValue(), false);
+                accumulator.store(W3CStyleConstants.V_PREFIX + entry.getKey(), entry.getValue(), false);
+                if (filter(entry.getKey())) {
+                    accumulator.store(entry.getKey(), entry.getValue(), false);
+                }
             }
         }
+
         View view = element.getRealView();
         if (view != null) {
-            accumulator.store(W3CStyleConstants.LEFT, String.valueOf(WXViewUtils.getWeexPxByReal(view.getLeft())), false);
-            accumulator.store(W3CStyleConstants.TOP, String.valueOf(WXViewUtils.getWeexPxByReal(view.getTop())), false);
-            accumulator.store(W3CStyleConstants.RIGHT, String.valueOf(WXViewUtils.getWeexPxByReal(view.getRight())), false);
-            accumulator.store(W3CStyleConstants.BOTTOM, String.valueOf(WXViewUtils.getWeexPxByReal(view.getBottom())), false);
-            accumulator.store(W3CStyleConstants.WIDTH, String.valueOf(WXViewUtils.getWeexPxByReal(view.getWidth())), false);
-            accumulator.store(W3CStyleConstants.HEIGHT, String.valueOf(WXViewUtils.getWeexPxByReal(view.getHeight())), false);
+            accumulator.store(W3CStyleConstants.LEFT, String.valueOf(view.getLeft()), false);
+            accumulator.store( W3CStyleConstants.TOP, String.valueOf(view.getTop()), false);
+            accumulator.store(W3CStyleConstants.RIGHT, String.valueOf(view.getRight()), false);
+            accumulator.store(W3CStyleConstants.BOTTOM, String.valueOf(view.getBottom()), false);
+            accumulator.store(W3CStyleConstants.WIDTH, String.valueOf(view.getWidth()), false);
+            accumulator.store(W3CStyleConstants.HEIGHT, String.valueOf(view.getHeight()), false);
+
+
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.LEFT,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getLeft())), false);
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.TOP,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getTop())), false);
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.RIGHT,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getRight())), false);
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.BOTTOM,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getBottom())), false);
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.WIDTH,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getWidth())), false);
+//            accumulator.store(W3CStyleConstants.V_PREFIX + W3CStyleConstants.HEIGHT,
+//                    String.valueOf(WXViewUtils.getWeexPxByReal(view.getHeight())), false);
+
             if (view.getPaddingTop() != 0
                     || view.getPaddingBottom() != 0
                     || view.getPaddingLeft() != 0
                     || view.getPaddingRight() != 0) {
-                accumulator.store(W3CStyleConstants.PADDING_LEFT, String.valueOf(
-                        WXViewUtils.getWeexPxByReal(view.getPaddingLeft())), false);
-                accumulator.store(W3CStyleConstants.PADDING_TOP, String.valueOf(
-                        WXViewUtils.getWeexPxByReal(view.getPaddingTop())), false);
-                accumulator.store(W3CStyleConstants.PADDING_RIGHT, String.valueOf(
-                        WXViewUtils.getWeexPxByReal(view.getPaddingRight())), false);
-                accumulator.store(W3CStyleConstants.PADDING_BOTTOM, String.valueOf(
-                        WXViewUtils.getWeexPxByReal(view.getPaddingBottom())), false);
+                accumulator.store(W3CStyleConstants.PADDING_LEFT, String.valueOf(view.getPaddingLeft()), false);
+                accumulator.store(W3CStyleConstants.PADDING_TOP, String.valueOf(view.getPaddingTop()), false);
+                accumulator.store(W3CStyleConstants.PADDING_RIGHT, String.valueOf(view.getPaddingRight()), false);
+                accumulator.store(W3CStyleConstants.PADDING_BOTTOM, String.valueOf(view.getPaddingBottom()), false);
+
+//                accumulator.store(W3CStyleConstants.PADDING_LEFT, String.valueOf(
+//                        WXViewUtils.getWeexPxByReal(view.getPaddingLeft())), false);
+//                accumulator.store(W3CStyleConstants.PADDING_TOP, String.valueOf(
+//                        WXViewUtils.getWeexPxByReal(view.getPaddingTop())), false);
+//                accumulator.store(W3CStyleConstants.PADDING_RIGHT, String.valueOf(
+//                        WXViewUtils.getWeexPxByReal(view.getPaddingRight())), false);
+//                accumulator.store(W3CStyleConstants.PADDING_BOTTOM, String.valueOf(
+//                        WXViewUtils.getWeexPxByReal(view.getPaddingBottom())), false);
             }
 
             accumulator.store(W3CStyleConstants.VISIBILITY, String.valueOf(view.isShown()), false);
@@ -162,12 +200,9 @@ public class WXComponentDescriptor extends AbstractChainedDescriptor<WXComponent
             for (HashMap.Entry<String, String> entry : map.entrySet()) {
                 attributes.store(entry.getKey(), entry.getValue());
             }
-
         }
         View view = element.getRealView();
         if (view != null) {
-//            attributes.store(W3CStyleConstants.WIDTH, String.valueOf(view.getWidth()));
-//            attributes.store(W3CStyleConstants.HEIGHT, String.valueOf(view.getHeight()));
             if (!view.isShown()) {
                 attributes.store(W3CStyleConstants.VISIBILITY, String.valueOf(view.isShown()));
             }

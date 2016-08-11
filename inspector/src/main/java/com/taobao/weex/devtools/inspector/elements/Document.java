@@ -10,15 +10,14 @@
 package com.taobao.weex.devtools.inspector.elements;
 
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 
-import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.inspector.helper.ObjectIdMapper;
 import com.taobao.weex.devtools.inspector.helper.ThreadBoundProxy;
+import com.taobao.weex.devtools.inspector.protocol.module.DOM;
 import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.ArrayDeque;
@@ -199,7 +198,7 @@ public final class Document extends ThreadBoundProxy {
 
   private boolean doesElementMatch(Object element, int x, int y) {
     View view = null;
-    if (WeexInspector.isNativeMode()) {
+    if (DOM.isNativeMode()) {
       if (element instanceof View) {
         view = (View)element;
       }

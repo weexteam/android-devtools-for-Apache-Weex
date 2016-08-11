@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
 import com.taobao.weex.devtools.common.LogUtil;
@@ -37,6 +36,7 @@ import com.taobao.weex.devtools.inspector.screencast.ScreencastDispatcher;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXViewUtils;
 
 import org.json.JSONObject;
 
@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 public class DOM implements ChromeDevtoolsDomain {
+  private static boolean sNativeMode = true;
   private final ObjectMapper mObjectMapper;
   private final Document mDocument;
   private final Map<String, List<Integer>> mSearchResults;
@@ -69,6 +70,14 @@ public class DOM implements ChromeDevtoolsDomain {
     mPeerManager = new ChromePeerManager();
     mPeerManager.setListener(new PeerManagerListener());
     mListener = new DocumentUpdateListener();
+  }
+
+  public static void setNativeMode(boolean isNativeMode) {
+    sNativeMode = isNativeMode;
+  }
+
+  public static boolean isNativeMode() {
+    return sNativeMode;
   }
 
   @ChromeDevtoolsMethod
@@ -345,7 +354,7 @@ public class DOM implements ChromeDevtoolsDomain {
 
 
                 View view = null;
-                if (WeexInspector.isNativeMode()) {
+                if (isNativeMode()) {
                   if (elementForNodeId instanceof View) {
                     view = (View)elementForNodeId;
                   }
@@ -357,8 +366,13 @@ public class DOM implements ChromeDevtoolsDomain {
 
                   if (view != null && view.isShown()) {
                     float scale = ScreencastDispatcher.getsBitmapScale();
-                    model.width = (int)(view.getWidth() * scale + 0.5);
-                    model.height = (int)(view.getHeight() * scale + 0.5);
+                    model.width = view.getWidth();
+                    model.height = view.getHeight();
+                    if (!DOM.isNativeMode()) {
+                      model.width = (int)(model.width * 750 / WXViewUtils.getScreenWidth() + 0.5);
+                      model.height = (int)(model.height * 750 / WXViewUtils.getScreenWidth() + 0.5);
+                    }
+
                     int[] location = new int[2];
                     view.getLocationOnScreen(location);
 

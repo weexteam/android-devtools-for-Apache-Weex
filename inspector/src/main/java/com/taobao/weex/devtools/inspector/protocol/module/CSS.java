@@ -15,6 +15,7 @@ import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.inspector.elements.Document;
 import com.taobao.weex.devtools.inspector.elements.Origin;
 import com.taobao.weex.devtools.inspector.elements.StyleAccumulator;
+import com.taobao.weex.devtools.inspector.elements.W3CStyleConstants;
 import com.taobao.weex.devtools.inspector.helper.ChromePeerManager;
 import com.taobao.weex.devtools.inspector.helper.PeersRegisteredListener;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
@@ -82,10 +83,11 @@ public class CSS implements ChromeDevtoolsDomain {
               public void store(String name, String value, boolean isDefault) {
                 if (!isDefault) {
                   CSSComputedStyleProperty property = new CSSComputedStyleProperty();
-                  property.name = name;
-                  property.value = value;
-
-                  result.computedStyle.add(property);
+                  if (!name.startsWith("v-")) {
+                    property.name = name;
+                    property.value = value;
+                    result.computedStyle.add(property);
+                  }
                 }
               }
             });
@@ -98,34 +100,33 @@ public class CSS implements ChromeDevtoolsDomain {
   private static final HashMap<String, String> sProperties = new HashMap<String, String>();
 
   static {
-    sProperties.put("height", "");
-    sProperties.put("width", "");
+    sProperties.put(W3CStyleConstants.WIDTH, "");
+    sProperties.put(W3CStyleConstants.HEIGHT, "");
 
-    sProperties.put("padding-left","");
-    sProperties.put("padding-top","");
-    sProperties.put("padding-right","");
-    sProperties.put("padding-bottom","");
+    sProperties.put(W3CStyleConstants.PADDING_LEFT, "");
+    sProperties.put(W3CStyleConstants.PADDING_TOP, "");
+    sProperties.put(W3CStyleConstants.PADDING_RIGHT, "");
+    sProperties.put(W3CStyleConstants.PADDING_BOTTOM, "");
 
-    sProperties.put("border-left-width","");
-    sProperties.put("border-top-width","");
-    sProperties.put("border-right-width","");
-    sProperties.put("border-bottom-width","");
+    sProperties.put(W3CStyleConstants.BORDER_LEFT_WIDTH, "");
+    sProperties.put(W3CStyleConstants.BORDER_TOP_WIDTH, "");
+    sProperties.put(W3CStyleConstants.BORDER_RIGHT_WIDTH, "");
+    sProperties.put(W3CStyleConstants.BORDER_BOTTOM_WIDTH, "");
 
-    sProperties.put("margin-left","");
-    sProperties.put("margin-top","");
-    sProperties.put("margin-right","");
-    sProperties.put("margin-bottom","");
-    
-    sProperties.put("left","");
-    sProperties.put("top","");
-    sProperties.put("right","");
-    sProperties.put("bottom","");
+    sProperties.put(W3CStyleConstants.MARGIN_LEFT, "");
+    sProperties.put(W3CStyleConstants.MARGIN_TOP, "");
+    sProperties.put(W3CStyleConstants.MARGIN_RIGHT, "");
+    sProperties.put(W3CStyleConstants.MARGIN_BOTTOM, "");
+
+    sProperties.put(W3CStyleConstants.LEFT, "");
+    sProperties.put(W3CStyleConstants.TOP, "");
+    sProperties.put(W3CStyleConstants.RIGHT, "");
+    sProperties.put(W3CStyleConstants.BOTTOM, "");
   }
 
   private void mockStyleProperty(List<CSSComputedStyleProperty> computedStyle, HashMap<String, String> properties) {
     for (Map.Entry<String, String> entry : properties.entrySet()) {
       addStyleProperty(computedStyle, entry.getKey(), entry.getValue());
-      System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
     }
   }
 
@@ -144,31 +145,14 @@ public class CSS implements ChromeDevtoolsDomain {
 
     final GetMatchedStylesForNodeResult result = new GetMatchedStylesForNodeResult();
 
-    final RuleMatch match = new RuleMatch();
-    initMatch(match, "local");
-    final RuleMatch match1 = new RuleMatch();
-    initMatch(match1, "virtual");
+    final RuleMatch localMatch = new RuleMatch();
+    initMatch(localMatch, "local");
+    final RuleMatch virtualMatch = new RuleMatch();
+    initMatch(virtualMatch, "virtual");
     List<RuleMatch> matches = new ArrayList<>();
-    matches.add(match);
-    matches.add(match1);
+    matches.add(localMatch);
+    matches.add(virtualMatch);
     result.matchedCSSRules = matches;// ListUtil.newImmutableList(match);
-
-    Selector selector = new Selector();
-    selector.value = "<this_element>";
-
-    CSSRule rule = new CSSRule();
-
-    rule.origin = Origin.REGULAR;
-    rule.selectorList = new SelectorList();
-
-    rule.selectorList.selectors = ListUtil.newImmutableList(selector);
-
-    rule.style = new CSSStyle();
-    rule.style.cssProperties = new ArrayList<>();
-
-    match.rule = rule;
-
-    rule.style.shorthandEntries = Collections.emptyList();
 
     mDocument.postAndWait(new Runnable() {
       @Override
@@ -188,14 +172,16 @@ public class CSS implements ChromeDevtoolsDomain {
               public void store(String name, String value, boolean isDefault) {
                 if (!isDefault) {
                   CSSProperty property = new CSSProperty();
-                  property.name = name;
-                  property.value = value;
-
-                  match.rule.style.cssProperties.add(property);
-                  CSSProperty property1 = new CSSProperty();
-                  property1.name = "*-" + name;
-                  property1.value = value;
-                  match1.rule.style.cssProperties.add(property1);
+                  if (!name.startsWith(W3CStyleConstants.V_PREFIX)) {
+                    property.name = name;
+                    property.value = value;
+                    localMatch.rule.style.cssProperties.add(property);
+                  } else {
+                    CSSProperty virtualProperty = new CSSProperty();
+                    virtualProperty.name = name;
+                    virtualProperty.value = value;
+                    virtualMatch.rule.style.cssProperties.add(virtualProperty);
+                  }
                 }
               }
             });

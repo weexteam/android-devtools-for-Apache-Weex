@@ -24,4 +24,5 @@ public class W3CStyleConstants {
     public static final String BORDER_BOTTOM_WIDTH = "border-bottom-width";
 
     public static final String VISIBILITY = "visibility";
+    public static final String V_PREFIX = "v-";
 }

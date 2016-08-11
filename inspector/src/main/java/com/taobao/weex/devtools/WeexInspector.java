@@ -80,15 +80,6 @@ import javax.annotation.Nullable;
 public class WeexInspector {
   private WeexInspector() {
   }
-  private static boolean sNativeMode = false;
-
-  private static void setNativeMode(boolean isNativeMode) {
-    sNativeMode = isNativeMode;
-  }
-
-  public static boolean isNativeMode() {
-    return sNativeMode;
-  }
 
   /**
    * Construct a simple initializer helper which allows you to customize stetho behaviour

@@ -13,11 +13,11 @@ import android.app.Application;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.Util;
 import com.taobao.weex.devtools.inspector.elements.AbstractChainedDescriptor;
 import com.taobao.weex.devtools.inspector.elements.NodeType;
+import com.taobao.weex.devtools.inspector.protocol.module.DOM;
 import com.taobao.weex.ui.WXRenderManager;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public final class AndroidDocumentRoot extends AbstractChainedDescriptor<Android
 
   @Override
   protected void onGetChildren(AndroidDocumentRoot element, Accumulator<Object> children) {
-    if (WeexInspector.isNativeMode()) {
+    if (DOM.isNativeMode()) {
       children.store(mApplication);
     } else {
       WXRenderManager renderManager = WXSDKManager.getInstance().getWXRenderManager();
