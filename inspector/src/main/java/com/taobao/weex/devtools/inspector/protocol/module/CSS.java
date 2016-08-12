@@ -144,14 +144,16 @@ public class CSS implements ChromeDevtoolsDomain {
         GetMatchedStylesForNodeRequest.class);
 
     final GetMatchedStylesForNodeResult result = new GetMatchedStylesForNodeResult();
-
+    List<RuleMatch> matches = new ArrayList<>();
     final RuleMatch localMatch = new RuleMatch();
     initMatch(localMatch, "local");
-    final RuleMatch virtualMatch = new RuleMatch();
-    initMatch(virtualMatch, "virtual");
-    List<RuleMatch> matches = new ArrayList<>();
     matches.add(localMatch);
-    matches.add(virtualMatch);
+    final RuleMatch virtualMatch = new RuleMatch();
+    if (!DOM.isNativeMode()) {
+      initMatch(virtualMatch, "virtual");
+      matches.add(virtualMatch);
+    }
+
     result.matchedCSSRules = matches;// ListUtil.newImmutableList(match);
 
     mDocument.postAndWait(new Runnable() {
@@ -177,10 +179,12 @@ public class CSS implements ChromeDevtoolsDomain {
                     property.value = value;
                     localMatch.rule.style.cssProperties.add(property);
                   } else {
-                    CSSProperty virtualProperty = new CSSProperty();
-                    virtualProperty.name = name;
-                    virtualProperty.value = value;
-                    virtualMatch.rule.style.cssProperties.add(virtualProperty);
+                    if (!DOM.isNativeMode()) {
+                      CSSProperty virtualProperty = new CSSProperty();
+                      virtualProperty.name = name;
+                      virtualProperty.value = value;
+                      virtualMatch.rule.style.cssProperties.add(virtualProperty);
+                    }
                   }
                 }
               }

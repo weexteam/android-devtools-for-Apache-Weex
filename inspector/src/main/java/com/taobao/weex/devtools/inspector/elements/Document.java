@@ -184,8 +184,7 @@ public final class Document extends ThreadBoundProxy {
 
   private void findMatches(Object element, int x, int y, Accumulator<Integer> matchedIds) {
     final ElementInfo info = mShadowDocument.getElementInfo(element);
-
-    for (int i = 0, size = info.children.size(); i < size; i++) {
+    for (int size = info.children.size(), i = size - 1; i >= 0; i--) {
       final Object childElement = info.children.get(i);
 
       if (doesElementMatch(childElement, x, y)) {
