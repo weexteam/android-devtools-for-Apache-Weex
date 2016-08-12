@@ -1,6 +1,6 @@
 apply from: 'http://mirrors.taobao.net/mirror/gradle/android-parent.gradle'
 group = 'com.taobao.android'
-version = '0.0.1.2-SNAPSHOT'
+version = '0.0.2.4-SNAPSHOT'
 
 description = """weex_inspector"""
 
@@ -39,7 +39,7 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -76,7 +76,7 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
 //    compile project(':weex_sdk')
-    provided 'com.taobao.android:weex_sdk:0.6.1.8'
+    provided 'com.taobao.android:weex_sdk:0.7.0'
     provided 'com.alibaba:fastjson:1.1.45'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
