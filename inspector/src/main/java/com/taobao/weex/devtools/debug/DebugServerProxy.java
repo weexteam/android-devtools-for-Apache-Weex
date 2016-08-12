@@ -94,7 +94,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
             private String getShakeHandsMessage() {
                 Map<String, Object> func = new HashMap<>();
-                func.put("name", WXEnvironment.getApplication().getPackageName());
+                func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
                 func.put("model", WXEnvironment.SYS_MODEL);
                 func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
                 func.put("platform", WXEnvironment.OS);
