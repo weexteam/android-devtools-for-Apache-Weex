@@ -2,7 +2,9 @@ package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
 import android.content.Intent;
-import android.telephony.TelephonyManager;
+import android.os.Build;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,6 +40,9 @@ import java.util.Map;
 
 import okio.BufferedSource;
 
+import static android.os.Build.VERSION;
+import static android.os.Build.VERSION_CODES;
+
 public class DebugServerProxy implements IWXDebugProxy {
     private static final String TAG = "DebugServerProxy";
     private DebugSocketClient mWebSocketClient;
@@ -68,6 +73,18 @@ public class DebugServerProxy implements IWXDebugProxy {
         }
     }
 
+    // here just used to flag a debugged device, result same with adb device is fine
+    private String getDeviceId(Context context) {
+        String deviceId = null;
+        if (VERSION.SDK_INT > VERSION_CODES.FROYO) {
+            deviceId = Build.SERIAL;
+        }
+        if (TextUtils.isEmpty(deviceId)) {
+            deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
+        return deviceId;
+    }
+
     public void start() {
         WeexInspector.initializeWithDefaults(mContext);
         mBridge = DebugBridge.getInstance();
@@ -81,8 +98,7 @@ public class DebugServerProxy implements IWXDebugProxy {
                 func.put("model", WXEnvironment.SYS_MODEL);
                 func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
                 func.put("platform", WXEnvironment.OS);
-                func.put("deviceId", ((TelephonyManager) WXEnvironment.getApplication()
-                        .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId());
+                func.put("deviceId", getDeviceId(mContext));
 
                 Map<String, Object> map = new HashMap<>();
                 map.put("id", "0");

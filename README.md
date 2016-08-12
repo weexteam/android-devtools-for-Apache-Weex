@@ -25,18 +25,18 @@ Of course you can reuse the code of playground to build your own app, that is th
 - gradle dependency on inspector. 
 There are two choices to set the dependency, the Choice A is recommanded if you have no change to weex_sdk or inspector, while if you use your own custom weex_sdk or inspector Choice B is suitable.
  
-  * *CHOICE A : aar dependency from jcenter*.
+  * *A : aar dependency from jcenter*.
   ````
   dependencies {
           compile 'com.taobao.android:weex_inspector:x.x.x.x'
   }
   ````
-  * *CHOICE B : source code dependency.*
+  * *B : source code dependency.*
 
   you need to copy the dir of inspector to the same dir of your app and add `include ":inspector"`in your project's `settings.gradle` file just like playground have done, then add dependency in your app's `build.gralde`.
   ````
   dependencies {
-          compile project(:inspector)
+          compile project(':inspector')
   }
   ````
 
@@ -71,7 +71,9 @@ client.networkInterceptors().add(new OkHttpInterceptor());
   The network inspection only support OKHttpClient right now!!! If you want to use the network inspection to catch your bundle request, you must change your bundle server ip to the real server ip.
  
 - ship it
-  1. you must launch your bundle server firstly. in your weex dir, run command "./start";
-  2. then launch your remote debug server. run command `weex-devtool`, chrome will open a web page show a simply guidance;
-  3. if your app launched, you will see a device list in the chrome web page opened by last step, each device item have two button, `open debugger` and `open inspector`;
-  4. once you click the button "open inspector" chrome will open a page show the inspector view, on the other side, click the button `open debugger` chrome will open a new page to show the debug view;
+  1. You must launch your bundle server firstly. In your weex dir, run command "./start";
+  2. Launch your remote debug server. Run command `weex-devtool`, chrome will open a web page show a simply guidance and QR code;
+  3. Launch your app and make sure debug mode was enabled. You will see a device list in the chrome web page opened by last step, each device item have two button, `Debugger` and `Inspector`;There are two way to enable debug mode:
+    * scaning the QR code and handle the content just like the playground have done.
+    * init it in the XXXApplication by calling `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")`, if you call `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")` after weex sdk inited, you need to call `WXSDKEngine.reload()` to refresh the runtime.
+  4. Once you click the button `Inspector` chrome will open a page show the inspector view, on the other side, click the button `Debugger` chrome will open a new page to show the debug view;
