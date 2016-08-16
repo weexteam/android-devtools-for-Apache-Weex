@@ -9,9 +9,12 @@
 
 package com.taobao.weex.devtools.inspector.elements;
 
+import android.app.Activity;
+import android.app.Application;
 import android.os.SystemClock;
 import android.view.View;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
 import com.taobao.weex.devtools.common.LogUtil;
@@ -179,19 +182,51 @@ public final class Document extends ThreadBoundProxy {
     verifyThreadAccess();
 
     final Object rootElement = mDocumentProvider.getRootElement();
-    findMatches(rootElement, x, y, matchedIds);
+    final ElementInfo info = mShadowDocument.getElementInfo(rootElement);
+    if (info != null) {
+      for (int size = info.children.size(), i = size - 1; i >= 0; i--) {
+        final Object childElement = info.children.get(i);
+        Boolean found = false;
+        if (DOM.isNativeMode()) {
+          if (childElement instanceof Application) {
+            for (int s = info.children.size(), j = s - 1; j >= 0; j--) {
+              final ElementInfo childInfo = mShadowDocument.getElementInfo(childElement);
+              if (childInfo != null) {
+                final Object child = childInfo.children.get(j);
+                if (child instanceof Activity) {
+                  findMatches(child, x, y, matchedIds, found);
+                  if (found) {
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          if (childElement instanceof WXSDKInstance) {
+            findMatches(childElement, x, y, matchedIds, found);
+            if(found) {
+              break;
+            }
+          }
+        }
+      }
+    }
+
+
   }
 
-  private void findMatches(Object element, int x, int y, Accumulator<Integer> matchedIds) {
+  private void findMatches(Object element, int x, int y, Accumulator<Integer> matchedIds, Boolean found) {
     final ElementInfo info = mShadowDocument.getElementInfo(element);
     for (int size = info.children.size(), i = size - 1; i >= 0; i--) {
       final Object childElement = info.children.get(i);
 
       if (doesElementMatch(childElement, x, y)) {
         matchedIds.store(mObjectIdMapper.getIdForObject(childElement));
+        found = true;
       }
 
-      findMatches(childElement, x, y, matchedIds);
+      findMatches(childElement, x, y, matchedIds, found);
     }
   }
 
@@ -207,22 +242,17 @@ public final class Document extends ThreadBoundProxy {
       }
     }
 
-    return view != null && view.isShown() && isPointInsideView(x, y, view);
+    return view != null && isPointInsideView(x, y, view) && view.isShown();
   }
 
-  public static boolean isPointInsideView(float x, float y, View view){
+  public static boolean isPointInsideView(int x, int y, View view) {
     int location[] = new int[2];
     view.getLocationOnScreen(location);
     int viewX = location[0];
     int viewY = location[1];
 
     //point is inside view bounds
-    if(( x > viewX && x < (viewX + view.getWidth())) &&
-            ( y > viewY && y < (viewY + view.getHeight()))){
-      return true;
-    } else {
-      return false;
-    }
+    return x > viewX && y > viewY && x < (viewX + view.getWidth()) && y < (viewY + view.getHeight());
   }
 
   public void findMatchingElements(String query, Accumulator<Integer> matchedIds) {

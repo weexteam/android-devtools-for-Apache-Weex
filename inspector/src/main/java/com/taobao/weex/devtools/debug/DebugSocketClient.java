@@ -69,7 +69,7 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
         Buffer messageBuffer = new Buffer();
         messageBuffer.writeUtf8(message);
         try {
-            Log.v(TAG, "sendMessage " + message);
+            // Log.v(TAG, "sendMessage " + message);
             mWebSocket.sendMessage(WebSocket.PayloadType.TEXT, messageBuffer);
         } catch (IOException e) {
             Log.e(TAG, "sendMessage IOException " + e.toString());
