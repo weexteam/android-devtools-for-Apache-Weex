@@ -13,9 +13,11 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
+import com.taobao.weex.utils.LogLevel;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -23,6 +25,17 @@ import java.util.List;
  */
 public class WxDebug implements ChromeDevtoolsDomain {
     private static final String TAG = "WxDebug";
+    private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
+
+    static {
+        sLevelMap.put("all", LogLevel.ALL);
+        sLevelMap.put("verbose", LogLevel.VERBOSE);
+        sLevelMap.put("info", LogLevel.INFO);
+        sLevelMap.put("debug", LogLevel.DEBUG);
+        sLevelMap.put("warn", LogLevel.WARN);
+        sLevelMap.put("error", LogLevel.ERROR);
+    }
+
     private final ObjectMapper mObjectMapper = new ObjectMapper();
     public WxDebug() {
 
@@ -30,7 +43,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
     @ChromeDevtoolsMethod
     public void enable(JsonRpcPeer peer, JSONObject params) {
-        Application context = WXEnvironment.getApplication();
+        Context context = WXEnvironment.getApplication();
         if (context != null) {
             WXSDKEngine.reload(context, true);
             context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
@@ -39,10 +52,20 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
     @ChromeDevtoolsMethod
     public void disable(JsonRpcPeer peer, JSONObject params) {
-        Application context = WXEnvironment.getApplication();
+        Context context = WXEnvironment.getApplication();
         if (context != null) {
             WXSDKEngine.reload(context, false);
             context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+        }
+    }
+
+    @ChromeDevtoolsMethod
+    public void setLogLevel(JsonRpcPeer peer, JSONObject params) {
+        if (params != null) {
+            LogLevel logLevel = sLevelMap.get(params.optString("logLevel"));
+            if (logLevel != null) {
+                WXEnvironment.sLogLevel = logLevel;
+            }
         }
     }
 
@@ -104,6 +127,4 @@ public class WxDebug implements ChromeDevtoolsDomain {
         @JsonProperty(required = true)
         public List<String> args;
     }
-
-
 }
