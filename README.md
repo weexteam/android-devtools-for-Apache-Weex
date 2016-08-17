@@ -31,7 +31,7 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
           compile 'com.taobao.android:weex_inspector:0.0.2.3'
   }
   ````
-See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases).All the release version will publish to the jcenter [jcenter repo](https://bintray.com/bintray/jcenter?filterByPkgName=weex_inspector).
+See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases). All the release version will publish to the [jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
   * *B - source code dependency.*
 
