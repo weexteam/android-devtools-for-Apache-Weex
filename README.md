@@ -8,10 +8,10 @@ Weex devtools is a custom devtools for weex that implements [Chrome Debugging Pr
 - **Debugger**
  Debugger can be used to debug your bundle js source, you can set `Breakpoint` \ watch `CallStack`.
 
-## How to install and launch devtools server
+## Install and launch devtools server
 Open your terminal then type `npm install -g weex-toolkit` and run.Launch it just type and run the command `weex debug`, then a Chrome web page will be opened.
 
-## How to use on an android device or emulator
+## Use on an android device or emulator
 
 ### Taste of first debug with playground
 If you are a green hand to the debug of weex, we recommend you to try your first debug with `playground`, what you need to do is just launch the playground and scan the QR code shown in the debug page which wound opened if the `devtools server` have been launched. after you scan the QR code, the web page will list your connected devices.
