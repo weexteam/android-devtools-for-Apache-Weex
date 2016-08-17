@@ -84,27 +84,35 @@ public class FilesDumperPlugin implements DumperPlugin {
 
   private static void printDirectoryText(File dir, String path, PrintStream writer) {
     File[] listFiles = dir.listFiles();
-    for (int i = 0; i < listFiles.length; ++i) {
-      File file = listFiles[i];
-      if (file.isDirectory()) {
-        printDirectoryText(file, path + file.getName() + "/", writer);
-      } else {
-        writer.println(path + file.getName());
+    if (listFiles != null && listFiles.length > 0) {
+      for (int i = 0; i < listFiles.length; ++i) {
+        File file = listFiles[i];
+        if (file != null) {
+          if (file.isDirectory()) {
+            printDirectoryText(file, path + file.getName() + "/", writer);
+          } else {
+            writer.println(path + file.getName());
+          }
+        }
       }
     }
   }
 
   private static void printDirectoryVisual(File dir, int depth, PrintStream writer) {
     File[] listFiles = dir.listFiles();
-    for (int i = 0; i < listFiles.length; ++i) {
-      printHeaderVisual(depth, writer);
-      File file = listFiles[i];
-      writer.print("+---");
-      writer.print(file.getName());
-      writer.println();
+    if (listFiles != null && listFiles.length > 0) {
+      for (int i = 0; i < listFiles.length; ++i) {
+        printHeaderVisual(depth, writer);
+        File file = listFiles[i];
+        if (file != null) {
+          writer.print("+---");
+          writer.print(file.getName());
+          writer.println();
 
-      if (file.isDirectory()) {
-        printDirectoryVisual(file, depth + 1, writer);
+          if (file.isDirectory()) {
+            printDirectoryVisual(file, depth + 1, writer);
+          }
+        }
       }
     }
   }
@@ -137,7 +145,10 @@ public class FilesDumperPlugin implements DumperPlugin {
         if (selectedFiles.size() > 0) {
           addFiles(output, buf, selectedFiles.toArray(new File[selectedFiles.size()]));
         } else {
-          addFiles(output, buf, getBaseDir(mContext).listFiles());
+          File file = getBaseDir(mContext);
+          if (file != null) {
+            addFiles(output, buf, getBaseDir(mContext).listFiles());
+          }
         }
         success = true;
       } finally {

@@ -144,7 +144,7 @@ public class ResponseBodyFileManager {
     }
   }
 
-  private class AsyncPrettyPrintingCallable implements Callable<String> {
+  private static class AsyncPrettyPrintingCallable implements Callable<String> {
     private final InputStream mInputStream;
     private final AsyncPrettyPrinter mAsyncPrettyPrinter;
 

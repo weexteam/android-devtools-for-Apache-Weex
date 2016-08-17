@@ -54,6 +54,7 @@ public class DebugServerProxy implements IWXDebugProxy {
     private WXBridgeManager mJsManager;
     private Context mContext;
     private DebugBridge mBridge;
+    private final Object mLock = new Object();
 
     public DebugServerProxy(Context context, WXBridgeManager jsManager) {
         mContext = context;
@@ -86,66 +87,74 @@ public class DebugServerProxy implements IWXDebugProxy {
     }
 
     public void start() {
-        WeexInspector.initializeWithDefaults(mContext);
-        mBridge = DebugBridge.getInstance();
-        mBridge.setSession(mWebSocketClient);
-        mBridge.setBridgeManager(mJsManager);
-        mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
+        synchronized (mLock) {
+            WeexInspector.initializeWithDefaults(mContext);
+            mBridge = DebugBridge.getInstance();
+            mBridge.setSession(mWebSocketClient);
+            mBridge.setBridgeManager(mJsManager);
+            mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
 
-            private String getShakeHandsMessage() {
-                Map<String, Object> func = new HashMap<>();
-                func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
-                func.put("model", WXEnvironment.SYS_MODEL);
-                func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
-                func.put("platform", WXEnvironment.OS);
-                func.put("deviceId", getDeviceId(mContext));
+                private String getShakeHandsMessage() {
+                    Map<String, Object> func = new HashMap<>();
+                    func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
+                    func.put("model", WXEnvironment.SYS_MODEL);
+                    func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+                    func.put("platform", WXEnvironment.OS);
+                    func.put("deviceId", getDeviceId(mContext));
 
-                Map<String, Object> map = new HashMap<>();
-                map.put("id", "0");
-                map.put("method", "WxDebug.registerDevice");
-                map.put("params", func);
-                return JSON.toJSONString(map);
-            }
-
-            @Override
-            public void onSuccess(String response) {
-                mWebSocketClient.sendText(getShakeHandsMessage());
-                mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECTED));
-                mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
-                mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
-                WXSDKManager.getInstance().postOnUiThread(
-                        new Runnable() {
-
-                            @Override
-                            public void run() {
-                                Toast.makeText(
-                                        WXEnvironment.sApplication,
-                                        "debug server connected", Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        }, 0);
-                WXLogUtils.d("connect debugger server success!");
-                if (mJsManager != null) {
-                    mJsManager.initScriptsFramework(null);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", "0");
+                    map.put("method", "WxDebug.registerDevice");
+                    map.put("params", func);
+                    return JSON.toJSONString(map);
                 }
-            }
 
-            @Override
-            public void onFailure(Throwable cause) {
-                mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECT_FAILED));
-                WXLogUtils.d("connect debugger server failure!! " + cause.toString());
-            }
+                @Override
+                public void onSuccess(String response) {
+                    synchronized (mLock) {
+                        if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
+                            mWebSocketClient.sendText(getShakeHandsMessage());
+                            mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECTED));
+                            mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
+                            mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
+                            WXSDKManager.getInstance().postOnUiThread(
+                                    new Runnable() {
 
-        });
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(
+                                                    WXEnvironment.sApplication,
+                                                    "debug server connected", Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
+                                    }, 0);
+                            WXLogUtils.d("connect debugger server success!");
+                            if (mJsManager != null) {
+                                mJsManager.initScriptsFramework(null);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable cause) {
+                    mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECT_FAILED));
+                    WXLogUtils.d("connect debugger server failure!! " + cause.toString());
+                }
+
+            });
+        }
     }
 
     @Override
     public void stop() {
-        if (mWebSocketClient != null) {
-            mWebSocketClient.closeQuietly();
-            mWebSocketClient = null;
+        synchronized (mLock) {
+            if (mWebSocketClient != null) {
+                mWebSocketClient.closeQuietly();
+                mWebSocketClient = null;
+            }
+            mBridge = null;
         }
-        mBridge = null;
     }
 
     @Override
