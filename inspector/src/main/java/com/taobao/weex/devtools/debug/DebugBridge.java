@@ -61,7 +61,7 @@ public class DebugBridge implements IWXBridge {
             synchronized (mLock) {
                 try {
                     Log.v(TAG, "waiting for session now");
-                    mLock.wait();
+                    mLock.wait(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

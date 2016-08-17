@@ -57,6 +57,7 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
                 mWebSocket.close(1000, "End of session");
             } catch (IOException e) {
                 // swallow, no need to handle it here
+                Log.e(TAG, "closeQuietly IOException " + e.toString());
             }
             mWebSocket = null;
         }
