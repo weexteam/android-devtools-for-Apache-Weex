@@ -22,16 +22,18 @@ If you are a green hand to the debug of weex, we recommend you to try your first
 ### Enable devtools in your own app
 Of course you can reuse the code of playground to build your own app, that is the simplest way to let your app's js code debuggable. On the other hand QR code is not necessary, if your review the source code you can draw a conclusion that QR CODE is just a way to set `devtools server` address. following those steps you can do the same thing.
 
-- gradle dependency on inspector. 
+#### Gradle dependency on inspector. 
 There are two choices to set the dependency, the Choice A is recommanded if you have no change to weex_sdk or inspector, while if you use your own custom weex_sdk or inspector Choice B is suitable.
  
-  * *A : aar dependency from jcenter*.
+  * *A - aar dependency from jcenter*.
   ````
   dependencies {
-          compile 'com.taobao.android:weex_inspector:x.x.x.x'
+          compile 'com.taobao.android:weex_inspector:0.0.2.3'
   }
   ````
-  * *B : source code dependency.*
+See the release version list [HERE](https://github.com/weexteam/weex_devtools_android/releases).All the release version will publish to the jcenter.
+
+  * *B - source code dependency.*
 
   you need to copy the dir of inspector to the same dir of your app and add `include ":inspector"`in your project's `settings.gradle` file just like playground have done, then add dependency in your app's `build.gralde`.
   ````
@@ -40,7 +42,7 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
   }
   ````
 
-- initialize in your XXXApplication file.
+#### Initialize in your XXXApplication file.
 ````
     public class MyApplication extends Application {
       public void onCreate() {
@@ -54,28 +56,31 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
 }
 ````
 
-- ship it
+#### Ship It!
   1. You must launch your bundle server firstly. In your weex dir, run command "./start";
-  2. Launch your remote debug server. Run command `weex-devtool`, chrome will open a web page show a simply guidance and QR code;
+  2. Launch your remote debug server. Run command `weex debug`, chrome will open a web page show a simply guidance and QR code;
   3. Launch your app and make sure debug mode was enabled. You will see a device list in the chrome web page opened by last step, each device item have two button, `Debugger` and `Inspector`;There are two way to enable debug mode:
     * scaning the QR code and handle the content just like the playground have done.
     * init it in the XXXApplication by calling `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")`, if you call `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")` after weex sdk inited, you need to call `WXSDKEngine.reload()` to refresh the runtime.
   4. Once you click the button `Inspector` chrome will open a page show the inspector view, on the other side, click the button `Debugger` chrome will open a new page to show the debug view;
 
-  
-- [**OPTION**] *set your remote bundle server ip.*
+---
+
+#### OPTIONS
+
+##### [**OPTION**] *set your remote bundle server ip.*
 
     For example, in the playground it is in the `IndexActivity.java`, you need to change the value of `DEFAULT_IP` in IndexActivity.java from `"your_current_IP"` to a server ip like `"30.30.30.150"`:
 ````
     private static final String DEFAULT_IP = "30.30.30.150"; // "your_current_IP";
 ````
 
-- [**OPTION**] *enable network inspection.*
+##### [**OPTION**] *enable network inspection.*
 ````
 OkHttpClient client = new OkHttpClient();
 client.networkInterceptors().add(new OkHttpInterceptor());
 ````
 
-- notice
+###### Notice
   The network inspection only support OKHttpClient right now!!! If you want to use the network inspection to catch your bundle request, you must change your bundle server ip to the real server ip.
 
