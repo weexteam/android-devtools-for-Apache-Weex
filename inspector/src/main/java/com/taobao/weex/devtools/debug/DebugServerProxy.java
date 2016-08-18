@@ -101,6 +101,10 @@ public class DebugServerProxy implements IWXDebugProxy {
                     func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
                     func.put("platform", WXEnvironment.OS);
                     func.put("deviceId", getDeviceId(mContext));
+                    if (WXEnvironment.sLogLevel != null) {
+                        func.put("logLevel", WXEnvironment.sLogLevel.getName());
+                    }
+                    func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
 
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", "0");
