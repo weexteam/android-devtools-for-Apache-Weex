@@ -12,7 +12,7 @@ import com.taobao.weex.devtools.inspector.elements.W3CStyleConstants;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
-import com.taobao.weex.ui.component.WXBorder;
+// import com.taobao.weex.ui.component.WXBorder;
 import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXEmbed;
@@ -47,7 +47,7 @@ public class WXComponentDescriptor extends AbstractChainedDescriptor<WXComponent
 
     static {
         sClassName.put(WXComponent.class, "component");
-        sClassName.put(WXBorder.class, "border");
+        // sClassName.put(WXBorder.class, "border");
         sClassName.put(WXText.class, WXBasicComponentType.TEXT);
         sClassName.put(WXVContainer.class, WXBasicComponentType.CONTAINER);
         sClassName.put(WXDiv.class, WXBasicComponentType.DIV);
