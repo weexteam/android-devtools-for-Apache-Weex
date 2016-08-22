@@ -61,7 +61,7 @@ public class DebugBridge implements IWXBridge {
             synchronized (mLock) {
                 try {
                     Log.v(TAG, "waiting for session now");
-                    mLock.wait();
+                    mLock.wait(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -146,9 +146,9 @@ public class DebugBridge implements IWXBridge {
     @Override
     public int callNative(String instanceId, String tasks, String callback) {
         if (mJsManager != null) {
-            return  mJsManager.callNative(instanceId, tasks, callback);
-        }else{
-            return WXBridgeManager.INSTANCE_RENDERING_ERROR;
+            return mJsManager.callNative(instanceId, tasks, callback);
+        } else {
+            return 0;
         }
     }
 

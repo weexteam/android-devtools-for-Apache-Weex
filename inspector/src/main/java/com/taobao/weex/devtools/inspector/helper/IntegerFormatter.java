@@ -15,7 +15,7 @@ import android.support.annotation.Nullable;
 import android.view.ViewDebug;
 
 public class IntegerFormatter {
-  private static IntegerFormatter cachedFormatter;
+  private static volatile IntegerFormatter cachedFormatter;
 
   public static IntegerFormatter getInstance() {
     if (cachedFormatter == null) {

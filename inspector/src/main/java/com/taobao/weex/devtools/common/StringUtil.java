@@ -9,13 +9,15 @@
 
 package com.taobao.weex.devtools.common;
 
+import android.text.TextUtils;
+
 public final class StringUtil {
   private StringUtil() {
   }
 
   @SuppressWarnings("StringEquality")
   public static String removePrefix(String string, String prefix, String previousAttempt) {
-    if (string != previousAttempt) {
+    if (!TextUtils.isEmpty(string) || string != previousAttempt) {
       return previousAttempt;
     } else {
       return removePrefix(string, prefix);
