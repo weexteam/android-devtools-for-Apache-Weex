@@ -33,6 +33,7 @@ import com.taobao.weex.utils.WXSoInstallMgrSdk;
 public class IndexActivity extends AbstractWeexActivity {
 
   private static final int CAMERA_PERMISSION_REQUEST_CODE = 0x1;
+  private static final int TELEPHONY_PERMISSION_REQUEST_CODE = 0x2;
   private static final String TAG = "IndexActivity";
   private static final String DEFAULT_IP = "your_current_IP";
   private static String CURRENT_IP= DEFAULT_IP; // your_current_IP
@@ -112,11 +113,25 @@ public class IndexActivity extends AbstractWeexActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         return true;
       }
+
     } else if (id == R.id.action_scan) {
       //redirect to SimulatorDebugActivity if playground is running on simulator
-      if (OtherUtil.isEmulator(this)) {
-        startActivity(new Intent(this, SimulatorDebugActivity.class));
-        return true;
+      if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+              != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+          Toast.makeText(this, "please give me the READ_PHONE_STATE permission", Toast.LENGTH_SHORT).show();
+
+        } else {
+          ActivityCompat.requestPermissions(this,
+                  new String[]{Manifest.permission.READ_PHONE_STATE},
+                  TELEPHONY_PERMISSION_REQUEST_CODE);
+        }
+
+      } else {
+        if (OtherUtil.isEmulator(this)) {
+          startActivity(new Intent(this, SimulatorDebugActivity.class));
+          return true;
+        }
       }
 
       if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -136,11 +151,27 @@ public class IndexActivity extends AbstractWeexActivity {
   @Override
   public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode == CAMERA_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-      startActivity(new Intent(this, CaptureActivity.class));
-    } else {
-      Toast.makeText(this, "request camara permission fail!", Toast.LENGTH_SHORT).show();
+    switch (requestCode) {
+      case CAMERA_PERMISSION_REQUEST_CODE:
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          startActivity(new Intent(this, CaptureActivity.class));
+
+        } else {
+          Toast.makeText(this, "request CAMERA permission fail!", Toast.LENGTH_SHORT).show();
+        }
+        break;
+
+      case TELEPHONY_PERMISSION_REQUEST_CODE:
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          if (OtherUtil.isEmulator(this)) {
+            startActivity(new Intent(this, SimulatorDebugActivity.class));
+          }
+
+        } else {
+          Toast.makeText(this, "request READ_PHONE_STATE permission fail!", Toast.LENGTH_SHORT).show();
+        }
     }
+
   }
 
   @Override

@@ -55,12 +55,12 @@ public class SimulatorDebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!mDebugHostEditText.getText().toString().
-                        matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")){
+                        matches(getResources().getString(R.string.ip_reg))){
                     Toast.makeText(SimulatorDebugActivity.this, "请输入有效服务器Ip", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(!mDebugPortEditText.getText().toString().matches("\\d+")){
+                if(!mDebugPortEditText.getText().toString().matches(getResources().getString(R.string.port_reg))){
                     Toast.makeText(SimulatorDebugActivity.this, "请输入有效服务器端口", Toast.LENGTH_SHORT).show();
                     return;
                 }
