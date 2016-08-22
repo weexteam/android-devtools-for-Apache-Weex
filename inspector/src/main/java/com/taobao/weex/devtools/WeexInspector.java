@@ -15,16 +15,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.taobao.weex.devtools.common.LogUtil;
-import com.taobao.weex.devtools.common.Util;
-import com.taobao.weex.devtools.dumpapp.DumpappHttpSocketLikeHandler;
-import com.taobao.weex.devtools.dumpapp.DumpappSocketLikeHandler;
-import com.taobao.weex.devtools.dumpapp.Dumper;
-import com.taobao.weex.devtools.dumpapp.DumperPlugin;
-import com.taobao.weex.devtools.dumpapp.plugins.CrashDumperPlugin;
-import com.taobao.weex.devtools.dumpapp.plugins.FilesDumperPlugin;
-import com.taobao.weex.devtools.dumpapp.plugins.HprofDumperPlugin;
-import com.taobao.weex.devtools.dumpapp.plugins.SharedPreferencesDumperPlugin;
-import com.taobao.weex.devtools.inspector.DevtoolsSocketHandler;
 import com.taobao.weex.devtools.inspector.console.RuntimeReplFactory;
 import com.taobao.weex.devtools.inspector.database.DatabaseFilesProvider;
 import com.taobao.weex.devtools.inspector.database.DefaultDatabaseFilesProvider;
@@ -51,13 +41,13 @@ import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
-import com.taobao.weex.devtools.server.AddressNameHelper;
-import com.taobao.weex.devtools.server.LazySocketHandler;
-import com.taobao.weex.devtools.server.LocalSocketServer;
-import com.taobao.weex.devtools.server.ProtocolDetectingSocketHandler;
-import com.taobao.weex.devtools.server.ServerManager;
-import com.taobao.weex.devtools.server.SocketHandler;
-import com.taobao.weex.devtools.server.SocketHandlerFactory;
+//import com.taobao.weex.devtools.server.AddressNameHelper;
+//import com.taobao.weex.devtools.server.LazySocketHandler;
+//import com.taobao.weex.devtools.server.LocalSocketServer;
+//import com.taobao.weex.devtools.server.ProtocolDetectingSocketHandler;
+//import com.taobao.weex.devtools.server.ServerManager;
+//import com.taobao.weex.devtools.server.SocketHandler;
+//import com.taobao.weex.devtools.server.SocketHandlerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -83,7 +73,7 @@ public class WeexInspector {
 
   /**
    * Construct a simple initializer helper which allows you to customize stetho behaviour
-   * with additional features, plugins, etc.  See {@link DefaultDumperPluginsBuilder} and
+   * with additional features, plugins, etc.  See DefaultDumperPluginsBuilder and
    * {@link DefaultInspectorModulesBuilder} for more information.
    * <p>
    * For simple use cases, consider {@link #initializeWithDefaults(Context)}.
@@ -99,10 +89,10 @@ public class WeexInspector {
    */
   public static void initializeWithDefaults(final Context context) {
     initialize(new Initializer(context) {
-      @Override
-      protected Iterable<DumperPlugin> getDumperPlugins() {
-        return new DefaultDumperPluginsBuilder(context).finish();
-      }
+//      @Override
+//      protected Iterable<DumperPlugin> getDumperPlugins() {
+//        return new DefaultDumperPluginsBuilder(context).finish();
+//      }
 
       @Override
       protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
@@ -130,14 +120,14 @@ public class WeexInspector {
     // initializer.start();
   }
 
-  public static DumperPluginsProvider defaultDumperPluginsProvider(final Context context) {
-    return new DumperPluginsProvider() {
-      @Override
-      public Iterable<DumperPlugin> get() {
-        return new DefaultDumperPluginsBuilder(context).finish();
-      }
-    };
-  }
+//  public static DumperPluginsProvider defaultDumperPluginsProvider(final Context context) {
+//    return new DumperPluginsProvider() {
+//      @Override
+//      public Iterable<DumperPlugin> get() {
+//        return new DefaultDumperPluginsBuilder(context).finish();
+//      }
+//    };
+//  }
 
   public static InspectorModulesProvider defaultInspectorModulesProvider(final Context context) {
     return new InspectorModulesProvider() {
@@ -193,37 +183,37 @@ public class WeexInspector {
    *
    * @see #initializeWithDefaults(Context)
    */
-  public static final class DefaultDumperPluginsBuilder {
-    private final Context mContext;
-    private final PluginBuilder<DumperPlugin> mDelegate = new PluginBuilder<>();
-
-    public DefaultDumperPluginsBuilder(Context context) {
-      mContext = context;
-    }
-
-    public DefaultDumperPluginsBuilder provide(DumperPlugin plugin) {
-      mDelegate.provide(plugin.getName(), plugin);
-      return this;
-    }
-
-    private DefaultDumperPluginsBuilder provideIfDesired(DumperPlugin plugin) {
-      mDelegate.provideIfDesired(plugin.getName(), plugin);
-      return this;
-    }
-
-    public DefaultDumperPluginsBuilder remove(String pluginName) {
-      mDelegate.remove(pluginName);
-      return this;
-    }
-
-    public Iterable<DumperPlugin> finish() {
-      provideIfDesired(new HprofDumperPlugin(mContext));
-      provideIfDesired(new SharedPreferencesDumperPlugin(mContext));
-      provideIfDesired(new CrashDumperPlugin());
-      provideIfDesired(new FilesDumperPlugin(mContext));
-      return mDelegate.finish();
-    }
-  }
+//  public static final class DefaultDumperPluginsBuilder {
+//    private final Context mContext;
+//    private final PluginBuilder<DumperPlugin> mDelegate = new PluginBuilder<>();
+//
+//    public DefaultDumperPluginsBuilder(Context context) {
+//      mContext = context;
+//    }
+//
+//    public DefaultDumperPluginsBuilder provide(DumperPlugin plugin) {
+//      mDelegate.provide(plugin.getName(), plugin);
+//      return this;
+//    }
+//
+//    private DefaultDumperPluginsBuilder provideIfDesired(DumperPlugin plugin) {
+//      mDelegate.provideIfDesired(plugin.getName(), plugin);
+//      return this;
+//    }
+//
+//    public DefaultDumperPluginsBuilder remove(String pluginName) {
+//      mDelegate.remove(pluginName);
+//      return this;
+//    }
+//
+//    public Iterable<DumperPlugin> finish() {
+//      provideIfDesired(new HprofDumperPlugin(mContext));
+//      provideIfDesired(new SharedPreferencesDumperPlugin(mContext));
+//      provideIfDesired(new CrashDumperPlugin());
+//      provideIfDesired(new FilesDumperPlugin(mContext));
+//      return mDelegate.finish();
+//    }
+//  }
 
   /**
    * Configuration mechanism to customize the behaviour of the standard set of inspector
@@ -385,62 +375,8 @@ public class WeexInspector {
     }
 
     @Nullable
-    protected abstract Iterable<DumperPlugin> getDumperPlugins();
-
-    @Nullable
     protected abstract Iterable<ChromeDevtoolsDomain> getInspectorModules();
 
-    final void start() {
-      // Note that _devtools_remote is a magic suffix understood by Chrome which causes
-      // the discovery process to begin.
-      LocalSocketServer server = new LocalSocketServer(
-          "main",
-          AddressNameHelper.createCustomAddress("_devtools_remote"),
-          new LazySocketHandler(new RealSocketHandlerFactory()));
-
-      ServerManager serverManager = new ServerManager(server);
-      serverManager.start();
-      // connect to debugger server through WebSocket
-      // new DebugServerProxy(getInspectorModules(), null).start();
-    }
-
-    private class RealSocketHandlerFactory implements SocketHandlerFactory {
-      @Override
-      public SocketHandler create() {
-        ProtocolDetectingSocketHandler socketHandler =
-            new ProtocolDetectingSocketHandler(mContext);
-
-        Iterable<DumperPlugin> dumperPlugins = getDumperPlugins();
-        if (dumperPlugins != null) {
-          Dumper dumper = new Dumper(dumperPlugins);
-
-          socketHandler.addHandler(
-              new ProtocolDetectingSocketHandler.ExactMagicMatcher(
-                  DumpappSocketLikeHandler.PROTOCOL_MAGIC),
-              new DumpappSocketLikeHandler(dumper));
-
-          // Support the old HTTP-based protocol since it's relatively straight forward to do.
-          DumpappHttpSocketLikeHandler legacyHandler = new DumpappHttpSocketLikeHandler(dumper);
-          socketHandler.addHandler(
-              new ProtocolDetectingSocketHandler.ExactMagicMatcher(
-                  "GET /dumpapp".getBytes()),
-              legacyHandler);
-          socketHandler.addHandler(
-              new ProtocolDetectingSocketHandler.ExactMagicMatcher(
-                  "POST /dumpapp".getBytes()),
-              legacyHandler);
-        }
-
-        Iterable<ChromeDevtoolsDomain> inspectorModules = getInspectorModules();
-        if (inspectorModules != null) {
-          socketHandler.addHandler(
-              new ProtocolDetectingSocketHandler.AlwaysMatchMatcher(),
-              new DevtoolsSocketHandler(mContext, inspectorModules));
-        }
-
-        return socketHandler;
-      }
-    }
   }
 
   /**
@@ -449,29 +385,11 @@ public class WeexInspector {
   public static class InitializerBuilder {
     final Context mContext;
 
-    @Nullable DumperPluginsProvider mDumperPlugins;
+    // @Nullable DumperPluginsProvider mDumperPlugins;
     @Nullable InspectorModulesProvider mInspectorModules;
 
     private InitializerBuilder(Context context) {
       mContext = context.getApplicationContext();
-    }
-
-    /**
-     * Enable use of the {@code dumpapp} system.  This is an extension to WeexInspector which allows
-     * developers to configure custom debug endpoints as tiny programs embedded inside of a larger
-     * running Android application.  Examples of this would be simple utilities to visualize and
-     * edit {@link SharedPreferences} data, kick off sync or other background tasks, inject custom
-     * data temporarily into the process for debugging/reproducibility, upload error reports,
-     * etc.
-     * <p>
-     * See {@code ./scripts/dumpapp} for more information on how to use this system once
-     * enabled.
-     *
-     * @param plugins The set of plugins to use.
-     */
-    public InitializerBuilder enableDumpapp(DumperPluginsProvider plugins) {
-      mDumperPlugins = Util.throwIfNull(plugins);
-      return this;
     }
 
     public InitializerBuilder enableWebKitInspector(InspectorModulesProvider modules) {
@@ -485,19 +403,11 @@ public class WeexInspector {
   }
 
   private static class BuilderBasedInitializer extends Initializer {
-    @Nullable private final DumperPluginsProvider mDumperPlugins;
     @Nullable private final InspectorModulesProvider mInspectorModules;
 
     private BuilderBasedInitializer(InitializerBuilder b) {
       super(b.mContext);
-      mDumperPlugins = b.mDumperPlugins;
       mInspectorModules = b.mInspectorModules;
-    }
-
-    @Nullable
-    @Override
-    protected Iterable<DumperPlugin> getDumperPlugins() {
-      return mDumperPlugins != null ? mDumperPlugins.get() : null;
     }
 
     @Nullable
