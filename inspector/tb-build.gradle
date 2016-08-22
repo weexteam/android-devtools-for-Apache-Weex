@@ -1,6 +1,6 @@
 apply from: 'http://mirrors.taobao.net/mirror/gradle/android-parent.gradle'
 group = 'com.taobao.android'
-version = '0.0.2.4-SNAPSHOT'
+version = '0.0.2.5-SNAPSHOT'
 
 description = """weex_inspector"""
 
@@ -63,7 +63,7 @@ android {
 }
 
 dependencies {
-    compile 'commons-cli:commons-cli:1.2'
+    // compile 'commons-cli:commons-cli:1.2'
     provided 'com.google.code.findbugs:jsr305:2.0.1'
     provided 'com.android.support:appcompat-v7:23.0.1'
     // optional
@@ -102,17 +102,17 @@ android.libraryVariants.all { variant ->
 
     // Ugly kludge to rename license files in the bundled commons-cli
     // dependency so that they do not appear to describe Stetho's license.
-    configurations.compile.each {
-        if (it.getName() == 'commons-cli-1.2.jar') {
-            def depJarPath = it.getPath()
-            task "tidyCommonsCli${name}"(type: Copy) {
-                from zipTree(depJarPath)
-                into "build/commons-cli-tidy-${name}"
-                rename 'LICENSE', 'commons-cli-LICENSE'
-                rename 'NOTICE', 'commons-cli-NOTICE'
-            }
-        }
-    }
+//    configurations.compile.each {
+//        if (it.getName() == 'commons-cli-1.2.jar') {
+//            def depJarPath = it.getPath()
+//            task "tidyCommonsCli${name}"(type: Copy) {
+//                from zipTree(depJarPath)
+//                into "build/commons-cli-tidy-${name}"
+//                rename 'LICENSE', 'commons-cli-LICENSE'
+//                rename 'NOTICE', 'commons-cli-NOTICE'
+//            }
+//        }
+//    }
 
     task "metainf${name}"(type: Copy) {
         from rootProject.file('LICENSE')
