@@ -170,6 +170,10 @@ public class IndexActivity extends AbstractWeexActivity {
         } else {
           Toast.makeText(this, "request READ_PHONE_STATE permission fail!", Toast.LENGTH_SHORT).show();
         }
+        break;
+
+      default:
+        break;
     }
 
   }
