@@ -18,6 +18,19 @@ If you are a green hand to the debug of weex, we recommend you to try your first
 
 ![devtools-main](https://img.alicdn.com/tps/TB13fwSKFXXXXXDaXXXXXXXXXXX-887-828.png "connecting (multiple) devices")
 
+#### How Debugger Works
+Devtools expands [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol) and the mechanism of communication between client and debug sever is based on [JSON-RPC](https://en.wikipedia.org/wiki/JSON-RPC).
+
+##### Devtools Client
+Devtools Client is integrated in App as aar, it connects to debug server through webscoket protocol with out permission check. I recommend you just packaged it in your debug version consider of the security mechanism.
+
+##### Devtools Debug Server
+Devtools Debug Server is the center node of the communication, it connects to both app and chrome, acts as the turn server of debugging protocol messages and the manager of the js runtime.
+
+##### Chrome FrontEnd
+Chrome's V8 engine acts as the javascript runtime, when debug mode is enabled, all the js code run on it. On the other side we also reuse most of the Chrome's debugging user interface, such as set breakpoint, see call stack and so on. 
+
+![debug sequence diagram](https://img.alicdn.com/tps/TB1igLoMVXXXXawapXXXXXXXXXX-786-1610.jpg "debug sequence diagram")
 
 ### Enable devtools in your own app
 Of course you can reuse the code of playground to build your own app, that is the simplest way to let your app's js code debuggable. On the other hand QR code is not necessary, if your review the source code you can draw a conclusion that QR CODE is just a way to set `devtools server` address. following those steps you can do the same thing.
@@ -28,10 +41,10 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
   * *A - aar dependency from jcenter*.
   ````
   dependencies {
-          compile 'com.taobao.android:weex_inspector:0.0.2.3'
+          compile 'com.taobao.android:weex_inspector:0.0.2.7'
   }
   ````
-The recent release version is 0.0.2.3 which depends on the weex_sdk:0.7.0. See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases). All the release version will publish to the [jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
+I strongly recommend you use the latest version since both weex sdk and devtools are developed iteratively and rapidly. See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases). All the release version will publish to the [jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
   * *B - source code dependency.*
 
@@ -63,6 +76,10 @@ The recent release version is 0.0.2.3 which depends on the weex_sdk:0.7.0. See t
     * scaning the QR code and handle the content just like the playground have done.
     * init it in the XXXApplication by calling `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")`, if you call `initDebugEnvironment(true, "xxx.xxx.xxx.xxx")` after weex sdk inited, you need to call `WXSDKEngine.reload()` to refresh the runtime.
   4. Once you click the button `Inspector` chrome will open a page show the inspector view, on the other side, click the button `Debugger` chrome will open a new page to show the debug view;
+
+
+
+
 
 ---
 
