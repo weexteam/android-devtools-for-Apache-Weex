@@ -10,10 +10,8 @@ import com.squareup.okhttp.ws.WebSocket;
 import com.squareup.okhttp.ws.WebSocketCall;
 import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.devtools.websocket.SimpleSession;
-import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import okio.Buffer;
@@ -23,7 +21,6 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
 
     private static final String TAG = "DebugSocketClient";
 
-    private final ConcurrentHashMap<Integer, Callback> mCallbacks = new ConcurrentHashMap<>();
     private WebSocket mWebSocket;
     private OkHttpClient mHttpClient;
     private Callback mConnectCallback;
@@ -94,7 +91,7 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
     }
 
     private void abort(String message, Throwable cause) {
-        WXLogUtils.e("Error occurred, shutting down websocket connection: " + message);
+        Log.v(TAG, "Error occurred, shutting down websocket connection: " + message);
         closeQuietly();
 
         // Trigger failure callbacks
@@ -102,10 +99,6 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
             mConnectCallback.onFailure(cause);
             mConnectCallback = null;
         }
-        for (Callback callback : mCallbacks.values()) {
-            callback.onFailure(cause);
-        }
-        mCallbacks.clear();
     }
 
     @Override

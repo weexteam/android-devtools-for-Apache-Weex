@@ -1,7 +1,6 @@
 package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -29,7 +28,6 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcRequest;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
-import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,7 +116,9 @@ public class DebugServerProxy implements IWXDebugProxy {
                     synchronized (mLock) {
                         if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
                             mWebSocketClient.sendText(getShakeHandsMessage());
-                            mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECTED));
+                            if (mBridge != null) {
+                                mBridge.onConnected();
+                            }
                             mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
                             mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
                             WXSDKManager.getInstance().postOnUiThread(
@@ -132,7 +132,7 @@ public class DebugServerProxy implements IWXDebugProxy {
                                                     .show();
                                         }
                                     }, 0);
-                            WXLogUtils.d("connect debugger server success!");
+                            Log.d(TAG, "connect debugger server success!");
                             if (mJsManager != null) {
                                 mJsManager.initScriptsFramework(null);
                             }
@@ -142,8 +142,12 @@ public class DebugServerProxy implements IWXDebugProxy {
 
                 @Override
                 public void onFailure(Throwable cause) {
-                    mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECT_FAILED));
-                    WXLogUtils.d("connect debugger server failure!! " + cause.toString());
+                    synchronized (mLock) {
+                        if (mBridge != null) {
+                            mBridge.onDisConnected();
+                        }
+                        Log.d(TAG, "connect debugger server failure!! " + cause.toString());
+                    }
                 }
 
             });
@@ -168,7 +172,6 @@ public class DebugServerProxy implements IWXDebugProxy {
 
     public void handleMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
         if (type != WebSocket.PayloadType.TEXT) {
-            WXLogUtils.w("Websocket received unexpected message with payload of type " + type);
             return;
         }
         try {

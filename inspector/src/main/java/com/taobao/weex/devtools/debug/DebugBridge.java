@@ -27,8 +27,7 @@ public class DebugBridge implements IWXBridge {
     private static volatile DebugBridge sInstance;
     private Object mLock = new Object();
     private WXBridgeManager mJsManager;
-    private SimpleSession mSession;
-    private ConnectionBroadcastReceiver mReceiver;
+    private volatile SimpleSession mSession;
 
     private DebugBridge() {
 
@@ -48,7 +47,6 @@ public class DebugBridge implements IWXBridge {
 
     public void setSession(SimpleSession session) {
         mSession = session;
-        registerBroadcastReceiver();
     }
 
     public void setBridgeManager(WXBridgeManager bridgeManager) {
@@ -67,7 +65,6 @@ public class DebugBridge implements IWXBridge {
                 }
             }
         }
-        unregisterBroadcastReceiver();
 
         if (mSession != null && mSession.isOpen()) {
             mSession.sendText(getInitFrameworkMessage(framework, params));
@@ -132,7 +129,7 @@ public class DebugBridge implements IWXBridge {
         func.put(WXDebugConstants.METHOD, function);
         func.put(WXDebugConstants.ARGS, array);
 
-        Log.v(TAG, "callJS: function is " + function + ", args " + array);
+        // Log.v(TAG, "callJS: function is " + function + ", args " + array);
         Map<String, Object> map = new HashMap<>();
         map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
         map.put(WXDebugConstants.PARAMS, func);
@@ -159,34 +156,18 @@ public class DebugBridge implements IWXBridge {
         }
     }
 
-    public class ConnectionBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (IWXDebugProxy.ACTION_DEBUG_SERVER_CONNECTED.equals(intent.getAction())) {
-                Log.v(TAG, "connect to debug server success");
-                synchronized (mLock) {
-                    mLock.notify();
-                }
-            } else if (IWXDebugProxy.ACTION_DEBUG_SERVER_CONNECT_FAILED.equals(intent.getAction())) {
-                Log.v(TAG, "connect to debug server failed");
-                synchronized (mLock) {
-                    mLock.notify();
-                }
-            }
+    public void onConnected() {
+        Log.v(TAG, "connect to debug server success");
+        synchronized (mLock) {
+            mLock.notify();
         }
     }
 
-    private void registerBroadcastReceiver() {
-        mReceiver = new ConnectionBroadcastReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(IWXDebugProxy.ACTION_DEBUG_SERVER_CONNECTED);
-        filter.addAction(IWXDebugProxy.ACTION_DEBUG_SERVER_CONNECT_FAILED);
-        WXEnvironment.getApplication().registerReceiver(mReceiver, filter);
-    }
-
-    private void unregisterBroadcastReceiver() {
-        if (mReceiver != null) {
-            WXEnvironment.getApplication().unregisterReceiver(mReceiver);
+    public void onDisConnected() {
+        Log.v(TAG, "connect to debug server failed");
+        synchronized (mLock) {
+            mSession = null;
+            mLock.notify();
         }
     }
 }
