@@ -43,7 +43,6 @@ import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
-  private final Object mLock = new Object();
   private DebugSocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;
@@ -85,7 +84,7 @@ public class DebugServerProxy implements IWXDebugProxy {
   }
 
   public void start() {
-    synchronized (mLock) {
+    synchronized (DebugServerProxy.class) {
       WeexInspector.initializeWithDefaults(mContext);
       mBridge = DebugBridge.getInstance();
       mBridge.setSession(mWebSocketClient);
@@ -113,7 +112,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
         @Override
         public void onSuccess(String response) {
-          synchronized (mLock) {
+          synchronized (DebugServerProxy.class) {
             if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
               mWebSocketClient.sendText(getShakeHandsMessage());
               if (mBridge != null) {
@@ -142,7 +141,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
         @Override
         public void onFailure(Throwable cause) {
-          synchronized (mLock) {
+          synchronized (DebugServerProxy.class) {
             if (mBridge != null) {
               mBridge.onDisConnected();
             }
@@ -156,7 +155,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
   @Override
   public void stop() {
-    synchronized (mLock) {
+    synchronized (DebugServerProxy.class) {
       if (mWebSocketClient != null) {
         mWebSocketClient.closeQuietly();
         mWebSocketClient = null;
