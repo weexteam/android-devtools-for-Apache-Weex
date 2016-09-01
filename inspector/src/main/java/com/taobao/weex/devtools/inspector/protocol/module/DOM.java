@@ -10,6 +10,8 @@
 package com.taobao.weex.devtools.inspector.protocol.module;
 
 import android.graphics.Color;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
@@ -30,8 +32,11 @@ import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcError;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
+import com.taobao.weex.devtools.inspector.screencast.ScreencastDispatcher;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.utils.WXViewUtils;
 
 import org.json.JSONObject;
 
@@ -45,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 public class DOM implements ChromeDevtoolsDomain {
+  private static boolean sNativeMode = true;
   private final ObjectMapper mObjectMapper;
   private final Document mDocument;
   private final Map<String, List<Integer>> mSearchResults;
@@ -59,11 +65,19 @@ public class DOM implements ChromeDevtoolsDomain {
     mObjectMapper = new ObjectMapper();
     mDocument = Util.throwIfNull(document);
     mSearchResults = Collections.synchronizedMap(
-      new HashMap<String, List<Integer>>());
+        new HashMap<String, List<Integer>>());
     mResultCounter = new AtomicInteger(0);
     mPeerManager = new ChromePeerManager();
     mPeerManager.setListener(new PeerManagerListener());
     mListener = new DocumentUpdateListener();
+  }
+
+  public static void setNativeMode(boolean isNativeMode) {
+    sNativeMode = isNativeMode;
+  }
+
+  public static boolean isNativeMode() {
+    return sNativeMode;
   }
 
   @ChromeDevtoolsMethod
@@ -94,7 +108,7 @@ public class DOM implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void highlightNode(JsonRpcPeer peer, JSONObject params) {
     final HighlightNodeRequest request =
-      mObjectMapper.convertValue(params, HighlightNodeRequest.class);
+        mObjectMapper.convertValue(params, HighlightNodeRequest.class);
     if (request.nodeId == null) {
       LogUtil.w("DOM.highlightNode was not given a nodeId; JS objectId is not supported");
       return;
@@ -250,8 +264,8 @@ public class DOM implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void discardSearchResults(JsonRpcPeer peer, JSONObject params) {
     final DiscardSearchResultsRequest request = mObjectMapper.convertValue(
-      params,
-      DiscardSearchResultsRequest.class);
+        params,
+        DiscardSearchResultsRequest.class);
 
     if (request.searchId != null) {
       mSearchResults.remove(request.searchId);
@@ -259,12 +273,42 @@ public class DOM implements ChromeDevtoolsDomain {
   }
 
   @ChromeDevtoolsMethod
+  public GetNodeForLocationResponse getNodeForLocation(JsonRpcPeer peer, JSONObject params) {
+    GetNodeForLocationResponse result = new GetNodeForLocationResponse();
+    final GetNodeForLocationRequest request = mObjectMapper.convertValue(
+            params,
+            GetNodeForLocationRequest.class);
+    if (request.x > 0 && request.y > 0) {
+      result.nodeId = findViewByLocation(request.x, request.y);
+    }
+
+    return result;
+  }
+
+  public int findViewByLocation(final int x, final int y) {
+    final ArrayListAccumulator<Integer> resultNodeIds = new ArrayListAccumulator<>();
+
+    mDocument.postAndWait(new Runnable() {
+      @Override
+      public void run() {
+        mDocument.findMatchingElements(x, y, resultNodeIds);
+      }
+    });
+    if (resultNodeIds.size() > 0) {
+      return resultNodeIds.get(resultNodeIds.size() - 1);
+    }
+    return 0;
+  }
+
+
+
+  @ChromeDevtoolsMethod
   public GetBoxModelResponse getBoxModel(JsonRpcPeer peer, JSONObject params) {
     GetBoxModelResponse response = new GetBoxModelResponse();
     final BoxModel model = new BoxModel();
     final GetBoxModelRequest request = mObjectMapper.convertValue(
-            params,
-            GetBoxModelRequest.class);
+        params,
+        GetBoxModelRequest.class);
 
     if (request.nodeId == null) {
       return null;
@@ -275,76 +319,133 @@ public class DOM implements ChromeDevtoolsDomain {
     mDocument.postAndWait(new Runnable() {
       @Override
       public void run() {
-        Object elementForNodeId = mDocument.getElementForNodeId(request.nodeId);
+        final Object elementForNodeId = mDocument.getElementForNodeId(request.nodeId);
 
         if (elementForNodeId == null) {
           LogUtil.w("Failed to get style of an element that does not exist, nodeid=" +
-                  request.nodeId);
+              request.nodeId);
           return;
         }
 
         mDocument.getElementStyles(
-                elementForNodeId,
-                new StyleAccumulator() {
-                  @Override
-                  public void store(String name, String value, boolean isDefault) {
-                    if (!isDefault) {
-//                      ArrayList<Double> padding = new ArrayList<>(8);
-//                      padding.add(new Double(100));
-//                      padding.add(new Double(100));
-//                      padding.add(new Double(800));
-//                      padding.add(new Double(100));
-//                      padding.add(new Double(800));
-//                      padding.add(new Double(800));
-//                      padding.add(new Double(100));
-//                      padding.add(new Double(800));
-//                      model.padding = padding;
-//
-//                      ArrayList<Double> content = new ArrayList<>(8);
-//                      content.add(new Double(400));
-//                      content.add(new Double(400));
-//                      content.add(new Double(600));
-//                      content.add(new Double(400));
-//                      content.add(new Double(600));
-//                      content.add(new Double(600));
-//                      content.add(new Double(400));
-//                      content.add(new Double(600));
-//                      model.content = content;
-//
-//                      ArrayList<Double> border = new ArrayList<>(8);
-//                      border.add(new Double(50));
-//                      border.add(new Double(50));
-//                      border.add(new Double(850));
-//                      border.add(new Double(50));
-//                      border.add(new Double(850));
-//                      border.add(new Double(850));
-//                      border.add(new Double(50));
-//                      border.add(new Double(850));
-//                      model.border = border;
-//
-//                      ArrayList<Double> margin = new ArrayList<>(8);
-//                      margin.add(new Double(25));
-//                      margin.add(new Double(25));
-//                      margin.add(new Double(900));
-//                      margin.add(new Double(25));
-//                      margin.add(new Double(900));
-//                      margin.add(new Double(900));
-//                      margin.add(new Double(25));
-//                      margin.add(new Double(900));
-//                      model.margin = margin;
+            elementForNodeId,
+            new StyleAccumulator() {
+              @Override
+              public void store(String name, String value, boolean isDefault) {
+                double left = 0;
+                double right = 0;
+                double top = 0;
+                double bottom = 0;
 
-                      if ("width".equals(name)) {
-                        model.width = Integer.valueOf(value);
-                      }
-                      if ("height".equals(name)) {
-                        model.height = Integer.valueOf(value);
+                double paddingLeft = 0;
+                double paddingRight = 0;
+                double paddingTop = 0;
+                double paddingBottom = 0;
+
+                double marginLeft = 0;
+                double marginRight = 0;
+                double marginTop = 0;
+                double marginBottom = 0;
+
+                double borderLeftWidth = 0;
+                double borderRightWidth = 0;
+                double borderTopWidth = 0;
+                double borderBottomWidth = 0;
+
+
+                View view = null;
+                if (isNativeMode()) {
+                  if (elementForNodeId instanceof View) {
+                    view = (View)elementForNodeId;
+                  }
+                } else {
+                  if (elementForNodeId instanceof WXComponent) {
+                    view = ((WXComponent) elementForNodeId).getHostView();
+                  }
+                }
+
+                  if (view != null && view.isShown()) {
+                    float scale = ScreencastDispatcher.getsBitmapScale();
+                    model.width = view.getWidth();
+                    model.height = view.getHeight();
+                    if (!DOM.isNativeMode()) {
+                      model.width = (int)(model.width * 750 / WXViewUtils.getScreenWidth() + 0.5);
+                      model.height = (int)(model.height * 750 / WXViewUtils.getScreenWidth() + 0.5);
+                    }
+
+                    int[] location = new int[2];
+                    view.getLocationOnScreen(location);
+
+                    left = location[0] * scale;
+                    top = location[1] * scale;
+                    right = left + view.getWidth() * scale;
+                    bottom = top + view.getHeight() * scale;
+
+                    paddingLeft = view.getPaddingLeft() * scale;
+                    paddingTop = view.getPaddingTop() * scale;
+                    paddingRight = view.getPaddingRight() * scale;
+                    paddingBottom = view.getPaddingBottom() * scale;
+
+                    if (view instanceof ViewGroup) {
+                      ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                      if (layoutParams != null) {
+                        if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
+                          ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams) layoutParams;
+                          marginLeft = margins.leftMargin * scale;
+                          marginTop = margins.topMargin * scale;
+                          marginRight = margins.rightMargin * scale;
+                          marginBottom = margins.bottomMargin * scale;
+                        }
                       }
                     }
                   }
-                });
+                  ArrayList<Double> padding = new ArrayList<>(8);
+                  padding.add(left + borderLeftWidth);
+                  padding.add(top + borderTopWidth);
+                  padding.add(right - borderRightWidth);
+                  padding.add(top + borderTopWidth);
+                  padding.add(right - borderRightWidth);
+                  padding.add(bottom - borderBottomWidth);
+                  padding.add(left + borderLeftWidth);
+                  padding.add(bottom - borderBottomWidth);
+                  model.padding = padding;
+
+                  ArrayList<Double> content = new ArrayList<>(8);
+                  content.add(left + borderLeftWidth + paddingLeft);
+                  content.add(top + borderTopWidth + paddingTop);
+                  content.add(right - borderRightWidth - paddingRight);
+                  content.add(top + borderTopWidth + paddingTop);
+                  content.add(right - borderRightWidth - paddingRight);
+                  content.add(bottom - borderBottomWidth - paddingBottom);
+                  content.add(left + borderLeftWidth + paddingLeft);
+                  content.add(bottom - borderBottomWidth - paddingBottom);
+                  model.content = content;
+
+                  ArrayList<Double> border = new ArrayList<>(8);
+                  border.add(left);
+                  border.add(top);
+                  border.add(right);
+                  border.add(top);
+                  border.add(right);
+                  border.add(bottom);
+                  border.add(left);
+                  border.add(bottom);
+                  model.border = border;
+
+                  ArrayList<Double> margin = new ArrayList<>(8);
+                  margin.add(left - marginLeft);
+                  margin.add(top - marginTop);
+                  margin.add(right + marginRight);
+                  margin.add(top - marginTop);
+                  margin.add(right + marginRight);
+                  margin.add(bottom + marginBottom);
+                  margin.add(left - marginLeft);
+                  margin.add(bottom + marginBottom);
+                  model.margin = margin;
+              }
+            });
       }
     });
-
 
     return response;
   }
@@ -642,10 +743,10 @@ public class DOM implements ChromeDevtoolsDomain {
     public int getColor() {
       byte alpha;
       if (this.a == null) {
-        alpha = (byte)255;
+        alpha = (byte) 255;
       } else {
         long aLong = Math.round(this.a * 255.0);
-        alpha = (aLong < 0) ? (byte)0 : (aLong >= 255) ? (byte)255 : (byte)aLong;
+        alpha = (aLong < 0) ? (byte) 0 : (aLong >= 255) ? (byte) 255 : (byte) aLong;
       }
 
       return Color.argb(alpha, this.r, this.g, this.b);
@@ -708,5 +809,18 @@ public class DOM implements ChromeDevtoolsDomain {
   private static class DiscardSearchResultsRequest {
     @JsonProperty(required = true)
     public String searchId;
+  }
+
+  private static class GetNodeForLocationRequest {
+    @JsonProperty(required = true)
+    public int x;
+
+    @JsonProperty(required = true)
+    public int y;
+  }
+
+  private static class GetNodeForLocationResponse implements JsonRpcResult {
+    @JsonProperty(required = true)
+    public Integer nodeId;
   }
 }

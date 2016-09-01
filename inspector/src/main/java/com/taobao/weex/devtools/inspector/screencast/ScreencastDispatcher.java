@@ -29,7 +29,8 @@ import com.taobao.weex.devtools.inspector.protocol.module.Page;
 import java.io.ByteArrayOutputStream;
 
 public final class ScreencastDispatcher {
-  private static final long FRAME_DELAY = 200l;
+  private static final long FRAME_DELAY = 300l;
+  private static float sBitmapScale = 1.0f;
 
   private final Handler mMainHandler = new Handler(Looper.getMainLooper());
   private final BitmapFetchRunnable mBitmapFetchRunnable = new BitmapFetchRunnable();
@@ -44,6 +45,7 @@ public final class ScreencastDispatcher {
   private HandlerThread mHandlerThread;
   private Bitmap mBitmap;
   private Canvas mCanvas;
+
   private Page.StartScreencastRequest mRequest;
   private ByteArrayOutputStream mStream;
   private Page.ScreencastFrameEvent mEvent = new Page.ScreencastFrameEvent();
@@ -52,8 +54,11 @@ public final class ScreencastDispatcher {
   public ScreencastDispatcher() {
   }
 
+  public static float getsBitmapScale() {
+    return sBitmapScale;
+  }
+
   public void startScreencast(JsonRpcPeer peer, Page.StartScreencastRequest request) {
-    LogUtil.d("Starting screencast");
     mRequest = request;
     mHandlerThread = new HandlerThread("Screencast Thread");
     mHandlerThread.start();
@@ -65,7 +70,6 @@ public final class ScreencastDispatcher {
   }
 
   public void stopScreencast() {
-    LogUtil.d("Stopping screencast");
     mBackgroundHandler.post(new CancellationRunnable());
   }
 
@@ -92,6 +96,7 @@ public final class ScreencastDispatcher {
           int viewHeight = rootView.getHeight();
           float scale = Math.min((float) mRequest.maxWidth / (float) viewWidth,
               (float) mRequest.maxHeight / (float) viewHeight);
+          sBitmapScale = scale;
           int destWidth = (int) (viewWidth * scale);
           int destHeight = (int) (viewHeight * scale);
           mBitmap = Bitmap.createBitmap(destWidth, destHeight, Bitmap.Config.RGB_565);
@@ -130,7 +135,7 @@ public final class ScreencastDispatcher {
       Bitmap.CompressFormat format = Bitmap.CompressFormat.valueOf(mRequest.format.toUpperCase());
       mBitmap.compress(format, mRequest.quality, base64Stream);
       mEvent.data = mStream.toString();
-      mMetadata.pageScaleFactor = 1;
+      mMetadata.pageScaleFactor = sBitmapScale;
       mMetadata.deviceWidth = width;
       mMetadata.deviceHeight = height;
       mEvent.metadata = mMetadata;

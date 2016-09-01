@@ -1,6 +1,5 @@
 package com.taobao.weex.devtools.inspector.protocol.module;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
@@ -24,60 +23,73 @@ import java.util.List;
  * Created by budao on 16/6/24.
  */
 public class WxDebug implements ChromeDevtoolsDomain {
-    private static final String TAG = "WxDebug";
-    private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
+  private static final String TAG = "WxDebug";
+  private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
 
-    static {
-        sLevelMap.put("all", LogLevel.ALL);
-        sLevelMap.put("verbose", LogLevel.VERBOSE);
-        sLevelMap.put("info", LogLevel.INFO);
-        sLevelMap.put("debug", LogLevel.DEBUG);
-        sLevelMap.put("warn", LogLevel.WARN);
-        sLevelMap.put("error", LogLevel.ERROR);
+  static {
+    sLevelMap.put("all", LogLevel.ALL);
+    sLevelMap.put("verbose", LogLevel.VERBOSE);
+    sLevelMap.put("info", LogLevel.INFO);
+    sLevelMap.put("debug", LogLevel.DEBUG);
+    sLevelMap.put("warn", LogLevel.WARN);
+    sLevelMap.put("error", LogLevel.ERROR);
+  }
+
+  private final ObjectMapper mObjectMapper = new ObjectMapper();
+
+  public WxDebug() {
+
+  }
+
+  @ChromeDevtoolsMethod
+  public void enable(JsonRpcPeer peer, JSONObject params) {
+    Context context = WXEnvironment.getApplication();
+    if (context != null) {
+      WXSDKEngine.reload(context, true);
+      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
     }
+  }
 
-    private final ObjectMapper mObjectMapper = new ObjectMapper();
-    public WxDebug() {
-
+  @ChromeDevtoolsMethod
+  public void disable(JsonRpcPeer peer, JSONObject params) {
+    Context context = WXEnvironment.getApplication();
+    if (context != null) {
+      WXSDKEngine.reload(context, false);
+      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
     }
+  }
 
-    @ChromeDevtoolsMethod
-    public void enable(JsonRpcPeer peer, JSONObject params) {
-        Context context = WXEnvironment.getApplication();
-        if (context != null) {
-            WXSDKEngine.reload(context, true);
-            context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
-        }
+  @ChromeDevtoolsMethod
+  public void setLogLevel(JsonRpcPeer peer, JSONObject params) {
+    if (params != null) {
+      LogLevel logLevel = sLevelMap.get(params.optString("logLevel"));
+      if (logLevel != null) {
+        WXEnvironment.sLogLevel = logLevel;
+      }
     }
+  }
 
-    @ChromeDevtoolsMethod
-    public void disable(JsonRpcPeer peer, JSONObject params) {
-        Context context = WXEnvironment.getApplication();
-        if (context != null) {
-            WXSDKEngine.reload(context, false);
-            context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
-        }
+  @ChromeDevtoolsMethod
+  public void setElementMode(JsonRpcPeer peer, JSONObject params) {
+    if (params != null) {
+      String mode = params.optString("mode");
+      if ("vdom".equals(mode)) {
+        DOM.setNativeMode(false);
+      } else {
+        DOM.setNativeMode(true);
+      }
     }
+  }
 
-    @ChromeDevtoolsMethod
-    public void setLogLevel(JsonRpcPeer peer, JSONObject params) {
-        if (params != null) {
-            LogLevel logLevel = sLevelMap.get(params.optString("logLevel"));
-            if (logLevel != null) {
-                WXEnvironment.sLogLevel = logLevel;
-            }
-        }
+  @ChromeDevtoolsMethod
+  public void callNative(JsonRpcPeer peer, JSONObject params) {
+    if (params != null) {
+      DebugBridge.getInstance().callNative(
+          params.optString("instance"),
+          params.optString("tasks"),
+          params.optString("callback"));
     }
-
-    @ChromeDevtoolsMethod
-    public void callNative(JsonRpcPeer peer, JSONObject params) {
-        if (params != null) {
-            DebugBridge.getInstance().callNative(
-                    params.optString("instance"),
-                    params.optString("tasks"),
-                    params.optString("callback"));
-        }
-        // another way to handle call native
+    // another way to handle call native
 //        CallNative callNative = mObjectMapper.convertValue(params, CallNative.class);
 //        if (callNative != null) {
 //            try {
@@ -92,39 +104,39 @@ public class WxDebug implements ChromeDevtoolsDomain {
 //                e.printStackTrace();
 //            }
 //        }
-    }
+  }
 
-    @ChromeDevtoolsMethod
-    public void reload(JsonRpcPeer peer, JSONObject params) {
-        WXSDKEngine.reload();
-        Context context = WXEnvironment.getApplication();
-        if (context != null) {
-            context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
-        }
+  @ChromeDevtoolsMethod
+  public void reload(JsonRpcPeer peer, JSONObject params) {
+    WXSDKEngine.reload();
+    Context context = WXEnvironment.getApplication();
+    if (context != null) {
+      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
     }
+  }
 
-    public static class CallNative {
-        @JsonProperty(required = true)
-        public String instance;
-        @JsonProperty(required = true)
-        public String callback;
-        @JsonProperty(required = true)
-        public List<Task> tasks;
-    }
+  public static class CallNative {
+    @JsonProperty(required = true)
+    public String instance;
+    @JsonProperty(required = true)
+    public String callback;
+    @JsonProperty(required = true)
+    public List<Task> tasks;
+  }
 
-    public static class CallJS {
-        @JsonProperty(required = true)
-        public String method;
-        @JsonProperty(required = true)
-        public List<Object> args;
-    }
+  public static class CallJS {
+    @JsonProperty(required = true)
+    public String method;
+    @JsonProperty(required = true)
+    public List<Object> args;
+  }
 
-    public static class Task {
-        @JsonProperty(required = true)
-        public String module;
-        @JsonProperty(required = true)
-        public String method;
-        @JsonProperty(required = true)
-        public List<String> args;
-    }
+  public static class Task {
+    @JsonProperty(required = true)
+    public String module;
+    @JsonProperty(required = true)
+    public String method;
+    @JsonProperty(required = true)
+    public List<String> args;
+  }
 }

@@ -41,8 +41,6 @@ import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 
 
@@ -252,13 +250,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
    * hot refresh
    */
   private void startHotRefresh() {
-    try {
-      String host = new URL(mUri.toString()).getHost();
-      String wsUrl = "ws://" + host + ":8082";
-      mWXHandler.obtainMessage(Constants.HOT_REFRESH_CONNECT, 0, 0, wsUrl).sendToTarget();
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
+    String host = mUri.getHost();
+    String port = mUri.getQueryParameter("wsport");
+    if (port == null || port.length() == 0) {
+      port = "8082";
     }
+    String wsUrl = "ws://" + host + ":" + port;
+    mWXHandler.obtainMessage(Constants.HOT_REFRESH_CONNECT, 0, 0, wsUrl).sendToTarget();
   }
 
   private void addOnListener() {
@@ -315,7 +313,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
 
   @Override
   public void onViewCreated(WXSDKInstance instance, View view) {
-    WXLogUtils.d("into--[onViewCreated]");
+    WXLogUtils.e("into--[onViewCreated]");
     if (mWAView != null && mContainer != null && mWAView.getParent() == mContainer) {
       mContainer.removeView(mWAView);
     }
@@ -379,6 +377,13 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
       finish();
       return true;
     } else if (id == R.id.action_refresh) {
+
+      if(mUri.isHierarchical() && mUri.getQueryParameterNames()!=null && mUri.getQueryParameterNames().contains(Constants.WEEX_TPL_KEY)){
+        String url=mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
+        loadWXfromService(url);
+        return true;
+      }
+
       if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
         loadWXfromService(mUri.toString());
         return true;
@@ -402,9 +407,7 @@ public class WXPageActivity extends WXBaseActivity implements IWXRenderListener,
         Log.v(TAG, "connect to debug server success");
         if (mUri != null) {
           if (TextUtils.equals(mUri.getScheme(), "http") || TextUtils.equals(mUri.getScheme(), "https")) {
-            String weexTpl = mUri.getQueryParameter(Constants.WEEX_TPL_KEY);
-            String url = TextUtils.isEmpty(weexTpl) ? mUri.toString() : weexTpl;
-            loadWXfromService(url);
+            loadWXfromService(mUri.toString());
           } else {
             loadWXfromLocal(true);
           }
