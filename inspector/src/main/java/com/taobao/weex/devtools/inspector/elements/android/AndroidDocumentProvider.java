@@ -21,6 +21,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.Predicate;
 import com.taobao.weex.devtools.common.ThreadBound;
@@ -33,6 +36,8 @@ import com.taobao.weex.devtools.inspector.elements.DocumentProviderListener;
 import com.taobao.weex.devtools.inspector.elements.NodeDescriptor;
 import com.taobao.weex.devtools.inspector.elements.ObjectDescriptor;
 import com.taobao.weex.devtools.inspector.helper.ThreadBoundProxy;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,11 +83,15 @@ final class AndroidDocumentProvider extends ThreadBoundProxy
     mDocumentRoot = new AndroidDocumentRoot(application);
 
     mDescriptorMap = new DescriptorMap()
-        .beginInit()
-        .register(Activity.class, new ActivityDescriptor())
-        .register(AndroidDocumentRoot.class, mDocumentRoot)
-        .register(Application.class, new ApplicationDescriptor())
-        .register(Dialog.class, new DialogDescriptor());
+            .beginInit()
+            .register(WXSDKInstance.class, new WXSDKInstanceDescriptor())
+            .register(WXComponent.class, new WXComponentDescriptor())
+            .register(WXVContainer.class, new WXVContainerDescriptor())
+            .register(Activity.class, new ActivityDescriptor())
+            .register(AndroidDocumentRoot.class, mDocumentRoot)
+            .register(Application.class, new ApplicationDescriptor())
+            .register(Dialog.class, new DialogDescriptor());
+
     DialogFragmentDescriptor.register(mDescriptorMap);
     FragmentDescriptor.register(mDescriptorMap)
         .register(Object.class, new ObjectDescriptor())
@@ -244,6 +253,24 @@ final class AndroidDocumentProvider extends ThreadBoundProxy
     }
   }
 
+  private void getWXSDKInstances() {
+    Descriptor appDescriptor = getDescriptor(mDocumentRoot);
+    if (appDescriptor != null) {
+      Accumulator<Object> elementAccumulator = new Accumulator<Object>() {
+        @Override
+        public void store(Object element) {
+          // Recursively scan this element's children in search of more Windows.
+          Descriptor elementDescriptor = getDescriptor(element);
+          if (elementDescriptor != null) {
+            elementDescriptor.getChildren(element, this);
+          }
+        }
+      };
+
+      appDescriptor.getChildren(mDocumentRoot, elementAccumulator);
+    }
+  }
+
   private final class InspectModeHandler {
     private final Predicate<View> mViewSelector = new Predicate<View>() {
       @Override
@@ -262,6 +289,8 @@ final class AndroidDocumentProvider extends ThreadBoundProxy
       }
 
       mOverlays = new ArrayList<>();
+
+      getWXSDKInstances();
 
       getWindows(new Accumulator<Window>() {
         @Override

@@ -1,7 +1,6 @@
 package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -29,7 +28,6 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcRequest;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
-import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,212 +42,216 @@ import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
-    private static final String TAG = "DebugServerProxy";
-    private DebugSocketClient mWebSocketClient;
-    private ObjectMapper mObjectMapper = new ObjectMapper();
-    private MethodDispatcher mMethodDispatcher;
-    private Iterable<ChromeDevtoolsDomain> mDomainModules;
-    private JsonRpcPeer mPeer;
-    private String mRemoteUrl = WXEnvironment.sRemoteDebugProxyUrl;
-    private WXBridgeManager mJsManager;
-    private Context mContext;
-    private DebugBridge mBridge;
-    private final Object mLock = new Object();
+  private static final String TAG = "DebugServerProxy";
+  private DebugSocketClient mWebSocketClient;
+  private ObjectMapper mObjectMapper = new ObjectMapper();
+  private MethodDispatcher mMethodDispatcher;
+  private Iterable<ChromeDevtoolsDomain> mDomainModules;
+  private JsonRpcPeer mPeer;
+  private String mRemoteUrl = WXEnvironment.sRemoteDebugProxyUrl;
+  private WXBridgeManager mJsManager;
+  private Context mContext;
+  private DebugBridge mBridge;
 
-    public DebugServerProxy(Context context, WXBridgeManager jsManager) {
-        mContext = context;
-        mWebSocketClient = new DebugSocketClient(this);
-        mJsManager = jsManager;
-        mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
+  public DebugServerProxy(Context context, WXBridgeManager jsManager) {
+    mContext = context;
+    mWebSocketClient = new DebugSocketClient(this);
+    mJsManager = jsManager;
+    mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
+  }
+
+  private static void logDispatchException(JsonRpcException e) {
+    JsonRpcError errorMessage = e.getErrorMessage();
+    switch (errorMessage.code) {
+      case METHOD_NOT_FOUND:
+        LogRedirector.d(TAG, "Method not implemented: " + errorMessage.message);
+        break;
+      default:
+        LogRedirector.w(TAG, "Error processing remote message", e);
     }
+  }
 
-    private static void logDispatchException(JsonRpcException e) {
-        JsonRpcError errorMessage = e.getErrorMessage();
-        switch (errorMessage.code) {
-            case METHOD_NOT_FOUND:
-                LogRedirector.d(TAG, "Method not implemented: " + errorMessage.message);
-                break;
-            default:
-                LogRedirector.w(TAG, "Error processing remote message", e);
-        }
+  // here just used to flag a debugged device, result same with adb device is fine
+  private String getDeviceId(Context context) {
+    String deviceId = null;
+    if (VERSION.SDK_INT > VERSION_CODES.FROYO) {
+      deviceId = Build.SERIAL;
     }
-
-    // here just used to flag a debugged device, result same with adb device is fine
-    private String getDeviceId(Context context) {
-        String deviceId = null;
-        if (VERSION.SDK_INT > VERSION_CODES.FROYO) {
-            deviceId = Build.SERIAL;
-        }
-        if (TextUtils.isEmpty(deviceId)) {
-            deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        }
-        return deviceId;
+    if (TextUtils.isEmpty(deviceId)) {
+      deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
+    return deviceId;
+  }
 
-    public void start() {
-        synchronized (mLock) {
-            WeexInspector.initializeWithDefaults(mContext);
-            mBridge = DebugBridge.getInstance();
-            mBridge.setSession(mWebSocketClient);
-            mBridge.setBridgeManager(mJsManager);
-            mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
+  public void start() {
+    synchronized (DebugServerProxy.class) {
+      WeexInspector.initializeWithDefaults(mContext);
+      mBridge = DebugBridge.getInstance();
+      mBridge.setSession(mWebSocketClient);
+      mBridge.setBridgeManager(mJsManager);
+      mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
 
-                private String getShakeHandsMessage() {
-                    Map<String, Object> func = new HashMap<>();
-                    func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
-                    func.put("model", WXEnvironment.SYS_MODEL);
-                    func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
-                    func.put("platform", WXEnvironment.OS);
-                    func.put("deviceId", getDeviceId(mContext));
-                    if (WXEnvironment.sLogLevel != null) {
-                        func.put("logLevel", WXEnvironment.sLogLevel.getName());
+        private String getShakeHandsMessage() {
+          Map<String, Object> func = new HashMap<>();
+          func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
+          func.put("model", WXEnvironment.SYS_MODEL);
+          func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+          func.put("platform", WXEnvironment.OS);
+          func.put("deviceId", getDeviceId(mContext));
+          if (WXEnvironment.sLogLevel != null) {
+            func.put("logLevel", WXEnvironment.sLogLevel.getName());
+          }
+          func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
+
+          Map<String, Object> map = new HashMap<>();
+          map.put("id", "0");
+          map.put("method", "WxDebug.registerDevice");
+          map.put("params", func);
+          return JSON.toJSONString(map);
+        }
+
+        @Override
+        public void onSuccess(String response) {
+          synchronized (DebugServerProxy.class) {
+            if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
+              mWebSocketClient.sendText(getShakeHandsMessage());
+              if (mBridge != null) {
+                mBridge.onConnected();
+              }
+              mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
+              mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
+              WXSDKManager.getInstance().postOnUiThread(
+                  new Runnable() {
+
+                    @Override
+                    public void run() {
+                      Toast.makeText(
+                          WXEnvironment.sApplication,
+                          "debug server connected", Toast.LENGTH_SHORT)
+                          .show();
                     }
-                    func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", "0");
-                    map.put("method", "WxDebug.registerDevice");
-                    map.put("params", func);
-                    return JSON.toJSONString(map);
-                }
-
-                @Override
-                public void onSuccess(String response) {
-                    synchronized (mLock) {
-                        if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
-                            mWebSocketClient.sendText(getShakeHandsMessage());
-                            mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECTED));
-                            mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
-                            mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
-                            WXSDKManager.getInstance().postOnUiThread(
-                                    new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    WXEnvironment.sApplication,
-                                                    "debug server connected", Toast.LENGTH_SHORT)
-                                                    .show();
-                                        }
-                                    }, 0);
-                            WXLogUtils.d("connect debugger server success!");
-                            if (mJsManager != null) {
-                                mJsManager.initScriptsFramework(null);
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable cause) {
-                    mContext.sendBroadcast(new Intent(ACTION_DEBUG_SERVER_CONNECT_FAILED));
-                    WXLogUtils.d("connect debugger server failure!! " + cause.toString());
-                }
-
-            });
-        }
-    }
-
-    @Override
-    public void stop() {
-        synchronized (mLock) {
-            if (mWebSocketClient != null) {
-                mWebSocketClient.closeQuietly();
-                mWebSocketClient = null;
+                  }, 0);
+              Log.d(TAG, "connect debugger server success!");
+              if (mJsManager != null) {
+                mJsManager.initScriptsFramework(null);
+              }
             }
-            mBridge = null;
+          }
         }
-    }
 
-    @Override
-    public IWXBridge getWXBridge() {
-        return mBridge;
-    }
-
-    public void handleMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
-        if (type != WebSocket.PayloadType.TEXT) {
-            WXLogUtils.w("Websocket received unexpected message with payload of type " + type);
-            return;
-        }
-        try {
-            try {
-                String message = payload.readUtf8();
-                Util.throwIfNull(mPeer);
-                handleRemoteMessage(mPeer, message);
-            } catch (Exception e) {
-
-            } finally {
-                payload.close();
+        @Override
+        public void onFailure(Throwable cause) {
+          synchronized (DebugServerProxy.class) {
+            if (mBridge != null) {
+              mBridge.onDisConnected();
             }
-
-        } catch (IOException e) {
-            if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
-                LogRedirector.v(TAG, "Unexpected I/O exception processing message: " + e);
-            }
+            Log.d(TAG, "connect debugger server failure!! " + cause.toString());
+          }
         }
+
+      });
     }
+  }
 
-    private void handleRemoteMessage(JsonRpcPeer peer, String message)
-            throws IOException, MessageHandlingException, JSONException {
-        // Parse as a generic JSONObject first since we don't know if this is a request or response.
-        JSONObject messageNode = new JSONObject(message);
-        if (messageNode.has("method")) {
-            handleRemoteRequest(peer, messageNode);
-        } else if (messageNode.has("result")) {
-            handleRemoteResponse(peer, messageNode);
-        } else {
-            throw new MessageHandlingException("Improper JSON-RPC message: " + message);
-        }
+  @Override
+  public void stop() {
+    synchronized (DebugServerProxy.class) {
+      if (mWebSocketClient != null) {
+        mWebSocketClient.closeQuietly();
+        mWebSocketClient = null;
+      }
+      mBridge = null;
     }
+  }
 
-    private void handleRemoteRequest(JsonRpcPeer peer, JSONObject requestNode)
-            throws MessageHandlingException {
-        JsonRpcRequest request;
-        request = mObjectMapper.convertValue(
-                requestNode,
-                JsonRpcRequest.class);
+  @Override
+  public IWXBridge getWXBridge() {
+    return mBridge;
+  }
 
-        JSONObject result = null;
-        JSONObject error = null;
-        try {
-            result = mMethodDispatcher.dispatch(peer,
-                    request.method,
-                    request.params);
-        } catch (JsonRpcException e) {
-            logDispatchException(e);
-            error = mObjectMapper.convertValue(e.getErrorMessage(), JSONObject.class);
-        }
-        if (request.id != null) {
-            JsonRpcResponse response = new JsonRpcResponse();
-            response.id = request.id;
-            response.result = result;
-            response.error = error;
-            JSONObject jsonObject = mObjectMapper.convertValue(response, JSONObject.class);
-            String responseString;
-            try {
-                responseString = jsonObject.toString();
-            } catch (OutOfMemoryError e) {
-                // JSONStringer can cause an OOM when the Json to handle is too big.
-                response.result = null;
-                response.error = mObjectMapper.convertValue(e.getMessage(), JSONObject.class);
-                jsonObject = mObjectMapper.convertValue(response, JSONObject.class);
-                responseString = jsonObject.toString();
-            }
-            peer.getWebSocket().sendText(responseString);
-        }
+  public void handleMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
+    if (type != WebSocket.PayloadType.TEXT) {
+      return;
     }
+    try {
+      try {
+        String message = payload.readUtf8();
+        Util.throwIfNull(mPeer);
+        handleRemoteMessage(mPeer, message);
+      } catch (Exception e) {
 
-    private void handleRemoteResponse(JsonRpcPeer peer, JSONObject responseNode)
-            throws MismatchedResponseException {
-        JsonRpcResponse response = mObjectMapper.convertValue(
-                responseNode,
-                JsonRpcResponse.class);
-        PendingRequest pendingRequest = peer.getAndRemovePendingRequest(response.id);
-        if (pendingRequest == null) {
-            throw new MismatchedResponseException(response.id);
-        }
-        if (pendingRequest.callback != null) {
-            pendingRequest.callback.onResponse(peer, response);
-        }
+      } finally {
+        payload.close();
+      }
+
+    } catch (IOException e) {
+      if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
+        LogRedirector.v(TAG, "Unexpected I/O exception processing message: " + e);
+      }
     }
+  }
+
+  private void handleRemoteMessage(JsonRpcPeer peer, String message)
+      throws IOException, MessageHandlingException, JSONException {
+    // Parse as a generic JSONObject first since we don't know if this is a request or response.
+    JSONObject messageNode = new JSONObject(message);
+    if (messageNode.has("method")) {
+      handleRemoteRequest(peer, messageNode);
+    } else if (messageNode.has("result")) {
+      handleRemoteResponse(peer, messageNode);
+    } else {
+      throw new MessageHandlingException("Improper JSON-RPC message: " + message);
+    }
+  }
+
+  private void handleRemoteRequest(JsonRpcPeer peer, JSONObject requestNode)
+      throws MessageHandlingException {
+    JsonRpcRequest request;
+    request = mObjectMapper.convertValue(
+        requestNode,
+        JsonRpcRequest.class);
+
+    JSONObject result = null;
+    JSONObject error = null;
+    try {
+      result = mMethodDispatcher.dispatch(peer,
+          request.method,
+          request.params);
+    } catch (JsonRpcException e) {
+      logDispatchException(e);
+      error = mObjectMapper.convertValue(e.getErrorMessage(), JSONObject.class);
+    }
+    if (request.id != null) {
+      JsonRpcResponse response = new JsonRpcResponse();
+      response.id = request.id;
+      response.result = result;
+      response.error = error;
+      JSONObject jsonObject = mObjectMapper.convertValue(response, JSONObject.class);
+      String responseString;
+      try {
+        responseString = jsonObject.toString();
+      } catch (OutOfMemoryError e) {
+        // JSONStringer can cause an OOM when the Json to handle is too big.
+        response.result = null;
+        response.error = mObjectMapper.convertValue(e.getMessage(), JSONObject.class);
+        jsonObject = mObjectMapper.convertValue(response, JSONObject.class);
+        responseString = jsonObject.toString();
+      }
+      peer.getWebSocket().sendText(responseString);
+    }
+  }
+
+  private void handleRemoteResponse(JsonRpcPeer peer, JSONObject responseNode)
+      throws MismatchedResponseException {
+    JsonRpcResponse response = mObjectMapper.convertValue(
+        responseNode,
+        JsonRpcResponse.class);
+    PendingRequest pendingRequest = peer.getAndRemovePendingRequest(response.id);
+    if (pendingRequest == null) {
+      throw new MismatchedResponseException(response.id);
+    }
+    if (pendingRequest.callback != null) {
+      pendingRequest.callback.onResponse(peer, response);
+    }
+  }
 }

@@ -71,17 +71,15 @@ public class Page implements ChromeDevtoolsDomain {
     message.level = Console.MessageLevel.LOG;
     message.text =
 // Note: not using Android resources so we can maintain .jar distribution for now.
-"_____/\\\\\\\\\\\\\\\\\\\\\\_______________________________________________/\\\\\\_______________________\n" +
-" ___/\\\\\\/////////\\\\\\____________________________________________\\/\\\\\\_______________________\n" +
-"  __\\//\\\\\\______\\///______/\\\\\\_________________________/\\\\\\______\\/\\\\\\_______________________\n" +
-"   ___\\////\\\\\\__________/\\\\\\\\\\\\\\\\\\\\\\_____/\\\\\\\\\\\\\\\\___/\\\\\\\\\\\\\\\\\\\\\\_\\/\\\\\\_____________/\\\\\\\\\\____\n" +
-"    ______\\////\\\\\\______\\////\\\\\\////____/\\\\\\/////\\\\\\_\\////\\\\\\////__\\/\\\\\\\\\\\\\\\\\\\\____/\\\\\\///\\\\\\__\n" +
-"     _________\\////\\\\\\______\\/\\\\\\_______/\\\\\\\\\\\\\\\\\\\\\\_____\\/\\\\\\______\\/\\\\\\/////\\\\\\__/\\\\\\__\\//\\\\\\_\n" +
-"      __/\\\\\\______\\//\\\\\\_____\\/\\\\\\_/\\\\__\\//\\\\///////______\\/\\\\\\_/\\\\__\\/\\\\\\___\\/\\\\\\_\\//\\\\\\__/\\\\\\__\n" +
-"       _\\///\\\\\\\\\\\\\\\\\\\\\\/______\\//\\\\\\\\\\____\\//\\\\\\\\\\\\\\\\\\\\____\\//\\\\\\\\\\___\\/\\\\\\___\\/\\\\\\__\\///\\\\\\\\\\/___\n" +
-"        ___\\///////////_________\\/////______\\//////////______\\/////____\\///____\\///_____\\/////_____\n" +
-"         Welcome to WEEX!\n" +
-"          Attached to " + ProcessUtil.getProcessName() + "\n";
+        "                                  _               _                 _      \n" +
+        "                                 | |             | |               | |     \n" +
+        " __      __ ___   ___ __  __   __| |  ___ __   __| |_  ___    ___  | | ___ \n" +
+        " \\ \\ /\\ / // _ \\ / _ \\\\ \\/ /  / _` | / _ \\\\ \\ / /| __|/ _ \\  / _ \\ | |/ __|\n" +
+        "  \\ V  V /|  __/|  __/ >  <  | (_| ||  __/ \\ V / | |_| (_) || (_) || |\\__ \\\n" +
+        "   \\_/\\_/  \\___| \\___|/_/\\_\\  \\__,_| \\___|  \\_/   \\__|\\___/  \\___/ |_||___/\n" +
+        "                                                                           \n" +
+        "                                                                           \n" +
+        "   Welcome to WEEX! Attached to " + ProcessUtil.getProcessName() + "\n";
     Console.MessageAddedRequest messageAddedRequest = new Console.MessageAddedRequest();
     messageAddedRequest.message = message;
     peer.invokeMethod("Console.messageAdded", messageAddedRequest, null /* callback */);
@@ -376,7 +374,7 @@ public class Page implements ChromeDevtoolsDomain {
 
   public static class ScreencastFrameEventMetadata {
     @JsonProperty(required = true)
-    public int pageScaleFactor;
+    public float pageScaleFactor;
     @JsonProperty(required = true)
     public int offsetTop;
     @JsonProperty(required = true)

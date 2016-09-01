@@ -9,13 +9,19 @@
 
 package com.taobao.weex.devtools.inspector.elements;
 
+import android.app.Activity;
+import android.app.Application;
 import android.os.SystemClock;
+import android.view.View;
 
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.ArrayListAccumulator;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.inspector.helper.ObjectIdMapper;
 import com.taobao.weex.devtools.inspector.helper.ThreadBoundProxy;
+import com.taobao.weex.devtools.inspector.protocol.module.DOM;
+import com.taobao.weex.ui.component.WXComponent;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -170,6 +176,83 @@ public final class Document extends ThreadBoundProxy {
     }
 
     return rootElement;
+  }
+
+  public void findMatchingElements(int x, int y, Accumulator<Integer> matchedIds) {
+    verifyThreadAccess();
+
+    final Object rootElement = mDocumentProvider.getRootElement();
+    final ElementInfo info = mShadowDocument.getElementInfo(rootElement);
+    if (info != null) {
+      for (int size = info.children.size(), i = size - 1; i >= 0; i--) {
+        final Object childElement = info.children.get(i);
+        Boolean found = false;
+        if (DOM.isNativeMode()) {
+          if (childElement instanceof Application) {
+            for (int s = info.children.size(), j = s - 1; j >= 0; j--) {
+              final ElementInfo childInfo = mShadowDocument.getElementInfo(childElement);
+              if (childInfo != null) {
+                final Object child = childInfo.children.get(j);
+                if (child instanceof Activity) {
+                  findMatches(child, x, y, matchedIds, found);
+                  if (found) {
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          if (childElement instanceof WXSDKInstance) {
+            findMatches(childElement, x, y, matchedIds, found);
+            if(found) {
+              break;
+            }
+          }
+        }
+      }
+    }
+
+
+  }
+
+  private void findMatches(Object element, int x, int y, Accumulator<Integer> matchedIds, Boolean found) {
+    final ElementInfo info = mShadowDocument.getElementInfo(element);
+    for (int size = info.children.size(), i = size - 1; i >= 0; i--) {
+      final Object childElement = info.children.get(i);
+
+      if (doesElementMatch(childElement, x, y)) {
+        matchedIds.store(mObjectIdMapper.getIdForObject(childElement));
+        found = true;
+      }
+
+      findMatches(childElement, x, y, matchedIds, found);
+    }
+  }
+
+  private boolean doesElementMatch(Object element, int x, int y) {
+    View view = null;
+    if (DOM.isNativeMode()) {
+      if (element instanceof View) {
+        view = (View)element;
+      }
+    } else {
+      if (element instanceof WXComponent) {
+        view = ((WXComponent) element).getHostView();
+      }
+    }
+
+    return view != null && isPointInsideView(x, y, view) && view.isShown();
+  }
+
+  public static boolean isPointInsideView(int x, int y, View view) {
+    int location[] = new int[2];
+    view.getLocationOnScreen(location);
+    int viewX = location[0];
+    int viewY = location[1];
+
+    //point is inside view bounds
+    return x > viewX && y > viewY && x < (viewX + view.getWidth()) && y < (viewY + view.getHeight());
   }
 
   public void findMatchingElements(String query, Accumulator<Integer> matchedIds) {

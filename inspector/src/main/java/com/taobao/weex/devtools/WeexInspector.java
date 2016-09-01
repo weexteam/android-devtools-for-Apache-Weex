@@ -225,6 +225,7 @@ public class WeexInspector {
     private final Application mContext;
     private final PluginBuilder<ChromeDevtoolsDomain> mDelegate = new PluginBuilder<>();
 
+
     @Nullable private DocumentProviderFactory mDocumentProvider;
     @Nullable private RuntimeReplFactory mRuntimeRepl;
     @Nullable private DatabaseFilesProvider mDatabaseFilesProvider;
