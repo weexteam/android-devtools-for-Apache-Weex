@@ -250,7 +250,7 @@ public class CSS implements ChromeDevtoolsDomain {
 
   private static class Selector {
     @JsonProperty(required = true)
-    public String value;
+    public String text;
 
     @JsonProperty
     public SourceRange range;
@@ -380,7 +380,7 @@ public class CSS implements ChromeDevtoolsDomain {
     match.matchingSelectors = ListUtil.newImmutableList(0);
 
     Selector selector = new Selector();
-    selector.value = value;
+    selector.text = value;
 
     CSSRule rule = new CSSRule();
 
