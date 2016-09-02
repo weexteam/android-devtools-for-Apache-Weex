@@ -1,4 +1,4 @@
-# Weex Devtools Android接入指南
+# Weex Devtools接入指南
 
 Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的一款调试神器.其主要功能简介请点击[这里](http://www.atatech.org/articles/58022)查看.这篇文章重点介绍Android端的接入问题及注意事项.
 
