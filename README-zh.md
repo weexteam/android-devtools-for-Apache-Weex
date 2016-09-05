@@ -33,6 +33,7 @@ App可以从Maven Central通过Gradle 或者 Maven添加对devtools aar的依赖
   
   或者
   * *源码依赖*.
+  
   需要复制[inspector](https://github.com/weexteam/weex_devtools_android/tree/master/inspector)目录到你的app的同级目录, 然后在工程的 `settings.gradle` 文件下添加 `include ":inspector"`, 此过程可以参考playground源码的工程配置及其配置, 然后在app的`build.gralde`中添加依赖.
   ```
   dependencies {
@@ -63,12 +64,10 @@ App可以从Maven Central通过Gradle 或者 Maven添加对devtools aar的依赖
 
 #### 添加Debug模式开关
 
-控制调试模式的打开和关闭的关键点可以概括为: **两个方法和一个广播**.
+控制调试模式的打开和关闭的关键点可以概括为三条规则.
 
-* 两个方法是 **initDebugEnvironment** 和 **WXSDKEngine.reload()**
-* 一个广播是 **IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH**
+**规则一 : 通过sRemoteDebugMode 和 sRemoteDebugProxyUrl和来设置开关和Debug Server地址.**
 
-##### 两个方法 —— initDebugEnvironment 和 WXSDKEngine.reload()
 Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试模式是否开启分别是:
 
 ```
@@ -76,7 +75,7 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
     public static String sRemoteDebugProxyUrl; // DebugServer的websocket地址
 ```
 
-**规则一 : 无论在App中无论以何种方式设置Debug模式, 都必须在恰当的时机调用类似如下的方法来设置WXEnvironment.sRemoteDebugMode 和 WXEnvironment.sRemoteDebugProxyUrl.**
+无论在App中无论以何种方式设置Debug模式, 都必须在恰当的时机调用类似如下的方法来设置WXEnvironment.sRemoteDebugMode 和 WXEnvironment.sRemoteDebugProxyUrl.
 
 ```
   private void initDebugEnvironment(boolean enable, String host) {
@@ -85,8 +84,9 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
   }
 ```
 
-**规则二 : 一般而言, 修改了WXEnvironment.sRemoteDebugMode以后都要调用`WXSDKEngine.reload()` 方法才能够使Debug模式生效.**
-WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试模式时需要调用此方法来创建新的weex运行时和DebugBridge并将所有的JS调用桥接到调试服务器执行. 在reload过程中会调用launchInspector, 这就是SDK控制debug模式最核心一个方法, 其传入参数即为sRemoteDebugMode, 若为true则该方法中尝试以反射的方式获取DebugBridge用来在远端执行JS, 否则在本地运行. 从这里可以看到, SDK对devtools的aar包并无强依赖, 我们的App只需要在Debug包中打包该aar即可, 这样多少可以缓解包大小问题和安全问题.
+**规则二 :修改sRemoteDebugMode后一定要调用`WXSDKEngine.reload()`.**
+
+一般來說，在修改了WXEnvironment.sRemoteDebugMode以后调用了`WXSDKEngine.reload()` 方法才能够使Debug模式生效. WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试模式时需要调用此方法来创建新的weex运行时和DebugBridge并将所有的JS调用桥接到调试服务器执行. 在reload过程中会调用launchInspector, 这就是SDK控制debug模式最核心一个方法, 其传入参数即为sRemoteDebugMode, 若为true则该方法中尝试以反射的方式获取DebugBridge用来在远端执行JS, 否则在本地运行. 从这里可以看到, SDK对devtools的aar包并无强依赖, 我们的App只需要在Debug包中打包该aar即可, 这样多少可以缓解包大小问题和安全问题.
 
 ```
   private void launchInspector(boolean remoteDebug) {
@@ -115,9 +115,10 @@ WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试�
   }
 ```
 
- 只要遵循上面的原理, 开启Debug模式的方式和时机可由接入方灵活实现. 若修改WXEnvironment.sRemoteDebugMode的时机在WXBridgeManager初始化和restart和之前则`WXSDKEngine.reload()`可忽略.
+ 只要遵循上面的原理, 开启Debug模式的方式和时机可由接入方灵活实现. **例外：** _若修改WXEnvironment.sRemoteDebugMode的时机在WXBridgeManager初始化和restart和之前则`WXSDKEngine.reload()`可忽略._
 
-##### 一个广播 —— IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH
+**规则三 : 通过响应ACTION_DEBUG_INSTANCE_REFRESH广播及时刷新.**
+
 广播ACTION_DEBUG_INSTANCE_REFRESH在调试模式切换和Chrome调试页面刷新时发出, 主要用来通知当前的weex容器以Debug模式重新加载当前页. 在playground中的处理过程如下:
 ```
   public class RefreshBroadcastReceiver extends BroadcastReceiver {
@@ -231,5 +232,3 @@ Chrome的V8引擎扮演着bundle javascript runtime的角色. 开启debug模式�
 4. **调试过程中频繁刷新连接失败, Server端提示重新启动App, 非必现**
   已知的原因如下:
   * 多线程操作网络连接引起, 在频繁的即断即连时容易触发. 在0.0.7.1版本已修复.
-
-
