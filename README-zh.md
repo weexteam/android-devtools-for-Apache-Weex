@@ -153,6 +153,7 @@ public class MyApplication extends Application {
 这种方式最直接, 在代码中直接hardcode了开启调试模式, 如果在SDK初始化之前调用甚至连`WXSDKEngine.reload()`都不需要调用, 接入方如果需要更灵活的策略可以将`initDebugEnvironment(boolean enable, String host)`和`WXSDKEngine.reload()`组合在一起在合适的位置和时机调用即可.
 
 * 范例2:扫码接入
+
 Playground中较多的使用扫码的方式传递信息, 不仅用这种方式控制Debug模式的开关,而且还通过它来传入bundle的url直接调试. 应当说在开发中这种方式是比较高效的, 省去了修改sdk代码重复编译和安装App的麻烦, 缺点就是调试工具这种方式接入需要App具有扫码和处理特定规则二维码的能力.除了Playground中的方式, 接入方亦可根据业务场景对Debugger和接入方式进行二次开发.
 Playground的集成的具体代码可参考如下两个文件:
     * 开关控制 , 主要參考對二維碼的處理部分.詳見[WXApplication.java](https://github.com/weexteam/weex_devtools_android/blob/master/playground/app/src/main/java/com/alibaba/weex/WXApplication.java)
@@ -160,11 +161,10 @@ Playground的集成的具体代码可参考如下两个文件:
 
 #### Ship It!
 
-##### 準備工作 
+##### 前置工作 
 如果未安装Debug Server, 在命令行执行 `npm install -g weex-toolkit` 既可以安装调试服务器, 运行命令 `weex debug` 就会启动DebugServer并打开一个调试页面. 页面下方会展示一个二维码, 这个二维码用于向App传递Server端的地址建立连接.
 
-
-如果你的App客户端完成了以上步骤那么恭喜你已经接入完成了, 就可以愉快的调试了, 调试体验和网页调试一致!如果你是一名调试weex bundle的新手, 建议你首先用官方的playground体验一下调试流程. 只需要启动app扫描chrome调试页面下方的第一个二维码即可建立与DebugServer的通信, chorome的调试页面将会列出连接成功的设备信息.
+如果你的App客户端完成了以上步骤那么恭喜你已经接入完成了, 就可以愉快的调试了, 调试体验和网页调试一致!建议新手首先用官方的playground体验一下调试流程. 只需要启动app扫描chrome调试页面下方的第一个二维码即可建立与DebugServer的通信, chorome的调试页面将会列出连接成功的设备信息.
 
 ![devtools-main](https://img.alicdn.com/tps/TB13fwSKFXXXXXDaXXXXXXXXXXX-887-828.png "connecting (multiple) devices")
 
