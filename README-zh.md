@@ -13,12 +13,13 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 #### 添加依赖
 App可以从Maven Central通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
-  * *Gradle依赖*.
+  * *Gradle依赖*.  
   ```
   dependencies {
      compile 'com.taobao.android:weex_inspector:0.0.7.1'
   }
   ```
+  
   或者
   * *Maven依赖*.
   ```
@@ -29,6 +30,7 @@ App可以从Maven Central通过Gradle 或者 Maven添加对devtools aar的依赖
     <type>pom</type>
   </dependency>
   ```
+  
   或者
   * *源码依赖*.
   需要复制[inspector](https://github.com/weexteam/weex_devtools_android/tree/master/inspector)目录到你的app的同级目录, 然后在工程的 `settings.gradle` 文件下添加 `include ":inspector"`, 此过程可以参考playground源码的工程配置及其配置, 然后在app的`build.gralde`中添加依赖.
