@@ -86,7 +86,7 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
 
 **规则二 :修改sRemoteDebugMode后一定要调用`WXSDKEngine.reload()`.**
 
-一般來說，在修改了WXEnvironment.sRemoteDebugMode以后调用了`WXSDKEngine.reload()` 方法才能够使Debug模式生效. WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试模式时需要调用此方法来创建新的weex运行时和DebugBridge并将所有的JS调用桥接到调试服务器执行. 在reload过程中会调用launchInspector, 这就是SDK控制debug模式最核心一个方法, 其传入参数即为sRemoteDebugMode, 若为true则该方法中尝试以反射的方式获取DebugBridge用来在远端执行JS, 否则在本地运行. 从这里可以看到, SDK对devtools的aar包并无强依赖, 我们的App只需要在Debug包中打包该aar即可, 这样多少可以缓解包大小问题和安全问题.
+一般來說，在修改了WXEnvironment.sRemoteDebugMode以后调用了`WXSDKEngine.reload()` 方法才能够使Debug模式生效. WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试模式时需要调用此方法来创建新的weex运行时和DebugBridge并将所有的JS调用桥接到调试服务器执行. 在reload过程中会调用launchInspector, 这就是SDK控制debug模式最核心一个方法, 其传入参数即为sRemoteDebugMode, 若为true则该方法中尝试以反射的方式获取DebugBridge用来在远端执行JS, 否则在本地运行. 
 
 ```
   private void launchInspector(boolean remoteDebug) {
@@ -115,7 +115,9 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
   }
 ```
 
- 只要遵循上面的原理, 开启Debug模式的方式和时机可由接入方灵活实现. **例外：** _若修改WXEnvironment.sRemoteDebugMode的时机在WXBridgeManager初始化和restart和之前则`WXSDKEngine.reload()`可忽略._
+ 只要遵循上面的原理, 开启Debug模式的方式和时机可由接入方灵活实现. 从launchInspector可以看到, SDK对devtools的aar包并无强依赖, 我们的App只需要在Debug包中打包该aar即可, 这样多少可以缓解包大小问题和安全问题.
+ 
+ **例外：** _若修改WXEnvironment.sRemoteDebugMode的时机在WXBridgeManager初始化和restart和之前则`WXSDKEngine.reload()`可忽略._
 
 **规则三 : 通过响应ACTION_DEBUG_INSTANCE_REFRESH广播及时刷新.**
 
@@ -141,7 +143,7 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
 #### 接入示例
 最简单方式就是复用Playground的相关代码,比如扫码和刷新等模块, 但是扫码不是必须的, 它只是与app通信的一种形式, 二维码里的包含DebugServer IP及bundle地址等信息,用于建立App和Debug Server之间的连接及动态加载bundle. 在Playground中给出了两种开启debug模式的范例.
 
-* 范例1: 在XXXApplication中初始化
+* 范例1: 通过在XXXApplication中设置开关打开调试模式
 ```
 public class MyApplication extends Application {
   public void onCreate() {
@@ -152,10 +154,11 @@ public class MyApplication extends Application {
 ```
 这种方式最直接, 在代码中直接hardcode了开启调试模式, 如果在SDK初始化之前调用甚至连`WXSDKEngine.reload()`都不需要调用, 接入方如果需要更灵活的策略可以将`initDebugEnvironment(boolean enable, String host)`和`WXSDKEngine.reload()`组合在一起在合适的位置和时机调用即可.
 
-* 范例2:扫码接入
+* 范例2:通过扫码打开调试模式
 
 Playground中较多的使用扫码的方式传递信息, 不仅用这种方式控制Debug模式的开关,而且还通过它来传入bundle的url直接调试. 应当说在开发中这种方式是比较高效的, 省去了修改sdk代码重复编译和安装App的麻烦, 缺点就是调试工具这种方式接入需要App具有扫码和处理特定规则二维码的能力.除了Playground中的方式, 接入方亦可根据业务场景对Debugger和接入方式进行二次开发.
-Playground的集成的具体代码可参考如下两个文件:
+
+Playground集成的具体代码可参考如下两个文件:
     * 开关控制 , 主要參考對二維碼的處理部分.詳見[WXApplication.java](https://github.com/weexteam/weex_devtools_android/blob/master/playground/app/src/main/java/com/alibaba/weex/WXApplication.java)
     * 刷新控制 , 主要參考是容器對ACTION_DEBUG_INSTANCE_REFRESH的處理, 詳見[WXPageActivity.java](https://github.com/weexteam/weex_devtools_android/blob/master/playground/app/src/main/java/com/alibaba/weex/WXPageActivity.java)
 
