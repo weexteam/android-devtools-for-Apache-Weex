@@ -12,7 +12,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 ## Android应用接入
 
 #### 添加依赖
-可以从Maven Central通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
+可以通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
   * *Gradle依赖*.  
   ```
