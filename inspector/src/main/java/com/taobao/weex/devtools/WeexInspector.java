@@ -33,6 +33,7 @@ import com.taobao.weex.devtools.inspector.protocol.module.Database;
 import com.taobao.weex.devtools.inspector.protocol.module.DatabaseConstants;
 import com.taobao.weex.devtools.inspector.protocol.module.Debugger;
 import com.taobao.weex.devtools.inspector.protocol.module.HeapProfiler;
+import com.taobao.weex.devtools.inspector.protocol.module.Input;
 import com.taobao.weex.devtools.inspector.protocol.module.Inspector;
 import com.taobao.weex.devtools.inspector.protocol.module.Network;
 import com.taobao.weex.devtools.inspector.protocol.module.Page;
@@ -323,6 +324,7 @@ public class WeexInspector {
         provideIfDesired(new DOM(document));
         provideIfDesired(new CSS(document));
       }
+      provideIfDesired(new Input());
       provideIfDesired(new DOMStorage(mContext));
       provideIfDesired(new HeapProfiler());
       provideIfDesired(new Inspector());

@@ -29,7 +29,7 @@ import com.taobao.weex.devtools.inspector.protocol.module.Page;
 import java.io.ByteArrayOutputStream;
 
 public final class ScreencastDispatcher {
-  private static final long FRAME_DELAY = 300l;
+  private static final long FRAME_DELAY = 250l;
   private static float sBitmapScale = 1.0f;
 
   private final Handler mMainHandler = new Handler(Looper.getMainLooper());
