@@ -462,17 +462,17 @@ public class DOM implements ChromeDevtoolsDomain {
 
   private static class BoxModel {
     @JsonProperty(required = true)
-    List<Double> content;
+    public List<Double> content;
     @JsonProperty(required = true)
-    List<Double> padding;
+    public List<Double> padding;
     @JsonProperty(required = true)
-    List<Double> border;
+    public List<Double> border;
     @JsonProperty(required = true)
-    List<Double> margin;
+    public List<Double> margin;
     @JsonProperty(required = true)
-    Integer width;
+    public Integer width;
     @JsonProperty(required = true)
-    Integer height;
+    public Integer height;
   }
 
   private Node createNodeForElement(
