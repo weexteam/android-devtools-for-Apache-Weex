@@ -107,6 +107,18 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   @ChromeDevtoolsMethod
+  public void callAddElement(JsonRpcPeer peer, JSONObject params) {
+    if (params != null) {
+      DebugBridge.getInstance().callAddElement(
+          params.optString("instance"),
+          params.optString("ref"),
+          params.optString("dom"),
+          params.optString("index"),
+          params.optString("callback"));
+    }
+  }
+
+  @ChromeDevtoolsMethod
   public void reload(JsonRpcPeer peer, JSONObject params) {
     WXSDKEngine.reload();
     Context context = WXEnvironment.getApplication();
