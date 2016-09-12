@@ -3,11 +3,15 @@ package com.taobao.weex.devtools.debug;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.websocket.SimpleSession;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,6 +144,15 @@ public class DebugBridge implements IWXBridge {
       return mJsManager.callNative(instanceId, tasks, callback);
     } else {
       return 0;
+    }
+  }
+
+  @Override
+  public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
+    if (mJsManager != null) {
+      return mJsManager.callAddElement(instanceId, ref, dom, index, callback);
+    } else {
+      return 1;
     }
   }
 
