@@ -56,7 +56,7 @@ public class Input implements ChromeDevtoolsDomain {
         instrumentation.sendKeyDownUpSync(code);
         return null;
       } else if (request.nativeVirtualKeyCode >= 65 && request.nativeVirtualKeyCode <= 90) {
-        //a-z
+        // a-z
         int code = request.nativeVirtualKeyCode - 65 + KeyEvent.KEYCODE_A;
         instrumentation.sendKeyDownUpSync(code);
         return null;
