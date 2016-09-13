@@ -29,15 +29,7 @@ public final class ViewUtil {
   }
 
   private static boolean isHittable(View view) {
-    if (view.getVisibility() != View.VISIBLE) {
-      return false;
-    }
-
-    if (ViewCompat.getInstance().getAlpha(view) < 0.001f) {
-      return false;
-    }
-
-    return true;
+    return view.getVisibility() == View.VISIBLE && ViewCompat.getInstance().getAlpha(view) > 0.001f;
   }
 
   @Nullable

@@ -71,7 +71,7 @@ public class MethodInvoker {
       return false;
     }
 
-    abstract T convertArgument(String argument);
+    protected abstract T convertArgument(String argument);
   }
 
   private static class StringMethodInvoker extends TypedMethodInvoker<String> {
@@ -80,7 +80,7 @@ public class MethodInvoker {
     }
 
     @Override
-    String convertArgument(String argument) {
+    protected String convertArgument(String argument) {
       return argument;
     }
   }
@@ -91,7 +91,7 @@ public class MethodInvoker {
     }
 
     @Override
-    CharSequence convertArgument(String argument) {
+    protected CharSequence convertArgument(String argument) {
       return argument;
     }
   }
@@ -102,7 +102,7 @@ public class MethodInvoker {
     }
 
     @Override
-    Integer convertArgument(String argument) {
+    protected Integer convertArgument(String argument) {
       return Integer.parseInt(argument);
     }
   }
@@ -113,7 +113,7 @@ public class MethodInvoker {
     }
 
     @Override
-    Float convertArgument(String argument) {
+    protected Float convertArgument(String argument) {
       return Float.parseFloat(argument);
     }
   }
@@ -124,7 +124,7 @@ public class MethodInvoker {
     }
 
     @Override
-    Boolean convertArgument(String argument) {
+    protected Boolean convertArgument(String argument) {
       return Boolean.parseBoolean(argument);
     }
   }

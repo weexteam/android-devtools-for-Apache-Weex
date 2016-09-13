@@ -21,8 +21,8 @@ import javax.annotation.Nullable;
 
 // @VisibleForTest
 public class DecompressionHelper {
-  static final String GZIP_ENCODING = "gzip";
-  static final String DEFLATE_ENCODING = "deflate";
+  protected static final String GZIP_ENCODING = "gzip";
+  protected static final String DEFLATE_ENCODING = "deflate";
 
   public static InputStream teeInputWithDecompression(
       NetworkPeerManager peerManager,

@@ -88,7 +88,7 @@ public class SqliteDatabaseDriver extends Database.DatabaseDriver {
    * @return Tidied list with shadow databases removed.
    */
   // @VisibleForTesting
-  static List<File> tidyDatabaseList(List<File> databaseFiles) {
+  protected static List<File> tidyDatabaseList(List<File> databaseFiles) {
     Set<File> originalAsSet = new HashSet<File>(databaseFiles);
     List<File> tidiedList = new ArrayList<File>();
     for (File databaseFile : databaseFiles) {
@@ -155,10 +155,10 @@ public class SqliteDatabaseDriver extends Database.DatabaseDriver {
     }
   }
 
-  private static String getFirstWord(String s) {
-    s = s.trim();
-    int firstSpace = s.indexOf(' ');
-    return firstSpace >= 0 ? s.substring(0, firstSpace) : s;
+  private static String getFirstWord(String str) {
+    str = str.trim();
+    int firstSpace = str.indexOf(' ');
+    return firstSpace >= 0 ? str.substring(0, firstSpace) : str;
   }
 
   @TargetApi(DatabaseConstants.MIN_API_LEVEL)

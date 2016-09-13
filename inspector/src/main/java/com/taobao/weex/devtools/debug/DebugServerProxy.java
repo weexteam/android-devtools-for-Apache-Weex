@@ -68,6 +68,7 @@ public class DebugServerProxy implements IWXDebugProxy {
         break;
       default:
         LogRedirector.w(TAG, "Error processing remote message", e);
+        break;
     }
   }
 

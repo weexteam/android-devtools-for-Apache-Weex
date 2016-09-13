@@ -115,7 +115,7 @@ dependencies {
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     provided 'com.android.support:appcompat-v7:23.1.1'
-    provided 'com.taobao.android:weex_sdk:0.7.0'
+    provided 'com.taobao.android:weex_sdk:0.8.0.1'
     provided 'com.alibaba:fastjson:1.1.45+'
 }
 

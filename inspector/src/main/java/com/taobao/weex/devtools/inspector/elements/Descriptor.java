@@ -24,13 +24,13 @@ public abstract class Descriptor implements NodeDescriptor {
   protected Descriptor() {
   }
 
-  final void initialize(Host host) {
+  protected final void initialize(Host host) {
     Util.throwIfNull(host);
     Util.throwIfNotNull(mHost);
     mHost = host;
   }
 
-  final boolean isInitialized() {
+  protected final boolean isInitialized() {
     return mHost != null;
   }
 

@@ -163,6 +163,7 @@ public class ChromeDevtoolsServer implements SimpleEndpoint {
         break;
       default:
         LogRedirector.w(TAG, "Error processing remote message", e);
+        break;
     }
   }
 
