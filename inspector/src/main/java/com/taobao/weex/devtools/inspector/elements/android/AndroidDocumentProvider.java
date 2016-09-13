@@ -22,8 +22,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.WXSDKManager;
-import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.common.Predicate;
 import com.taobao.weex.devtools.common.ThreadBound;
@@ -346,14 +344,12 @@ final class AndroidDocumentProvider extends ThreadBoundProxy
           final View parent = (View)getParent();
           View view = ViewUtil.hitTest(parent, event.getX(), event.getY(), mViewSelector);
 
-          if (event.getAction() != MotionEvent.ACTION_CANCEL) {
-            if (view != null) {
-              mHighlighter.setHighlightedView(view, INSPECT_HOVER_COLOR);
+          if (view != null && event.getAction() != MotionEvent.ACTION_CANCEL) {
+            mHighlighter.setHighlightedView(view, INSPECT_HOVER_COLOR);
 
-              if (event.getAction() == MotionEvent.ACTION_UP) {
-                if (mListener != null) {
-                  mListener.onInspectRequested(view);
-                }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+              if (mListener != null) {
+                mListener.onInspectRequested(view);
               }
             }
           }
