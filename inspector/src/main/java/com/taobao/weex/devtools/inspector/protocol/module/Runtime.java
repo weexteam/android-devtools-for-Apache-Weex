@@ -254,7 +254,7 @@ public class Runtime implements ChromeDevtoolsDomain {
       EvaluateRequest request = mObjectMapper.convertValue(params, EvaluateRequest.class);
 
       try {
-        if (!request.objectGroup.equals("console")) {
+        if (!"console".equals(request.objectGroup)) {
           return buildExceptionResponse("Not supported by FAB");
         }
 

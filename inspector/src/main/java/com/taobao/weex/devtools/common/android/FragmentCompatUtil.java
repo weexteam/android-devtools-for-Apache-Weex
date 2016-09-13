@@ -21,19 +21,15 @@ public final class FragmentCompatUtil {
   }
 
   public static boolean isDialogFragment(Object fragment) {
+    boolean result = false;
     FragmentCompat supportLib = FragmentCompat.getSupportLibInstance();
-    if (supportLib != null &&
-        supportLib.getDialogFragmentClass().isInstance(fragment)) {
-      return true;
+    result = supportLib != null && supportLib.getDialogFragmentClass().isInstance(fragment);
+    if (!result) {
+      FragmentCompat framework = FragmentCompat.getFrameworkInstance();
+      result = framework != null && framework.getDialogFragmentClass().isInstance(fragment);
     }
 
-    FragmentCompat framework = FragmentCompat.getFrameworkInstance();
-    if (framework != null &&
-        framework.getDialogFragmentClass().isInstance(fragment)) {
-      return true;
-    }
-
-    return false;
+    return result;
   }
 
   @Nullable
