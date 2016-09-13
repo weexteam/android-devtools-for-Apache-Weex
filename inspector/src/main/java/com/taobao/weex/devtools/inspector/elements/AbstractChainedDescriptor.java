@@ -41,7 +41,7 @@ public abstract class AbstractChainedDescriptor<E> extends Descriptor implements
   public void setSuper(Descriptor superDescriptor) {
     Util.throwIfNull(superDescriptor);
 
-    if (superDescriptor != mSuper) {
+    if (!superDescriptor.equals(mSuper)) {
       if (mSuper != null) {
         throw new IllegalStateException();
       }

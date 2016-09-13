@@ -385,7 +385,7 @@ public class WeexInspector {
    * Configure what services are to be enabled in this instance of WeexInspector.
    */
   public static class InitializerBuilder {
-    final Context mContext;
+    protected final Context mContext;
 
     // @Nullable DumperPluginsProvider mDumperPlugins;
     @Nullable InspectorModulesProvider mInspectorModules;

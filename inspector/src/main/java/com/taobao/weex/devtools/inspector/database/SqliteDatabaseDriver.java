@@ -155,10 +155,10 @@ public class SqliteDatabaseDriver extends Database.DatabaseDriver {
     }
   }
 
-  private static String getFirstWord(String s) {
-    s = s.trim();
-    int firstSpace = s.indexOf(' ');
-    return firstSpace >= 0 ? s.substring(0, firstSpace) : s;
+  private static String getFirstWord(String str) {
+    str = str.trim();
+    int firstSpace = str.indexOf(' ');
+    return firstSpace >= 0 ? str.substring(0, firstSpace) : str;
   }
 
   @TargetApi(DatabaseConstants.MIN_API_LEVEL)

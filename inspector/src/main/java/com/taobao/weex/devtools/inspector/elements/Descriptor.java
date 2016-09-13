@@ -30,7 +30,7 @@ public abstract class Descriptor implements NodeDescriptor {
     mHost = host;
   }
 
-  final boolean isInitialized() {
+  protected final boolean isInitialized() {
     return mHost != null;
   }
 
