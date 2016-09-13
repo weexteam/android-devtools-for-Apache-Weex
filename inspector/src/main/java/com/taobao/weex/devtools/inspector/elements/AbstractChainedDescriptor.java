@@ -49,7 +49,7 @@ public abstract class AbstractChainedDescriptor<E> extends Descriptor implements
     }
   }
 
-  final Descriptor getSuper() {
+  public final Descriptor getSuper() {
     return mSuper;
   }
 
