@@ -88,7 +88,7 @@ public class SqliteDatabaseDriver extends Database.DatabaseDriver {
    * @return Tidied list with shadow databases removed.
    */
   // @VisibleForTesting
-  static List<File> tidyDatabaseList(List<File> databaseFiles) {
+  protected static List<File> tidyDatabaseList(List<File> databaseFiles) {
     Set<File> originalAsSet = new HashSet<File>(databaseFiles);
     List<File> tidiedList = new ArrayList<File>();
     for (File databaseFile : databaseFiles) {
