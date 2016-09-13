@@ -25,7 +25,7 @@ abstract class ViewHighlightOverlays {
 
   public abstract void removeHighlight(View view);
 
-  static ViewHighlightOverlays newInstance() {
+  protected static ViewHighlightOverlays newInstance() {
     // This may not be needed since ViewHighlighter.newInstance() is already instantiating a
     // NoopHighlighter for SDK_INT < JELLY_BEAN_MR2, but just to make sure...
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -96,7 +96,7 @@ abstract class ViewHighlightOverlays {
       public HighlightDrawable() {
       }
 
-      void highlightView(View view) {
+      protected void highlightView(View view) {
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
         if (layoutParams instanceof MarginLayoutParams) {
           MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
@@ -120,7 +120,7 @@ abstract class ViewHighlightOverlays {
     static class MainHighlightDrawable extends HighlightDrawable {
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(0, 0, view.getWidth(), view.getHeight());
       }
@@ -144,7 +144,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(mPaddings.left, 0, view.getWidth() - mPaddings.right, mPaddings.top);
       }
@@ -156,7 +156,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(mPaddings.left, view.getHeight() - mPaddings.bottom,
             view.getWidth() - mPaddings.right, view.getHeight());
@@ -169,7 +169,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(view.getWidth() - mPaddings.right, 0, view.getWidth(), view.getHeight());
       }
@@ -181,7 +181,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(0, 0, mPaddings.left, view.getHeight());
       }
@@ -194,7 +194,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(0, 0, view.getWidth(), mMargins.top);
       }
@@ -213,7 +213,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(0, view.getHeight() - mMargins.bottom, view.getWidth(), view.getHeight());
       }
@@ -232,7 +232,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(view.getWidth() - mMargins.right, 0, view.getWidth(),
             view.getHeight() + mMargins.top + mMargins.bottom);
@@ -253,7 +253,7 @@ abstract class ViewHighlightOverlays {
       }
 
       @Override
-      void highlightView(View view) {
+      public void highlightView(View view) {
         super.highlightView(view);
         setBounds(0, 0, mMargins.left, view.getHeight() + mMargins.top + mMargins.bottom);
       }

@@ -376,7 +376,7 @@ public class CSS implements ChromeDevtoolsDomain {
     public List<InheritedStyleEntry> inherited;
   }
 
-  void initMatch(RuleMatch match, String value) {
+  private void initMatch(RuleMatch match, String value) {
     match.matchingSelectors = ListUtil.newImmutableList(0);
 
     Selector selector = new Selector();
