@@ -158,7 +158,7 @@ public class DebugServerProxy implements IWXDebugProxy {
   public void stop() {
     synchronized (DebugServerProxy.class) {
       if (mWebSocketClient != null) {
-        mWebSocketClient.closeQuietly();
+        mWebSocketClient.close(0, null);
         mWebSocketClient = null;
       }
       mBridge = null;
