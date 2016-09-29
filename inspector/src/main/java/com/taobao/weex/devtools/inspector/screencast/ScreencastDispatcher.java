@@ -139,8 +139,11 @@ public final class ScreencastDispatcher {
       mMetadata.deviceWidth = width;
       mMetadata.deviceHeight = height;
       mEvent.metadata = mMetadata;
-      mPeer.invokeMethod("Page.screencastFrame", mEvent, null);
-      mMainHandler.postDelayed(mEndAction, FRAME_DELAY);
+      if (mPeer.getWebSocket() != null && mPeer.getWebSocket().isOpen()) {
+        mPeer.invokeMethod("Page.screencastFrame", mEvent, null);
+        mMainHandler.postDelayed(mEndAction, FRAME_DELAY);
+      }
+
     }
   }
 
