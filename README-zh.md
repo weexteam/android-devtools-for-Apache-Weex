@@ -67,7 +67,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 
 | weex sdk | weex inspector | debug server |
 |----------|----------------|--------------|
-|0.8.0.1+  | 0.0.8.1        |0.2.39+       |
+|0.8.0.1+  | 0.0.8.1+       |0.2.39+       |
 |0.7.0+    | 0.0.7.13       |0.2.38        |
 |0.6.0+    | 0.0.2.2        |              |
 
