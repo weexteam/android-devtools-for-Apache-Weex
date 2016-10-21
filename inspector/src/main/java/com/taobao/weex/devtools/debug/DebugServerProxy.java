@@ -43,6 +43,7 @@ import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
+  private static final String DEVTOOL_VERSION = "0.0.8.5";
   private DebugSocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;
@@ -97,6 +98,7 @@ public class DebugServerProxy implements IWXDebugProxy {
           func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
           func.put("model", WXEnvironment.SYS_MODEL);
           func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
+          func.put("devtoolVersion", DEVTOOL_VERSION);
           func.put("platform", WXEnvironment.OS);
           func.put("deviceId", getDeviceId(mContext));
           if (WXEnvironment.sLogLevel != null) {
