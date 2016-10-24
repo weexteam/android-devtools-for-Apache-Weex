@@ -7,5 +7,4 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    <dimen name="title_bar_height">56dp</dimen>
 </resources>
