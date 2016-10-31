@@ -8,7 +8,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.squareup.okhttp.ws.WebSocket;
+
+import okhttp3.MediaType;
+import okhttp3.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -172,8 +174,8 @@ public class DebugServerProxy implements IWXDebugProxy {
     return mBridge;
   }
 
-  public void handleMessage(BufferedSource payload, WebSocket.PayloadType type) throws IOException {
-    if (type != WebSocket.PayloadType.TEXT) {
+  public void handleMessage(BufferedSource payload, MediaType type) throws IOException {
+    if (type != WebSocket.TEXT) {
       return;
     }
     try {

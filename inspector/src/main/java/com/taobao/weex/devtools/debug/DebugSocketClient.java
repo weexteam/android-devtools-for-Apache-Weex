@@ -8,19 +8,20 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ws.WebSocket;
-import com.squareup.okhttp.ws.WebSocketCall;
-import com.squareup.okhttp.ws.WebSocketListener;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.ws.WebSocket;
+import okhttp3.ws.WebSocketCall;
+import okhttp3.ws.WebSocketListener;
 import okio.Buffer;
-import okio.BufferedSource;
 
 public class DebugSocketClient implements WebSocketListener, SimpleSession {
 
@@ -57,9 +58,9 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
   }
 
   @Override
-  public void onMessage(BufferedSource payload, WebSocket.PayloadType type)
+  public void onMessage(ResponseBody payload)
       throws IOException {
-    mProxy.handleMessage(payload, type);
+    mProxy.handleMessage(payload.source(), payload.contentType());
   }
 
   @Override
@@ -75,13 +76,12 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
   }
 
   @Override
-  public void onFailure(IOException e) {
+  public void onFailure(IOException e, Response response) {
     abort("Websocket exception", e);
   }
 
   @Override
-  public void onOpen(WebSocket webSocket, Request arg1, Response arg2)
-      throws IOException {
+  public void onOpen(WebSocket webSocket, Response response) {
     mWebSocket = webSocket;
     if (mConnectCallback != null) {
       mConnectCallback.onSuccess(null);
@@ -120,11 +120,11 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
     if (mHttpClient != null) {
       throw new IllegalStateException("DebugSocketClient is already initialized.");
     }
-    mHttpClient = new OkHttpClient();
-    mHttpClient.setConnectTimeout(30, TimeUnit.SECONDS);
-    mHttpClient.setWriteTimeout(30, TimeUnit.SECONDS);
-    // Disable timeouts for read
-    mHttpClient.setReadTimeout(0, TimeUnit.MINUTES);
+    mHttpClient = new OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(0, TimeUnit.MINUTES)
+        .build();
 
     if (!TextUtils.isEmpty(url)) {
       Request request = new Request.Builder().url(url).build();
@@ -149,11 +149,9 @@ public class DebugSocketClient implements WebSocketListener, SimpleSession {
     if (mWebSocket == null) {
       return;
     }
-    Buffer messageBuffer = new Buffer();
-    messageBuffer.writeUtf8(message);
     try {
       // Log.v(TAG, "sendMessage " + message);
-      mWebSocket.sendMessage(WebSocket.PayloadType.TEXT, messageBuffer);
+      mWebSocket.sendMessage(RequestBody.create(WebSocket.TEXT, message));
     } catch (IOException e) {
       Log.e(TAG, "sendMessage IOException " + e.toString());
     }
