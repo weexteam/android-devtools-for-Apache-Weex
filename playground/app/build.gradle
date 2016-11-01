@@ -73,6 +73,8 @@ dependencies {
     // compile project(':weex_sdk')
     compile 'com.taobao.android:weex_sdk:0.8.0'
     compile project(':appframework')
+//    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+//    compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     compile 'com.squareup.okio:okio:1.0.1'
