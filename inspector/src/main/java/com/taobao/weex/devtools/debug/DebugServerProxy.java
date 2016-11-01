@@ -8,9 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-
-import okhttp3.MediaType;
-import okhttp3.ws.WebSocket;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -38,15 +35,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import okio.BufferedSource;
-
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
   private static final String DEVTOOL_VERSION = "0.0.8.5";
-  private DebugSocketClient mWebSocketClient;
+  private SocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;
   private Iterable<ChromeDevtoolsDomain> mDomainModules;
@@ -58,7 +53,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
   public DebugServerProxy(Context context, WXBridgeManager jsManager) {
     mContext = context;
-    mWebSocketClient = new DebugSocketClient(this);
+    mWebSocketClient = SocketClientFactory.create(this);
     mJsManager = jsManager;
     mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
   }
@@ -93,7 +88,7 @@ public class DebugServerProxy implements IWXDebugProxy {
       mBridge = DebugBridge.getInstance();
       mBridge.setSession(mWebSocketClient);
       mBridge.setBridgeManager(mJsManager);
-      mWebSocketClient.connect(mRemoteUrl, new DebugSocketClient.Callback() {
+      mWebSocketClient.connect(mRemoteUrl, new OkHttp3SocketClient.Callback() {
 
         private String getShakeHandsMessage() {
           Map<String, Object> func = new HashMap<>();
@@ -174,22 +169,11 @@ public class DebugServerProxy implements IWXDebugProxy {
     return mBridge;
   }
 
-  public void handleMessage(BufferedSource payload, MediaType type) throws IOException {
-    if (type != WebSocket.TEXT) {
-      return;
-    }
+  public void handleMessage(String message) throws IOException {
     try {
-      try {
-        String message = payload.readUtf8();
-        Util.throwIfNull(mPeer);
-        handleRemoteMessage(mPeer, message);
-      } catch (Exception e) {
-
-      } finally {
-        payload.close();
-      }
-
-    } catch (IOException e) {
+      Util.throwIfNull(mPeer);
+      handleRemoteMessage(mPeer, message);
+    } catch (Exception e) {
       if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
         LogRedirector.v(TAG, "Unexpected I/O exception processing message: " + e);
       }
