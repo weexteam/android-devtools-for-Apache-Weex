@@ -467,7 +467,7 @@ public class Runtime implements ChromeDevtoolsDomain {
     public ObjectType type;
   }
 
-  private static class GetPropertiesRequest implements JsonRpcResult {
+  private static class GetPropertiesRequest {
     @JsonProperty(required = true)
     public boolean ownProperties;
 
