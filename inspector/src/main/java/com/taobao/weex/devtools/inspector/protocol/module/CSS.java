@@ -354,7 +354,7 @@ public class CSS implements ChromeDevtoolsDomain {
     public List<CSSComputedStyleProperty> computedStyle;
   }
 
-  private static class GetMatchedStylesForNodeRequest implements JsonRpcResult {
+  private static class GetMatchedStylesForNodeRequest {
     @JsonProperty(required = true)
     public int nodeId;
 
