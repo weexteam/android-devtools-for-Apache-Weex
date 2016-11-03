@@ -1,10 +1,5 @@
 package com.taobao.weex.devtools.debug;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -13,6 +8,7 @@ import com.taobao.weex.devtools.common.ReflectionUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -23,98 +19,58 @@ import java.util.concurrent.TimeUnit;
 public class OkHttpSocketClient extends SocketClient {
 
   private static final String TAG = "OkHttpSocketClient";
-  private static final String KEY_MESSAGE = "web_socket_message";
-  private Handler mHandler;
-  private Object mWebSocket;
-  private Callback mConnectCallback;
-  private DebugServerProxy mProxy;
-  private HandlerThread mHandlerThread;
-  private Object mSocketClient;
-  private Object mWebSocketListener;
-  private InvocationHandler mInvocationHandler;
 
   private static HashMap<String, Class> sClazzMap = new HashMap<String, Class>();
 
+  private static final String CLASS_WEBSOCKET = "com.squareup.okhttp.ws.WebSocket";
+  private static final String CLASS_WEBSOCKET_LISTENER = "com.squareup.okhttp.ws.WebSocketListener";
+  private static final String CLASS_WEBSOCKET_CALL = "com.squareup.okhttp.ws.WebSocketCall";
+  private static final String CLASS_WEBSOCKET_PAYLOADTYPE = "com.squareup.okhttp.ws.WebSocket$PayloadType";
+
+  private static final String CLASS_OKHTTP_CLIENT = "com.squareup.okhttp.OkHttpClient";
+  private static final String CLASS_RESPONSE = "com.squareup.okhttp.Response";
+  private static final String CLASS_REQUEST = "com.squareup.okhttp.Request";
+  private static final String CLASS_REQUEST_BUILDER = "com.squareup.okhttp.Request$Builder";
+
+  private static final String CLASS_BUFFER = "okio.Buffer";
+  private static final String CLASS_BUFFER_SOURCE = "okio.BufferedSource";
+
   static {
-    try {
-      sClazzMap.put("com.squareup.okhttp.ws.WebSocket", Class.forName("com.squareup.okhttp.ws.WebSocket"));
-      sClazzMap.put("com.squareup.okhttp.ws.WebSocketListener", Class.forName("com.squareup.okhttp.ws.WebSocketListener"));
-      sClazzMap.put("com.squareup.okhttp.Response", Class.forName("com.squareup.okhttp.Response"));
-      sClazzMap.put("com.squareup.okhttp.Request", Class.forName("com.squareup.okhttp.Request"));
-      sClazzMap.put("com.squareup.okhttp.Request$Builder", Class.forName("com.squareup.okhttp.Request$Builder"));
-      sClazzMap.put("com.squareup.okhttp.ws.WebSocketCall", Class.forName("com.squareup.okhttp.ws.WebSocketCall"));
-
-      sClazzMap.put("com.squareup.okhttp.ws.WebSocket$PayloadType", Class.forName("com.squareup.okhttp.ws.WebSocket$PayloadType"));
-      sClazzMap.put("com.squareup.okhttp.OkHttpClient", Class.forName("com.squareup.okhttp.OkHttpClient"));
-
-      sClazzMap.put("okio.Buffer", Class.forName("okio.Buffer"));
-      sClazzMap.put("okio.BufferedSource", Class.forName("okio.BufferedSource"));
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+    String[] classNames = new String[]{
+        CLASS_WEBSOCKET,
+        CLASS_WEBSOCKET_LISTENER,
+        CLASS_WEBSOCKET_CALL,
+        CLASS_WEBSOCKET_PAYLOADTYPE,
+        CLASS_OKHTTP_CLIENT,
+        CLASS_RESPONSE,
+        CLASS_REQUEST,
+        CLASS_REQUEST_BUILDER,
+        CLASS_BUFFER,
+        CLASS_BUFFER_SOURCE
+    };
+    for (String className : classNames) {
+      sClazzMap.put(className, ReflectionUtil.tryGetClassForName(className));
     }
   }
 
-  Class mOkHttpClientClazz = sClazzMap.get("com.squareup.okhttp.OkHttpClient");
-  Class mRequestClazz = sClazzMap.get("com.squareup.okhttp.Request");
-  Class mRequestBuilderClazz = sClazzMap.get("com.squareup.okhttp.Request$Builder");
-  Class mWebSocketCallClazz = sClazzMap.get("com.squareup.okhttp.ws.WebSocketCall");
-  Class mWebSocketListenerClazz = sClazzMap.get("com.squareup.okhttp.ws.WebSocketListener");
+  private Class mOkHttpClientClazz = sClazzMap.get(CLASS_OKHTTP_CLIENT);
+  private Class mRequestClazz = sClazzMap.get(CLASS_REQUEST);
+  private Class mRequestBuilderClazz = sClazzMap.get(CLASS_REQUEST_BUILDER);
+  private Class mWebSocketCallClazz = sClazzMap.get(CLASS_WEBSOCKET_CALL);
+  private Class mWebSocketListenerClazz = sClazzMap.get(CLASS_WEBSOCKET_LISTENER);
 
-  Class mMediaTypeClazz = sClazzMap.get("com.squareup.okhttp.ws.WebSocket$PayloadType");
-  Class mWebSocketClazz = sClazzMap.get("com.squareup.okhttp.ws.WebSocket");
+  private Class mMediaTypeClazz = sClazzMap.get(CLASS_WEBSOCKET_PAYLOADTYPE);
+  private Class mWebSocketClazz = sClazzMap.get(CLASS_WEBSOCKET);
 
-  Class mBufferClazz = sClazzMap.get("okio.Buffer");
-  Class mBufferedSourceClazz = sClazzMap.get("okio.BufferedSource");
+  private Class mBufferClazz = sClazzMap.get(CLASS_BUFFER);
+  private Class mBufferedSourceClazz = sClazzMap.get(CLASS_BUFFER_SOURCE);
 
   public OkHttpSocketClient(DebugServerProxy proxy) {
-    mProxy = proxy;
-    mHandlerThread = new HandlerThread("DebugServerProxy");
-    mHandlerThread.start();
-    mHandler = new MessageHandler(mHandlerThread.getLooper());
-    mInvocationHandler = new InvocationHandler();
+    super(proxy);
+    mInvocationHandler = new WebSocketInvocationHandler();
   }
 
-  public void connect(String url, Callback callback) {
-    mConnectCallback = callback;
-    Message message = Message.obtain();
-    message.what = CONNECT_TO_WEB_SOCKET;
-    Bundle data = new Bundle();
-    data.putString(KEY_MESSAGE, url);
-    message.setData(data);
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendMessage(message);
-    }
-  }
-
-  @Override
-  public void sendText(String payload) {
-    Message message = Message.obtain();
-    message.what = SEND_MESSAGE;
-    Bundle data = new Bundle();
-    data.putString(KEY_MESSAGE, payload);
-    message.setData(data);
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendMessage(message);
-    }
-  }
-
-  @Override
-  public void sendBinary(byte[] payload) {
-  }
-
-  @Override
-  public void close(int closeReason, String reasonPhrase) {
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendEmptyMessage(CLOSE_WEB_SOCKET);
-    }
-  }
-
-  @Override
-  public boolean isOpen() {
-    return mWebSocket != null;
-  }
-
-  private void connect(String url) {
+  protected void connect(String url) {
     if (mSocketClient != null) {
       throw new IllegalStateException("OkHttpSocketClient is already initialized.");
     }
@@ -158,7 +114,8 @@ public class OkHttpSocketClient extends SocketClient {
     }
   }
 
-  private void closeQuietly() {
+  @Override
+  protected void close() {
     if (mWebSocket != null) {
       try {
         Method closeMethod = mWebSocketClazz.getMethod("close", new Class[]{int.class, String.class});
@@ -174,7 +131,7 @@ public class OkHttpSocketClient extends SocketClient {
     }
   }
 
-  private void sendMessage(int requestID, String message) {
+  protected void sendProtocolMessage(int requestID, String message) {
     if (mWebSocket == null) {
       return;
     }
@@ -201,7 +158,7 @@ public class OkHttpSocketClient extends SocketClient {
 
   private void abort(String message, Throwable cause) {
     Log.v(TAG, "Error occurred, shutting down websocket connection: " + message);
-    closeQuietly();
+    close();
 
     // Trigger failure callbacks
     if (mConnectCallback != null) {
@@ -210,33 +167,7 @@ public class OkHttpSocketClient extends SocketClient {
     }
   }
 
-  class MessageHandler extends Handler {
-
-    MessageHandler(Looper looper) {
-      super(looper);
-    }
-
-    public void handleMessage(Message msg) {
-      switch (msg.what) {
-        case CONNECT_TO_WEB_SOCKET:
-          connect(msg.getData().getString(KEY_MESSAGE));
-          break;
-        case SEND_MESSAGE:
-          OkHttpSocketClient.this.sendMessage(0, msg.getData().getString(KEY_MESSAGE));
-          break;
-        case CLOSE_WEB_SOCKET:
-          closeQuietly();
-          mHandlerThread.quit();
-          break;
-        case DISCONNECT_LOOPER:
-          closeQuietly();
-          mHandlerThread.quit();
-          break;
-      }
-    }
-  }
-
-  class InvocationHandler implements java.lang.reflect.InvocationHandler {
+  class WebSocketInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

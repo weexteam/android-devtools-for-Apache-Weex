@@ -1,10 +1,5 @@
 package com.taobao.weex.devtools.debug;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -13,6 +8,7 @@ import com.taobao.weex.devtools.common.ReflectionUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -22,103 +18,65 @@ import java.util.concurrent.TimeUnit;
 public class OkHttp3SocketClient extends SocketClient {
 
   private static final String TAG = "OkHttp3SocketClient";
-  private static final String KEY_MESSAGE = "web_socket_message";
-  private Handler mHandler;
-  private Object mWebSocket;
-  private Callback mConnectCallback;
-  private DebugServerProxy mProxy;
-  private HandlerThread mHandlerThread;
-  private Object mSocketClient;
-  private Object mWebSocketListener;
-  private InvocationHandler mInvocationHandler;
 
   private static HashMap<String, Class> sClazzMap = new HashMap<String, Class>();
+  private static final String CLASS_WEBSOCKET = "okhttp3.ws.WebSocket";
+  private static final String CLASS_WEBSOCKET_LISTENER = "okhttp3.ws.WebSocketListener";
+  private static final String CLASS_WEBSOCKET_CALL = "okhttp3.ws.WebSocketCall";
+  private static final String CLASS_MEDIATYPE = "okhttp3.MediaType";
+
+  private static final String CLASS_OKHTTP_CLIENT = "okhttp3.OkHttpClient";
+  private static final String CLASS_OKHTTP_CLIENT_BUILDER = "okhttp3.OkHttpClient$Builder";
+  private static final String CLASS_RESPONSE = "okhttp3.Response";
+  private static final String CLASS_REQUEST = "okhttp3.Request";
+  private static final String CLASS_RESPONSE_BODY = "okhttp3.ResponseBody";
+  private static final String CLASS_REQUEST_BODY = "okhttp3.RequestBody";
+  private static final String CLASS_REQUEST_BUILDER = "okhttp3.Request$Builder";
+
+  private static final String CLASS_BUFFER = "okio.Buffer";
+  private static final String CLASS_BUFFER_SOURCE = "okio.BufferedSource";
 
   static {
-    try {
-      sClazzMap.put("okhttp3.ws.WebSocket", Class.forName("okhttp3.ws.WebSocket"));
-      sClazzMap.put("okhttp3.ws.WebSocketListener", Class.forName("okhttp3.ws.WebSocketListener"));
-      sClazzMap.put("okhttp3.Response", Class.forName("okhttp3.Response"));
-      sClazzMap.put("okhttp3.Request", Class.forName("okhttp3.Request"));
-      sClazzMap.put("okhttp3.Request$Builder", Class.forName("okhttp3.Request$Builder"));
-      sClazzMap.put("okhttp3.ws.WebSocketCall", Class.forName("okhttp3.ws.WebSocketCall"));
-
-      sClazzMap.put("okhttp3.MediaType", Class.forName("okhttp3.MediaType"));
-      sClazzMap.put("okhttp3.OkHttpClient", Class.forName("okhttp3.OkHttpClient"));
-      sClazzMap.put("okhttp3.OkHttpClient$Builder", Class.forName("okhttp3.OkHttpClient$Builder"));
-      sClazzMap.put("okhttp3.RequestBody", Class.forName("okhttp3.RequestBody"));
-      sClazzMap.put("okhttp3.ResponseBody", Class.forName("okhttp3.ResponseBody"));
-
-      sClazzMap.put("okio.Buffer", Class.forName("okio.Buffer"));
-      sClazzMap.put("okio.BufferedSource", Class.forName("okio.BufferedSource"));
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+    String[] classNames = new String[]{
+        CLASS_WEBSOCKET,
+        CLASS_WEBSOCKET_LISTENER,
+        CLASS_WEBSOCKET_CALL,
+        CLASS_MEDIATYPE,
+        CLASS_OKHTTP_CLIENT,
+        CLASS_OKHTTP_CLIENT_BUILDER,
+        CLASS_RESPONSE,
+        CLASS_REQUEST,
+        CLASS_REQUEST_BUILDER,
+        CLASS_BUFFER,
+        CLASS_BUFFER_SOURCE,
+        CLASS_REQUEST_BODY,
+        CLASS_RESPONSE_BODY
+    };
+    for (String className : classNames) {
+      sClazzMap.put(className, ReflectionUtil.tryGetClassForName(className));
     }
   }
 
-  Class mOkHttpClientClazz = sClazzMap.get("okhttp3.OkHttpClient");
-  Class mOkHttpClientBuilderClazz = sClazzMap.get("okhttp3.OkHttpClient$Builder");
+   private Class mOkHttpClientClazz = sClazzMap.get(CLASS_OKHTTP_CLIENT);
+   private Class mOkHttpClientBuilderClazz = sClazzMap.get(CLASS_OKHTTP_CLIENT_BUILDER);
 
-  Class mRequestClazz = sClazzMap.get("okhttp3.Request");
-  Class mRequestBuilderClazz = sClazzMap.get("okhttp3.Request$Builder");
-  Class mWebSocketCallClazz = sClazzMap.get("okhttp3.ws.WebSocketCall");
-  Class mWebSocketListenerClazz = sClazzMap.get("okhttp3.ws.WebSocketListener");
+   private Class mRequestClazz = sClazzMap.get(CLASS_REQUEST);
+   private Class mRequestBuilderClazz = sClazzMap.get(CLASS_REQUEST_BUILDER);
+   private Class mWebSocketCallClazz = sClazzMap.get(CLASS_WEBSOCKET_CALL);
+   private Class mWebSocketListenerClazz = sClazzMap.get(CLASS_WEBSOCKET_LISTENER);
 
-  Class mRequestBodyClazz = sClazzMap.get("okhttp3.RequestBody");
-  Class mResponseBodyClazz = sClazzMap.get("okhttp3.ResponseBody");
-  Class mMediaTypeClazz = sClazzMap.get("okhttp3.MediaType");
-  Class mWebSocketClazz = sClazzMap.get("okhttp3.ws.WebSocket");
-  Class mBufferedSourceClazz = sClazzMap.get("okio.BufferedSource");
+   private Class mRequestBodyClazz = sClazzMap.get(CLASS_REQUEST_BODY);
+   private Class mResponseBodyClazz = sClazzMap.get(CLASS_RESPONSE_BODY);
+   private Class mMediaTypeClazz = sClazzMap.get(CLASS_MEDIATYPE);
+   private Class mWebSocketClazz = sClazzMap.get(CLASS_WEBSOCKET);
+   private Class mBufferedSourceClazz = sClazzMap.get(CLASS_BUFFER_SOURCE);
 
   public OkHttp3SocketClient(DebugServerProxy proxy) {
-    mProxy = proxy;
-    mHandlerThread = new HandlerThread("DebugServerProxy");
-    mHandlerThread.start();
-    mHandler = new MessageHandler(mHandlerThread.getLooper());
-    mInvocationHandler = new InvocationHandler();
+    super(proxy);
+    mInvocationHandler = new WebSocketInvocationHandler();
   }
 
-  public void connect(String url, Callback callback) {
-    mConnectCallback = callback;
-    Message message = Message.obtain();
-    message.what = CONNECT_TO_WEB_SOCKET;
-    Bundle data = new Bundle();
-    data.putString(KEY_MESSAGE, url);
-    message.setData(data);
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendMessage(message);
-    }
-  }
-
-  @Override
-  public void sendText(String payload) {
-    Message message = Message.obtain();
-    message.what = SEND_MESSAGE;
-    Bundle data = new Bundle();
-    data.putString(KEY_MESSAGE, payload);
-    message.setData(data);
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendMessage(message);
-    }
-  }
-
-  @Override
-  public void sendBinary(byte[] payload) {
-  }
-
-  @Override
-  public void close(int closeReason, String reasonPhrase) {
-    if (mHandlerThread != null && mHandlerThread.isAlive()) {
-      mHandler.sendEmptyMessage(CLOSE_WEB_SOCKET);
-    }
-  }
-
-  @Override
-  public boolean isOpen() {
-    return mWebSocket != null;
-  }
-
-  private void connect(String url) {
+  protected void connect(String url) {
     if (mSocketClient != null) {
       throw new IllegalStateException("OkHttp3SocketClient is already initialized.");
     }
@@ -163,7 +121,7 @@ public class OkHttp3SocketClient extends SocketClient {
 
   }
 
-  private void closeQuietly() {
+  protected void close() {
     if (mWebSocket != null) {
       try {
         Method closeMethod = mWebSocketClazz.getMethod("close", new Class[]{int.class, String.class});
@@ -179,7 +137,8 @@ public class OkHttp3SocketClient extends SocketClient {
     }
   }
 
-  private void sendMessage(int requestID, String message) {
+  @Override
+  protected void sendProtocolMessage(int requestID, String message) {
     if (mWebSocket == null) {
       return;
     }
@@ -206,7 +165,7 @@ public class OkHttp3SocketClient extends SocketClient {
 
   private void abort(String message, Throwable cause) {
     Log.v(TAG, "Error occurred, shutting down websocket connection: " + message);
-    closeQuietly();
+    close();
 
     // Trigger failure callbacks
     if (mConnectCallback != null) {
@@ -215,34 +174,7 @@ public class OkHttp3SocketClient extends SocketClient {
     }
   }
 
-
-  class MessageHandler extends Handler {
-
-    MessageHandler(Looper looper) {
-      super(looper);
-    }
-
-    public void handleMessage(Message msg) {
-      switch (msg.what) {
-        case CONNECT_TO_WEB_SOCKET:
-          connect(msg.getData().getString(KEY_MESSAGE));
-          break;
-        case SEND_MESSAGE:
-          OkHttp3SocketClient.this.sendMessage(0, msg.getData().getString(KEY_MESSAGE));
-          break;
-        case CLOSE_WEB_SOCKET:
-          closeQuietly();
-          mHandlerThread.quit();
-          break;
-        case DISCONNECT_LOOPER:
-          closeQuietly();
-          mHandlerThread.quit();
-          break;
-      }
-    }
-  }
-
-  class InvocationHandler implements java.lang.reflect.InvocationHandler {
+  class WebSocketInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
