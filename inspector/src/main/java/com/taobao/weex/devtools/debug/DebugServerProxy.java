@@ -40,7 +40,7 @@ import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
-  private static final String DEVTOOL_VERSION = "0.0.8.5";
+  private static final String DEVTOOL_VERSION = "0.8.0.0";
   private SocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;

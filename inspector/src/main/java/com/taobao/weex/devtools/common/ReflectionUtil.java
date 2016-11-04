@@ -10,6 +10,8 @@
 package com.taobao.weex.devtools.common;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.annotation.Nullable;
 
@@ -39,6 +41,41 @@ public final class ReflectionUtil {
 
       return null;
     }
+  }
+
+  @Nullable
+  public static Method tryGetMethod(Class<?> theClass, String methodName, Class... parameterTypes) {
+    try {
+      return theClass.getMethod(methodName, parameterTypes);
+    } catch (NoSuchMethodException e) {
+      LogUtil.d(
+          e,
+          "Could not retrieve %s method from %s",
+          methodName,
+          theClass);
+    }
+    return null;
+  }
+
+  public static Object tryInvokeMethod(Object receiver, Method method, Object... argument) {
+    try {
+      if (method != null && receiver != null) {
+        return method.invoke(receiver, argument);
+      }
+    } catch (InvocationTargetException e) {
+      LogUtil.d(
+          e,
+          "Could not invoke %s method from %s",
+          method,
+          receiver);
+    } catch (IllegalAccessException e) {
+      LogUtil.d(
+          e,
+          "Could not invoke %s method from %s",
+          method,
+          receiver);
+    }
+    return null;
   }
 
   @Nullable
