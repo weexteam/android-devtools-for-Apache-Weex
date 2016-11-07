@@ -218,7 +218,7 @@ import com.taobao.weex.ui.component.WXVContainer;
 public class FrescoImageComponent extends WXImage {
 
   public FrescoImageComponent(WXSDKInstance instance, WXDomObject node, WXVContainer parent, boolean lazy) {
-    super(instance, node, parent, lazy);
+    super(instance, node, parent);
   }
 
   @Override
