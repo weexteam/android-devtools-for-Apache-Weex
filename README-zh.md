@@ -190,21 +190,6 @@ Playground集成的具体代码可参考如下两个文件:
 
 ---
 
-#### 可选项
-##### [**OPTION**] *网络访问探测.*
-```
-OkHttpClient client = new OkHttpClient();
-client.networkInterceptors().add(new OkHttpInterceptor());
-```
-
-###### 注意
-  网络访问探测当前仅支持OKHttpClient 2.x!!! 如果想要使用该功能, 必须确定能从网络成功获取要探测的bundle, 比如在Playground中, 你可以把`IndexActivity.java`中的变量`DEFAULT_IP` 的值从`"your_current_IP"`修改为一个服务器IP, 比如`"30.30.30.150"`.
-
-  ```
-      private static final String DEFAULT_IP = "30.30.30.150"; // "your_current_IP";
-  ```
----
-
 ## 背景知识
 
 #### Devtools组件介绍
