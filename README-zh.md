@@ -4,7 +4,7 @@
 Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的一款调试神器.其主要功能简介请点击[这里](http://www.atatech.org/articles/58022)查看.这篇文章重点介绍Android端的接入问题及注意事项.
 
 - **Inspector**
- Inspector 用来查看运行状态如`Element` \ `Network` \ `Console log` \ `ScreenCast` \ `BoxModel` \ `DOM Tree` \ `Element Select` \ `DataBase` 等.
+ Inspector 用来查看运行状态如`Element` \ `Console log` \ `ScreenCast` \ `BoxModel` \ `DOM Tree` \ `Element Select` \ `DataBase` 等.
 
 - **Debugger**
  Debugger 用来调试weex bundle和jsframework. 可以设置断点和查看调用栈.
@@ -14,10 +14,10 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 #### 添加依赖
 可以通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
-  * *Gradle依赖*.  
+  * *Gradle依赖*.
   ```
   dependencies {
-     compile 'com.taobao.android:weex_inspector:0.0.7.1'
+     compile 'com.taobao.android:weex_inspector:0.8.0.0'
   }
   ```
   
@@ -27,7 +27,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   <dependency>
     <groupId>com.taobao.android</groupId>
     <artifactId>weex_inspector</artifactId>
-    <version>0.0.7.1</version>
+    <version>0.8.0.0</version>
     <type>pom</type>
   </dependency>
   ```
@@ -48,20 +48,29 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
  dependencies {
      provided 'com.google.code.findbugs:jsr305:2.0.1'
      provided 'com.android.support:appcompat-v7:23.1.1'
-     provided 'com.taobao.android:weex_sdk:0.7.0'
+     provided 'com.taobao.android:weex_sdk:0.8.0'
      provided 'com.alibaba:fastjson:1.1.45+'
      ...
  }
  ```
  
- * **compile方式引用的包**
+ * **反射引用的包(0.8.0.0以上版本)**
  ```
- dependencies {
+  dependencies {
      compile 'com.squareup.okhttp:okhttp:2.3.0'
      compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
-     ...
-}
+      ...
+  }
  ```
+ 
+ 或者
+  ```
+   dependencies {
+      compile 'com.squareup.okhttp:okhttp:3.4.1'
+      compile 'com.squareup.okhttp:okhttp-ws:3.4.1'
+       ...
+   }
+  ```
 
 ##### 版本兼容
 
