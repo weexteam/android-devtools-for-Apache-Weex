@@ -43,7 +43,7 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
   * *A - aar dependency from jcenter*.
   ````
   dependencies {
-          compile 'com.taobao.android:weex_inspector:0.0.2.7'
+          compile 'com.taobao.android:weex_inspector:0.8.0.0'
   }
   ````
 I strongly recommend you use the latest version since both weex sdk and devtools are developed iteratively and rapidly. See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases). All the release version will publish to the [jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
