@@ -1,6 +1,7 @@
 package com.taobao.weex.devtools.debug;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXBridge;
@@ -84,6 +86,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
   public void start() {
     synchronized (DebugServerProxy.class) {
+      WXEnvironment.sDebugServerConnectable = true;
       WeexInspector.initializeWithDefaults(mContext);
       mBridge = DebugBridge.getInstance();
       mBridge.setSession(mWebSocketClient);
@@ -153,15 +156,25 @@ public class DebugServerProxy implements IWXDebugProxy {
     }
   }
 
-  @Override
-  public void stop() {
+  //@Override
+  public void stop(boolean reload) {
     synchronized (DebugServerProxy.class) {
       if (mWebSocketClient != null) {
         mWebSocketClient.close(0, null);
         mWebSocketClient = null;
       }
       mBridge = null;
+      if (reload) {
+        switchLocalRuntime();
+      }
     }
+
+  }
+
+  private void switchLocalRuntime() {
+    WXEnvironment.sDebugServerConnectable = false;
+    WXSDKEngine.reload(WXEnvironment.getApplication(), false);
+    WXEnvironment.getApplication().sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
   }
 
   @Override

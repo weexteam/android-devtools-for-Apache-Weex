@@ -29,7 +29,7 @@ public class WXSDKInstanceDescriptor extends AbstractChainedDescriptor<WXSDKInst
 
     @Override
     protected void onGetChildren(WXSDKInstance element, Accumulator<Object> children) {
-        WXComponent component = element.getGodCom();
+        WXComponent component = element.getRootComponent();
         if (component != null) {
             children.store(component);
         }

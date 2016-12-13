@@ -60,12 +60,7 @@ public class DebugBridge implements IWXBridge {
       }
     }
 
-    if (mSession != null && mSession.isOpen()) {
-      mSession.sendText(getInitFrameworkMessage(framework, params));
-      return 1;
-    }
-
-    return 0;
+    return sendMessage(getInitFrameworkMessage(framework, params));
   }
 
   private String getInitFrameworkMessage(String framework, WXParams params) {
@@ -104,11 +99,6 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
-//        if (!mInit || (TextUtils.isEmpty(instanceId) && !WXBridgeManager.METHOD_REGISTER_MODULES.equals(function))
-//                || TextUtils.isEmpty(function)) {
-//            return -1;
-//        }
-
     ArrayList<Object> array = new ArrayList<>();
     int argsCount = args == null ? 0 : args.length;
     for (int i = 0; i < argsCount; i++) {
@@ -127,11 +117,7 @@ public class DebugBridge implements IWXBridge {
     Map<String, Object> map = new HashMap<>();
     map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
     map.put(WXDebugConstants.PARAMS, func);
-    if (mSession != null && mSession.isOpen()) {
-      mSession.sendText(JSON.toJSONString(map));
-    }
-
-    return 0;
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
@@ -171,6 +157,17 @@ public class DebugBridge implements IWXBridge {
     synchronized (mLock) {
       mSession = null;
       mLock.notify();
+    }
+  }
+
+  private int sendMessage(String message) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.sendText(message);
+      return 1;
+    } else {
+      // session error, we need stop debug mode and switch to local runtime
+      WXBridgeManager.getInstance().stopRemoteDebug();
+      return 0;
     }
   }
 }
