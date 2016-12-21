@@ -56,6 +56,7 @@ dependencies {
 //    compile 'com.squareup.okhttp:okhttp:2.3.0'
 //    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided project(path: ':weex_sdk')
+    compile project(path: ':protocol')
 }
 
 //apply from: rootProject.file('release.gradle')

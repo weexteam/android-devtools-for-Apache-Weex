@@ -50,7 +50,7 @@ public class WeexOkhttp3Interceptor implements Interceptor {
     public WeexOkhttp3Interceptor() {
         mEventReporter = NetworkEventReporterManager.get();
         if (mEventReporter == null) {
-            mEventReporter = NetworkEventReporterManager.emptyReporter();
+            mEventReporter = NetworkEventReporterManager.newEmptyReporter();
         }
     }
 
