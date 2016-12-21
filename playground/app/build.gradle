@@ -87,4 +87,6 @@ dependencies {
     // compile 'com.taobao.android:weex_inspector:0.0.8.5'
     compile project(':inspector')
     compile project(':weex_sdk')
+    compile project(path: ':okhttp3_interceptor')
+    compile project(path: ':okhttp_interceptor')
 }

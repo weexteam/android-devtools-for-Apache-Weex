@@ -1,13 +1,18 @@
-include ':app'
+include ':app', ':okhttp_interceptor', ':okhttp_interceptor'
 
 include ":weex_sdk"
-project(":weex_sdk").projectDir=new File("../../tb_weex/weex/android/sdk")
+project(":weex_sdk").projectDir = new File("../../tb_weex/weex/android/sdk")
 
 include ":inspector"
-project(":inspector").projectDir=new File("../inspector")
+project(":inspector").projectDir = new File("../inspector")
 
 include ":appframework"
-project(":appframework").projectDir=new File("../appframework")
+project(":appframework").projectDir = new File("../appframework")
 
+include ":okhttp_interceptor"
+project(":okhttp_interceptor").projectDir = new File("../okhttp_interceptor")
+
+include ":okhttp3_interceptor"
+project(":okhttp3_interceptor").projectDir = new File("../okhttp3_interceptor")
 //include ":weex_debug"
 //project(":weex_debug").projectDir=new File("../weex_debug")
