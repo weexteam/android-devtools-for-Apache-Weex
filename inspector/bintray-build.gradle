@@ -104,8 +104,8 @@ install {
 dependencies {
     // compile 'commons-cli:commons-cli:1.2'
     provided 'com.google.code.findbugs:jsr305:2.0.1'
-    compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
+//    compile 'com.squareup.okhttp:okhttp:2.3.0'
+//    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     // optional
     testCompile 'junit:junit:4.12'
     testCompile('org.robolectric:robolectric:2.4') {
