@@ -219,29 +219,40 @@ public class NetworkEventReporterManager {
     private static final String DEFAULT_NETWORK_EVENT_REPORTER_IMPL_CLASS = "com.taobao.weex.devtools.inspector.network.NetworkEventReporterImpl";
     private static NetworkEventReporter sReporter = null;
 
-    public static boolean isEnabled() {
-        return sReporter != null && sReporter.isEnabled();
-    }
-
     public static @Nullable NetworkEventReporter get() {
-        if (sReporter == null) {
-            synchronized (NetworkEventReporterManager.class) {
-                if (sReporter == null) {
-                    try {
-                        Class clazz = Class.forName(DEFAULT_NETWORK_EVENT_REPORTER_IMPL_CLASS);
-                        Method methodGet = clazz.getMethod("get");
-                        sReporter =  (NetworkEventReporter) methodGet.invoke(null);
-                    } catch (Exception e) {
-                        Log.w("NetworkEventReporter", e);
+        if (allowReport()) {
+            if (sReporter == null) {
+                synchronized (NetworkEventReporterManager.class) {
+                    if (sReporter == null) {
+                        try {
+                            Class clazz = Class.forName(DEFAULT_NETWORK_EVENT_REPORTER_IMPL_CLASS);
+                            Method methodGet = clazz.getMethod("get");
+                            sReporter = (NetworkEventReporter) methodGet.invoke(null);
+                        } catch (Exception e) {
+                            Log.w("NetworkEventReporter", e);
+                        }
                     }
                 }
             }
+            return sReporter;
+        } else {
+            return null;
         }
-        return sReporter;
     }
 
     public static NetworkEventReporter newEmptyReporter() {
         return new NetworkEventReporterAdapter();
+    }
+
+    private static boolean allowReport() {
+        try {
+            Class clazz = Class.forName("com.taobao.weex.WXEnvironment");
+            Method method = clazz.getMethod("isApkDebugable");
+            return (boolean) method.invoke(null);
+        } catch (Exception e) {
+            Log.w("NetworkEventReporter", e);
+        }
+        return false;
     }
 
     public static class NetworkEventReporterAdapter implements NetworkEventReporter {

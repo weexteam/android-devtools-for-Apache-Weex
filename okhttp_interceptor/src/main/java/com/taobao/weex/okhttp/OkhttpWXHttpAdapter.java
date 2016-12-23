@@ -15,6 +15,7 @@ import com.taobao.weex.common.WXResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -25,6 +26,8 @@ public class OkhttpWXHttpAdapter implements IWXHttpAdapter {
     @Override
     public void sendRequest(WXRequest request, final OnHttpListener listener) {
         OkHttpClient httpClient = new OkHttpClient();
+        httpClient.setConnectTimeout(request.timeoutMs, TimeUnit.MILLISECONDS);
+        httpClient.setReadTimeout(request.timeoutMs, TimeUnit.MILLISECONDS);
         httpClient.networkInterceptors().add(new WeexOkhttpInterceptor());
 
         String method = request.method == null ? "GET" : request.method.toUpperCase();
@@ -45,13 +48,19 @@ public class OkhttpWXHttpAdapter implements IWXHttpAdapter {
                 WXResponse wxResponse = new WXResponse();
                 wxResponse.errorMsg = e.getMessage();
                 wxResponse.errorCode = "-1";
+                wxResponse.statusCode = "-1";
                 listener.onHttpFinish(wxResponse);
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Response response) {
                 WXResponse wxResponse = new WXResponse();
-                byte[] responseBody = response.body().bytes();
+                byte[] responseBody = new byte[0];
+                try {
+                    responseBody = response.body().bytes();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 wxResponse.data = new String(responseBody);
                 wxResponse.statusCode = String.valueOf(response.code());
                 wxResponse.originalData = responseBody;

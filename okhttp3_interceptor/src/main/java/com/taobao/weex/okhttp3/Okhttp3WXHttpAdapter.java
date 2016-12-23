@@ -211,6 +211,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -228,7 +229,11 @@ import okhttp3.internal.http.HttpMethod;
 public class Okhttp3WXHttpAdapter implements IWXHttpAdapter {
     @Override
     public void sendRequest(final WXRequest request, final OnHttpListener listener) {
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new WeexOkhttp3Interceptor()).build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new WeexOkhttp3Interceptor())
+                .connectTimeout(request.timeoutMs, TimeUnit.MILLISECONDS)
+                .readTimeout(request.timeoutMs, TimeUnit.MILLISECONDS)
+                .build();
 
         String method = request.method == null ? "GET" : request.method.toUpperCase();
         String requestBodyString = request.body == null ? "{}" : request.body;
@@ -248,13 +253,19 @@ public class Okhttp3WXHttpAdapter implements IWXHttpAdapter {
                 WXResponse wxResponse = new WXResponse();
                 wxResponse.errorMsg = e.getMessage();
                 wxResponse.errorCode = "-1";
+                wxResponse.statusCode = "-1";
                 listener.onHttpFinish(wxResponse);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
                 WXResponse wxResponse = new WXResponse();
-                byte[] responseBody = response.body().bytes();
+                byte[] responseBody = new byte[0];
+                try {
+                    responseBody = response.body().bytes();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 wxResponse.data = new String(responseBody);
                 wxResponse.statusCode = String.valueOf(response.code());
                 wxResponse.originalData = responseBody;

@@ -21,6 +21,20 @@ android {
     }
 }
 
+apply from: './bintray.gradle'
+buildscript {
+    repositories {
+        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'com.android.support:support-annotations:25.0.1'

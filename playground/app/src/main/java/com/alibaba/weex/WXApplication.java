@@ -13,7 +13,6 @@ import com.taobao.weex.InitConfig;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.WXException;
-import com.taobao.weex.okhttp3.Okhttp3WXHttpAdapter;
 
 public class WXApplication extends Application {
 
@@ -26,7 +25,6 @@ public class WXApplication extends Application {
     WXSDKEngine.initialize(this,
         new InitConfig.Builder()
             .setImgAdapter(new ImageAdapter())
-            .setHttpAdapter(new Okhttp3WXHttpAdapter())
             .build()
     );
 
