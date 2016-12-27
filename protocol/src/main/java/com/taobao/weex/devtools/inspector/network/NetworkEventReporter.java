@@ -7,12 +7,14 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+
 package com.taobao.weex.devtools.inspector.network;
+
+
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.annotation.Nullable;
 
 /**
  * Interface that callers must invoke in order to supply data to the Network tab in
@@ -99,11 +101,11 @@ public interface NetworkEventReporter {
    */
   @Nullable
   InputStream interpretResponseStream(
-      String requestId,
-      @Nullable String contentType,
-      @Nullable String contentEncoding,
-      @Nullable InputStream inputStream,
-      ResponseHandler responseHandler);
+          String requestId,
+          @Nullable String contentType,
+          @Nullable String contentEncoding,
+          @Nullable InputStream inputStream,
+          ResponseHandler responseHandler);
 
   /**
    * Indicates that there was a failure while reading from response stream.  If you use
