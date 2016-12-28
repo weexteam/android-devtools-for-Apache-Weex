@@ -40,8 +40,13 @@ public class NetworkEventReporterImpl implements NetworkEventReporter {
   private ResourceTypeHelper mResourceTypeHelper;
 
   private static NetworkEventReporter sInstance;
+  private static boolean enabled = false;
 
   private NetworkEventReporterImpl() {
+  }
+
+  public static void setEnabled(boolean isEnabled) {
+    enabled = isEnabled;
   }
 
   /**
@@ -58,7 +63,7 @@ public class NetworkEventReporterImpl implements NetworkEventReporter {
   @Override
   public boolean isEnabled() {
     NetworkPeerManager peerManager = getPeerManagerIfEnabled();
-    return peerManager != null;
+    return enabled && (peerManager != null);
   }
 
   @Nullable
