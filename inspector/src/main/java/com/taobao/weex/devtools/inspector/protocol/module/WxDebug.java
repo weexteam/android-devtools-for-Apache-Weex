@@ -8,12 +8,14 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.devtools.debug.DebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
+import com.taobao.weex.devtools.inspector.network.NetworkEventReporterImpl;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -132,6 +134,16 @@ public class WxDebug implements ChromeDevtoolsDomain {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+    }
+  }
+
+  @ChromeDevtoolsMethod
+  public void network(JsonRpcPeer peer, JSONObject params) {
+    try {
+      boolean enabled = params.getBoolean("enable");
+      NetworkEventReporterImpl.setEnabled(enabled);
+    } catch (JSONException e) {
+      e.printStackTrace();
     }
   }
 
