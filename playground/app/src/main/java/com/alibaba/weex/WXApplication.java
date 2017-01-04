@@ -5,6 +5,7 @@ import android.app.Application;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.util.AppConfig;
 import com.alibaba.weex.extend.component.RichText;
+import com.alibaba.weex.extend.component.WXComponentSyncTest;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
 import com.alibaba.weex.extend.module.SyncTestModule;
@@ -32,6 +33,7 @@ public class WXApplication extends Application {
     try {
       Fresco.initialize(this);
       WXSDKEngine.registerComponent("richtext", RichText.class);
+      WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("myModule", MyModule.class);
