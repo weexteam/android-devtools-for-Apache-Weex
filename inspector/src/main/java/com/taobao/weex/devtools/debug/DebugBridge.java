@@ -3,6 +3,7 @@ package com.taobao.weex.devtools.debug;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
@@ -143,6 +144,21 @@ public class DebugBridge implements IWXBridge {
     if (mJsManager != null) {
       mJsManager.reportJSException(instanceId, func, exception);
     }
+  }
+
+  @Override
+  public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
+    if (mJsManager != null) {
+      JSONArray argArray = JSON.parseArray(new String(arguments));
+      return mJsManager.callNativeModule(instanceId, module, method, argArray, options);
+    }
+    return null;
+  }
+
+  @Override
+  public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
+    JSONArray argArray = JSON.parseArray(new String(arguments));
+    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
   public void onConnected() {
