@@ -66,8 +66,8 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
  或者
   ```
    dependencies {
-      compile 'com.squareup.okhttp:okhttp:3.4.1'
-      compile 'com.squareup.okhttp:okhttp-ws:3.4.1'
+      compile 'com.squareup.okhttp3:okhttp:3.4.1'
+      compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
        ...
    }
   ```
