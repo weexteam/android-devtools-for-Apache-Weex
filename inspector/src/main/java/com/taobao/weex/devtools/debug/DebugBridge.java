@@ -1,5 +1,6 @@
 package com.taobao.weex.devtools.debug;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -119,6 +120,20 @@ public class DebugBridge implements IWXBridge {
     map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
     map.put(WXDebugConstants.PARAMS, func);
     return sendMessage(JSON.toJSONString(map));
+  }
+
+  @Override
+  public int execJSService(String javascript) {
+    if(!TextUtils.isEmpty(javascript)){
+      Map<String, Object> params = new HashMap<>();
+      params.put(WXDebugConstants.METHOD_IMPORT_JS, javascript);
+
+      Map<String, Object> map = new HashMap<>();
+      map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
+      map.put(WXDebugConstants.PARAMS, params);
+      return sendMessage(JSON.toJSONString(map));
+    }
+    return 0;
   }
 
   @Override
