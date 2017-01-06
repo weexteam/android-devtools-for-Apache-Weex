@@ -48,7 +48,8 @@ dependencies {
     }
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    provided 'com.taobao.android:weex_sdk:0.10.1.3-SNAPSHOT'
+    //compile project(':weex_sdk')
+    compile 'com.taobao.android:weex_sdk:1.5.3.debug-SNAPSHOT'
     provided 'com.alibaba:fastjson:1.1.46.android'
 //    provided 'com.squareup.okio:okio:1.6.0'
 //    compile 'com.squareup.okhttp3:okhttp:3.4.1'
