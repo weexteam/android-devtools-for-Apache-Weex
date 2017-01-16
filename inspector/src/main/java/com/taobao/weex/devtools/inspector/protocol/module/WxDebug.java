@@ -3,17 +3,21 @@ package com.taobao.weex.devtools.inspector.protocol.module;
 import android.content.Context;
 import android.content.Intent;
 
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.devtools.debug.DebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
+import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
+import com.taobao.weex.devtools.inspector.network.NetworkEventReporterImpl;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -133,6 +137,75 @@ public class WxDebug implements ChromeDevtoolsDomain {
     if (context != null) {
       context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
     }
+  }
+
+  @ChromeDevtoolsMethod
+  public void network(JsonRpcPeer peer, JSONObject params) {
+    try {
+      boolean enabled = params.getBoolean("enable");
+      NetworkEventReporterImpl.setEnabled(enabled);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @ChromeDevtoolsMethod
+  public SyncCallResponse syncCall(JsonRpcPeer peer, JSONObject params) {
+    SyncCallResponse response = new SyncCallResponse();
+    int syncId = params.optInt("syncId");
+    String syncMethod = params.optString("method");
+    org.json.JSONArray args = params.optJSONArray("args");
+
+    Object result = null;
+    byte[] arguments = null;
+    byte[] options = null;
+    String instanceId = args.optString(0);
+    String domain = args.optString(1);
+    String method = args.optString(2);
+    org.json.JSONArray jsonArray = args.optJSONArray(3);
+    org.json.JSONObject jsonObject = args.optJSONObject(4);
+    if (jsonArray != null) {
+      arguments = jsonArray.toString().getBytes();
+    }
+    if (jsonObject != null) {
+      options = jsonObject.toString().getBytes();
+    }
+    if ("callNativeModule".equals(syncMethod)) {
+      result = DebugBridge.getInstance().callNativeModule(
+          instanceId,
+          domain,
+          method,
+          arguments,
+          options);
+    } else if ("callNativeComponent".equals(syncMethod)) {
+      DebugBridge.getInstance().callNativeComponent(
+          instanceId,
+          domain,
+          method,
+          arguments,
+          options);
+    }
+
+    response.method = "WxDebug.syncReturn";
+    SyncCallResponseParams param = new SyncCallResponseParams();
+    param.syncId = syncId;
+    param.ret = JSON.toJSON(result);
+    response.params = param;
+    return response;
+  }
+
+  public static class SyncCallResponse implements JsonRpcResult {
+    @JsonProperty
+    public String method;
+    @JsonProperty
+    public SyncCallResponseParams params;
+  }
+
+  public static class SyncCallResponseParams {
+    @JsonProperty
+    public Integer syncId;
+    @JsonProperty
+    public Object ret;
   }
 
   public static class CallNative {

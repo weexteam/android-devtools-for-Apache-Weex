@@ -1,8 +1,10 @@
 package com.taobao.weex.devtools.debug;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
@@ -60,12 +62,7 @@ public class DebugBridge implements IWXBridge {
       }
     }
 
-    if (mSession != null && mSession.isOpen()) {
-      mSession.sendText(getInitFrameworkMessage(framework, params));
-      return 1;
-    }
-
-    return 0;
+    return sendMessage(getInitFrameworkMessage(framework, params));
   }
 
   private String getInitFrameworkMessage(String framework, WXParams params) {
@@ -104,11 +101,6 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
-//        if (!mInit || (TextUtils.isEmpty(instanceId) && !WXBridgeManager.METHOD_REGISTER_MODULES.equals(function))
-//                || TextUtils.isEmpty(function)) {
-//            return -1;
-//        }
-
     ArrayList<Object> array = new ArrayList<>();
     int argsCount = args == null ? 0 : args.length;
     for (int i = 0; i < argsCount; i++) {
@@ -127,10 +119,20 @@ public class DebugBridge implements IWXBridge {
     Map<String, Object> map = new HashMap<>();
     map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
     map.put(WXDebugConstants.PARAMS, func);
-    if (mSession != null && mSession.isOpen()) {
-      mSession.sendText(JSON.toJSONString(map));
-    }
+    return sendMessage(JSON.toJSONString(map));
+  }
 
+  @Override
+  public int execJSService(String javascript) {
+    if(!TextUtils.isEmpty(javascript)){
+      Map<String, Object> params = new HashMap<>();
+      params.put(WXDebugConstants.PARAM_JS_SOURCE, javascript);
+
+      Map<String, Object> map = new HashMap<>();
+      map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_IMPORT_JS);
+      map.put(WXDebugConstants.PARAMS, params);
+      return sendMessage(JSON.toJSONString(map));
+    }
     return 0;
   }
 
@@ -159,6 +161,21 @@ public class DebugBridge implements IWXBridge {
     }
   }
 
+  @Override
+  public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
+    if (mJsManager != null) {
+      JSONArray argArray = JSON.parseArray(new String(arguments));
+      return mJsManager.callNativeModule(instanceId, module, method, argArray, options);
+    }
+    return null;
+  }
+
+  @Override
+  public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
+    JSONArray argArray = JSON.parseArray(new String(arguments));
+    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
+  }
+
   public void onConnected() {
     Log.v(TAG, "connect to debug server success");
     synchronized (mLock) {
@@ -171,6 +188,17 @@ public class DebugBridge implements IWXBridge {
     synchronized (mLock) {
       mSession = null;
       mLock.notify();
+    }
+  }
+
+  private int sendMessage(String message) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.sendText(message);
+      return 1;
+    } else {
+      // session error, we need stop debug mode and switch to local runtime
+      WXBridgeManager.getInstance().stopRemoteDebug();
+      return 0;
     }
   }
 }

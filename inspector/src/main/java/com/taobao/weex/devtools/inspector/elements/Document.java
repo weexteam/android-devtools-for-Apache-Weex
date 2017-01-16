@@ -439,9 +439,11 @@ public final class Document extends ThreadBoundProxy {
         // sub-tree is included automatically, so we don't need to send events for those.
         if (newElementInfo.parentElement == null) {
           ElementInfo oldElementInfo = mShadowDocument.getElementInfo(element);
-          int parentNodeId = mObjectIdMapper.getIdForObject(oldElementInfo.parentElement);
-          int nodeId = mObjectIdMapper.getIdForObject(element);
-          mUpdateListeners.onChildNodeRemoved(parentNodeId, nodeId);
+          Integer parentNodeId = mObjectIdMapper.getIdForObject(oldElementInfo.parentElement);
+          Integer nodeId = mObjectIdMapper.getIdForObject(element);
+          if (parentNodeId != null && nodeId != null) {
+            mUpdateListeners.onChildNodeRemoved(parentNodeId, nodeId);
+          }
         }
 
         // All garbage elements should be unhooked.
@@ -469,9 +471,11 @@ public final class Document extends ThreadBoundProxy {
         final ElementInfo newElementInfo = docUpdate.getElementInfo(element);
 
         if (newElementInfo.parentElement != oldElementInfo.parentElement) {
-          int parentNodeId = mObjectIdMapper.getIdForObject(oldElementInfo.parentElement);
-          int nodeId = mObjectIdMapper.getIdForObject(element);
-          mUpdateListeners.onChildNodeRemoved(parentNodeId, nodeId);
+          Integer parentNodeId = mObjectIdMapper.getIdForObject(oldElementInfo.parentElement);
+          Integer nodeId = mObjectIdMapper.getIdForObject(element);
+          if (parentNodeId != null && nodeId != null) {
+            mUpdateListeners.onChildNodeRemoved(parentNodeId, nodeId);
+          }
         }
       }
     });
@@ -639,8 +643,10 @@ public final class Document extends ThreadBoundProxy {
 
     public void removeWithEvent(int index) {
       Object element = remove(index);
-      int nodeId = mObjectIdMapper.getIdForObject(element);
-      mUpdateListeners.onChildNodeRemoved(mParentNodeId, nodeId);
+      Integer nodeId = mObjectIdMapper.getIdForObject(element);
+      if (nodeId != null) {
+        mUpdateListeners.onChildNodeRemoved(mParentNodeId, nodeId);
+      }
     }
   }
 

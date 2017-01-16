@@ -5,8 +5,10 @@ import android.app.Application;
 import com.alibaba.weex.commons.adapter.ImageAdapter;
 import com.alibaba.weex.commons.util.AppConfig;
 import com.alibaba.weex.extend.component.RichText;
+import com.alibaba.weex.extend.component.WXComponentSyncTest;
 import com.alibaba.weex.extend.module.MyModule;
 import com.alibaba.weex.extend.module.RenderModule;
+import com.alibaba.weex.extend.module.SyncTestModule;
 import com.alibaba.weex.extend.module.WXEventModule;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.taobao.weex.InitConfig;
@@ -19,7 +21,7 @@ public class WXApplication extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-//    initDebugEnvironment(false, "DEBUG_SERVER_HOST");
+//    initDebugEnvironment(true ,false, "DEBUG_SERVER_HOST");
     WXSDKEngine.addCustomOptions("appName", "WXSample");
     WXSDKEngine.addCustomOptions("appGroup", "WXApp");
     WXSDKEngine.initialize(this,
@@ -31,9 +33,11 @@ public class WXApplication extends Application {
     try {
       Fresco.initialize(this);
       WXSDKEngine.registerComponent("richtext", RichText.class);
+      WXSDKEngine.registerComponent("synccomponent", WXComponentSyncTest.class);
       WXSDKEngine.registerModule("render", RenderModule.class);
       WXSDKEngine.registerModule("event", WXEventModule.class);
       WXSDKEngine.registerModule("myModule", MyModule.class);
+      WXSDKEngine.registerModule("syncTest", SyncTestModule.class);
 
     } catch (WXException e) {
       e.printStackTrace();
@@ -43,15 +47,19 @@ public class WXApplication extends Application {
   }
 
   /**
-   * @param enable enable remote debugger. valid only if host not to be "DEBUG_SERVER_HOST".
+   *@param connectable debug server is connectable or not.
+   *               if true, sdk will try to connect remote debug server when init WXBridge.
+   *
+   * @param debuggable enable remote debugger. valid only if host not to be "DEBUG_SERVER_HOST".
    *               true, you can launch a remote debugger and inspector both.
    *               false, you can  just launch a inspector.
-   * @param host   the debug server host, must not be "DEBUG_SERVER_HOST", a ip address or domain will be OK.
-   *               for example "127.0.0.1".
+   * @param host the debug server host, must not be "DEBUG_SERVER_HOST", a ip address or domain will be OK.
+   *             for example "127.0.0.1".
    */
-  private void initDebugEnvironment(boolean enable, String host) {
+  private void initDebugEnvironment(boolean connectable, boolean debuggable, String host) {
     if (!"DEBUG_SERVER_HOST".equals(host)) {
-      WXEnvironment.sRemoteDebugMode = enable;
+      WXEnvironment.sDebugServerConnectable = connectable;
+      WXEnvironment.sRemoteDebugMode = debuggable;
       WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
     }
   }

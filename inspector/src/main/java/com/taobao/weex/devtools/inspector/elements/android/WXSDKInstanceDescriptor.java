@@ -7,7 +7,6 @@ import com.taobao.weex.devtools.common.Accumulator;
 import com.taobao.weex.devtools.inspector.elements.AbstractChainedDescriptor;
 import com.taobao.weex.devtools.inspector.elements.AttributeAccumulator;
 import com.taobao.weex.devtools.inspector.elements.StyleAccumulator;
-import com.taobao.weex.devtools.inspector.elements.android.HighlightableDescriptor;
 import com.taobao.weex.ui.component.WXComponent;
 
 import javax.annotation.Nullable;
@@ -29,7 +28,7 @@ public class WXSDKInstanceDescriptor extends AbstractChainedDescriptor<WXSDKInst
 
     @Override
     protected void onGetChildren(WXSDKInstance element, Accumulator<Object> children) {
-        WXComponent component = element.getGodCom();
+        WXComponent component = element.getRootComponent();
         if (component != null) {
             children.store(component);
         }
