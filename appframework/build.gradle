@@ -42,7 +42,7 @@ dependencies {
   provided 'com.android.support:support-v4:23.1.1'
   provided 'com.android.support:appcompat-v7:23.1.1'
   // compile project(':weex_sdk')
-  compile 'com.taobao.android:weex_sdk:1.5.3.debug-SNAPSHOT'
+  provided 'com.taobao.android:weex_sdk:0.9.5'
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile 'com.facebook.fresco:fresco:0.10.0'
   testCompile 'junit:junit:4.12'
