@@ -126,10 +126,10 @@ public class DebugBridge implements IWXBridge {
   public int execJSService(String javascript) {
     if(!TextUtils.isEmpty(javascript)){
       Map<String, Object> params = new HashMap<>();
-      params.put(WXDebugConstants.METHOD_IMPORT_JS, javascript);
+      params.put(WXDebugConstants.PARAM_JS_SOURCE, javascript);
 
       Map<String, Object> map = new HashMap<>();
-      map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
+      map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_IMPORT_JS);
       map.put(WXDebugConstants.PARAMS, params);
       return sendMessage(JSON.toJSONString(map));
     }
