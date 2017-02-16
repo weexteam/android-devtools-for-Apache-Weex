@@ -17,7 +17,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   * *Gradle依赖*.  
   ```
   dependencies {
-     compile 'com.taobao.android:weex_inspector:0.0.7.1'
+     compile 'com.taobao.android:weex_inspector:0.10.0.5'
   }
   ```
   
@@ -27,7 +27,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   <dependency>
     <groupId>com.taobao.android</groupId>
     <artifactId>weex_inspector</artifactId>
-    <version>0.0.7.1</version>
+    <version>0.10.0.5</version>
     <type>pom</type>
   </dependency>
   ```
@@ -48,7 +48,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
  dependencies {
      provided 'com.google.code.findbugs:jsr305:2.0.1'
      provided 'com.android.support:appcompat-v7:23.1.1'
-     provided 'com.taobao.android:weex_sdk:0.7.0'
+     provided 'com.taobao.android:weex_sdk:0.9.5'
      provided 'com.alibaba:fastjson:1.1.45+'
      ...
  }
@@ -67,6 +67,8 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 
 | weex sdk | weex inspector | debug server |
 |----------|----------------|--------------|
+|0.9.5+    | 0.10.0.5+      |0.2.39+       |
+|0.9.4+    | 0.9.4.0+       |0.2.39+       |
 |0.8.0.1+  | 0.0.8.1+       |0.2.39+       |
 |0.7.0+    | 0.0.7.13       |0.2.38        |
 |0.6.0+    | 0.0.2.2        |              |
