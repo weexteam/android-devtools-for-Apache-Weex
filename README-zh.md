@@ -83,16 +83,18 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试模式是否开启分别是:
 
 ```
-    public static boolean sRemoteDebugMode; // 是否开启debug模式, 默认关闭
+    public static boolean sDebugServerConnectable; // DebugServer是否可连通, 默认true
+    public static boolean sRemoteDebugMode; // 是否开启debug模式, 默认关闭
     public static String sRemoteDebugProxyUrl; // DebugServer的websocket地址
 ```
 
 无论在App中无论以何种方式设置Debug模式, 都必须在恰当的时机调用类似如下的方法来设置WXEnvironment.sRemoteDebugMode 和 WXEnvironment.sRemoteDebugProxyUrl.
 
 ```
-  private void initDebugEnvironment(boolean enable, String host) {
-    WXEnvironment.sRemoteDebugMode = enable;
-    WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
+  private void initDebugEnvironment(boolean connectable, boolean debuggable, String host) {
+      WXEnvironment.sDebugServerConnectable = connectable;
+      WXEnvironment.sRemoteDebugMode = debuggable;
+      WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
   }
 ```
 
