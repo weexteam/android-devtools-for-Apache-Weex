@@ -117,7 +117,7 @@ dependencies {
     provided 'com.android.support:appcompat-v7:23.1.1'
     provided 'com.taobao.android:weex_sdk:0.9.5'
     provided 'com.alibaba:fastjson:1.1.45+'
-    provided 'com.taobao.android.weex_inspection:protocol:1.0.2'
+    provided 'com.taobao.android.weex_inspection:protocol:1.1.0'
 }
 
 task sourcesJar(type: Jar) {
