@@ -17,7 +17,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   * *Gradle依赖*.
   ```
   dependencies {
-     compile 'com.taobao.android:weex_inspector:0.8.0.0'
+     compile 'com.taobao.android:weex_inspector:0.10.0.5'
   }
   ```
   
@@ -27,7 +27,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   <dependency>
     <groupId>com.taobao.android</groupId>
     <artifactId>weex_inspector</artifactId>
-    <version>0.8.0.0</version>
+    <version>0.10.0.5</version>
     <type>pom</type>
   </dependency>
   ```
@@ -48,7 +48,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
  dependencies {
      provided 'com.google.code.findbugs:jsr305:2.0.1'
      provided 'com.android.support:appcompat-v7:23.1.1'
-     provided 'com.taobao.android:weex_sdk:0.8.0'
+     provided 'com.taobao.android:weex_sdk:0.10.0'
      provided 'com.alibaba:fastjson:1.1.45+'
      ...
  }
@@ -76,6 +76,8 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 
 | weex sdk | weex inspector | debug server |
 |----------|----------------|--------------|
+|0.9.5+    | 0.10.0.5+      |0.2.39+       |
+|0.9.4+    | 0.9.4.0+       |0.2.39+       |
 |0.8.0.1+  | 0.0.8.1+       |0.2.39+       |
 |0.7.0+    | 0.0.7.13       |0.2.38        |
 |0.6.0+    | 0.0.2.2        |              |
@@ -90,16 +92,18 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试模式是否开启分别是:
 
 ```
-    public static boolean sRemoteDebugMode; // 是否开启debug模式, 默认关闭
+    public static boolean sDebugServerConnectable; // DebugServer是否可连通, 默认true
+    public static boolean sRemoteDebugMode; // 是否开启debug模式, 默认关闭
     public static String sRemoteDebugProxyUrl; // DebugServer的websocket地址
 ```
 
 无论在App中无论以何种方式设置Debug模式, 都必须在恰当的时机调用类似如下的方法来设置WXEnvironment.sRemoteDebugMode 和 WXEnvironment.sRemoteDebugProxyUrl.
 
 ```
-  private void initDebugEnvironment(boolean enable, String host) {
-    WXEnvironment.sRemoteDebugMode = enable;
-    WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
+  private void initDebugEnvironment(boolean connectable, boolean debuggable, String host) {
+      WXEnvironment.sDebugServerConnectable = connectable;
+      WXEnvironment.sRemoteDebugMode = debuggable;
+      WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
   }
 ```
 
