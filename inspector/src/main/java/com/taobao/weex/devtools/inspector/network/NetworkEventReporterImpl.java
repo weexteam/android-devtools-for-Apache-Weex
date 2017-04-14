@@ -155,11 +155,15 @@ public class NetworkEventReporterImpl implements NetworkEventReporter {
       responseJSON.connectionId = response.connectionId();
       responseJSON.fromDiskCache = response.fromDiskCache();
 
-      if (NetworkEventReporterManager.getParam("reportTiming", false)) {
-        if (response instanceof TimingInspectorResponse) {
-          Timing timing = ((TimingInspectorResponse) response).resourceTiming();
-          responseJSON.timing = createTimingFrom(timing);
+      try {
+        if (NetworkEventReporterManager.getParam("reportTiming", false)) {
+          if (response instanceof TimingInspectorResponse) {
+            Timing timing = ((TimingInspectorResponse) response).resourceTiming();
+            responseJSON.timing = createTimingFrom(timing);
+          }
         }
+      } catch (Throwable throwable) {
+        throwable.printStackTrace();
       }
 
       Network.ResponseReceivedParams receivedParams = new Network.ResponseReceivedParams();
