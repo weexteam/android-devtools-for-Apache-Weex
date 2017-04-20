@@ -201,4 +201,8 @@ public class DebugBridge implements IWXBridge {
       return 0;
     }
   }
+
+  public void takeHeapSnapshot(String filename) {
+    //xxx
+  }
 }
