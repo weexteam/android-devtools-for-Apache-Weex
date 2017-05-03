@@ -17,7 +17,6 @@ import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -144,7 +143,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
     try {
       boolean enabled = params.getBoolean("enable");
       NetworkEventReporterImpl.setEnabled(enabled);
-    } catch (JSONException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

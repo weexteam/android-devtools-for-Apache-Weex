@@ -8,8 +8,6 @@ import android.os.Message;
 
 import com.taobao.weex.devtools.websocket.SimpleSession;
 
-import java.lang.reflect.InvocationHandler;
-
 /**
  * Created by budao on 2016/11/1.
  */
@@ -20,13 +18,9 @@ public abstract class SocketClient implements SimpleSession {
   protected static final int DISCONNECT_LOOPER = 4;
   private static final String KEY_MESSAGE = "web_socket_message";
   protected Handler mHandler;
-  protected Object mWebSocket;
   protected Callback mConnectCallback;
   protected DebugServerProxy mProxy;
   protected HandlerThread mHandlerThread;
-  protected Object mSocketClient;
-  protected Object mWebSocketListener;
-  protected InvocationHandler mInvocationHandler;
 
   public SocketClient(DebugServerProxy proxy) {
     init(proxy);
@@ -72,11 +66,6 @@ public abstract class SocketClient implements SimpleSession {
     if (mHandlerThread != null && mHandlerThread.isAlive()) {
       mHandler.sendEmptyMessage(CLOSE_WEB_SOCKET);
     }
-  }
-
-  @Override
-  public boolean isOpen() {
-    return mWebSocket != null;
   }
 
   protected abstract void connect(String url);

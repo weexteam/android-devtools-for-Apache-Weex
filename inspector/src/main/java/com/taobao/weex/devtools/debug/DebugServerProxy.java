@@ -91,7 +91,7 @@ public class DebugServerProxy implements IWXDebugProxy {
       mBridge = DebugBridge.getInstance();
       mBridge.setSession(mWebSocketClient);
       mBridge.setBridgeManager(mJsManager);
-      mWebSocketClient.connect(mRemoteUrl, new OkHttp3SocketClient.Callback() {
+      mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
 
         private String getShakeHandsMessage() {
           Map<String, Object> func = new HashMap<>();

@@ -61,6 +61,7 @@ dependencies {
 //    compile 'com.squareup.okhttp:okhttp:2.3.0'
 //    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
     provided 'com.taobao.android.weex_inspection:protocol:1.1.1'
+    compile 'org.java-websocket:java-websocket:1.3.2'
 }
 
 //apply from: rootProject.file('release.gradle')

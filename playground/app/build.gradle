@@ -84,6 +84,7 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:support-annotations:23.1.1'
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
+    compile 'com.taobao.android.weex_inspection:protocol:1.1.1'
     // compile 'com.taobao.android:weex_inspector:0.0.8.5'
     compile project(':inspector')
     //compile 'com.taobao.android:weex_sdk:0.10.1.3-SNAPSHOT'
