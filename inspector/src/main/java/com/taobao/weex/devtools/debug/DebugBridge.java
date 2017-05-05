@@ -9,6 +9,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 
 import java.util.ArrayList;
@@ -203,6 +204,6 @@ public class DebugBridge implements IWXBridge {
   }
 
   public void takeHeapSnapshot(String filename) {
-    //xxx
+    LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
   }
 }

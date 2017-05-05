@@ -19,6 +19,14 @@ allprojects {
     }
 }
 
+subprojects {
+    ext {
+        weexSdkVersion="0.11.0"
+        fastjsonVersion="1.1.45+"
+        protocolVersion="1.1.2"
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
