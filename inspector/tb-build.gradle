@@ -60,6 +60,11 @@ android {
     tBuildConfig {
         libraryType 'aar'
     }
+    repositories {
+        maven {
+            url "http://mvnrepo.alibaba-inc.com/mvn/repository"
+        }
+    }
 }
 
 dependencies {
