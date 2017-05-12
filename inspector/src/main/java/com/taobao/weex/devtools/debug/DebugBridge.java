@@ -137,6 +137,11 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
+  public void takeHeapSnapshot(String s) {
+    new Throwable("Not implemented method").printStackTrace();
+  }
+
+  @Override
   public int callNative(String instanceId, String tasks, String callback) {
     if (mJsManager != null) {
       return mJsManager.callNative(instanceId, tasks, callback);
@@ -200,9 +205,5 @@ public class DebugBridge implements IWXBridge {
       WXBridgeManager.getInstance().stopRemoteDebug();
       return 0;
     }
-  }
-
-  public void takeHeapSnapshot(String filename) {
-    //xxx
   }
 }
