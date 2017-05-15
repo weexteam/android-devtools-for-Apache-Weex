@@ -29,6 +29,7 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcRequest;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 
   public DebugServerProxy(Context context, WXBridgeManager jsManager) {
     if (context == null) {
+      WXLogUtils.e(TAG, "Context is null, Inspector will not be enabled!");
       throw new IllegalArgumentException("Context is null");
     }
     mContext = context;
