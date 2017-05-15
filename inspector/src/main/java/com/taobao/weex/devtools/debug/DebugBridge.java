@@ -10,10 +10,13 @@ import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.websocket.SimpleSession;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Created by budao on 16/6/25.
@@ -24,6 +27,8 @@ public class DebugBridge implements IWXBridge {
   private Object mLock = new Object();
   private WXBridgeManager mJsManager;
   private volatile SimpleSession mSession;
+  private Queue<String> mCachedJsServices = new LinkedList<>();
+  private boolean mIsConnected = false;
 
   private DebugBridge() {
 
@@ -119,6 +124,13 @@ public class DebugBridge implements IWXBridge {
     Map<String, Object> map = new HashMap<>();
     map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
     map.put(WXDebugConstants.PARAMS, func);
+
+    if (!mIsConnected) {
+      WXLogUtils.w(TAG, "Session not opened, cached service");
+      mCachedJsServices.offer(JSON.toJSONString(map));
+      return 1;
+    }
+
     return sendMessage(JSON.toJSONString(map));
   }
 
@@ -181,11 +193,20 @@ public class DebugBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
+  private void execAllCachedServices() {
+    while (!mCachedJsServices.isEmpty()) {
+      WXLogUtils.w(TAG, "Exec cached service");
+      sendMessage(mCachedJsServices.poll());
+    }
+  }
+
   public void onConnected() {
     Log.v(TAG, "connect to debug server success");
     synchronized (mLock) {
       mLock.notify();
     }
+    mIsConnected = true;
+    execAllCachedServices();
   }
 
   public void onDisConnected() {
@@ -194,6 +215,7 @@ public class DebugBridge implements IWXBridge {
       mSession = null;
       mLock.notify();
     }
+    mIsConnected = false;
   }
 
   private int sendMessage(String message) {

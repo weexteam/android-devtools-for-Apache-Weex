@@ -54,6 +54,9 @@ public class DebugServerProxy implements IWXDebugProxy {
   private DebugBridge mBridge;
 
   public DebugServerProxy(Context context, WXBridgeManager jsManager) {
+    if (context == null) {
+      throw new IllegalArgumentException("Context is null");
+    }
     mContext = context;
     mWebSocketClient = SocketClientFactory.create(this);
     mJsManager = jsManager;
