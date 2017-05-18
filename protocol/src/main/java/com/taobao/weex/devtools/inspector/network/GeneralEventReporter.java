@@ -49,12 +49,19 @@ public class GeneralEventReporter {
     public InputStream interpretResponseStream(String requestId, String contentType, String contentEncoding, InputStream stream, boolean continueRead) {
         if (mReporter != null && mReporter.isEnabled()) {
             ResponseHandler defaultHandler = new DefaultResponseHandler(mReporter, requestId);
-            mReporter.interpretResponseStream(requestId, contentType, contentEncoding, stream, defaultHandler);
+            InputStream wrappedStream =  mReporter.interpretResponseStream(requestId, contentType, contentEncoding, stream, defaultHandler);
             if (!continueRead) {
                 try {
                     readAndClose(stream);
+                    if (wrappedStream != null) {
+                        wrappedStream.close();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            } else {
+                if (wrappedStream != null) {
+                    return wrappedStream;
                 }
             }
         }
