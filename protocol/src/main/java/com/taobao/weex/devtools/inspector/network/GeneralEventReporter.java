@@ -52,7 +52,7 @@ public class GeneralEventReporter {
             InputStream wrappedStream =  mReporter.interpretResponseStream(requestId, contentType, contentEncoding, stream, defaultHandler);
             if (!continueRead) {
                 try {
-                    readAndClose(stream);
+                    read(stream);
                     if (wrappedStream != null) {
                         wrappedStream.close();
                     }
@@ -92,7 +92,7 @@ public class GeneralEventReporter {
         }
     }
 
-    private byte[] readAndClose(InputStream in) throws IOException {
+    private byte[] read(InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024 * 4];
         int n = 0;
@@ -102,7 +102,6 @@ public class GeneralEventReporter {
         byte[] result = out.toByteArray();
         out.flush();
         out.close();
-        in.close();
         return result;
     }
 }
