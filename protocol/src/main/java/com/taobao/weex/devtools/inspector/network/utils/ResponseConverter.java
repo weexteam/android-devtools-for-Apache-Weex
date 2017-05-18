@@ -4,8 +4,10 @@ import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import com.taobao.weex.devtools.inspector.network.NetworkEventReporter;
+import com.taobao.weex.devtools.inspector.network.Timing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public class ResponseConverter {
         return new GeneralResponse(raw);
     }
 
-    private static class GeneralResponse implements NetworkEventReporter.InspectorResponse {
+    private static class GeneralResponse implements NetworkEventReporter.TimingInspectorResponse {
         private Map<String, Object> data;
         List<Pair<String, String>> headers = new ArrayList<>(0);
 
@@ -86,6 +88,47 @@ public class ResponseConverter {
                 }
             }
             return null;
+        }
+
+        @Nullable
+        @Override
+        public Timing resourceTiming() {
+            Map<String, Object> statisticData  = new HashMap<>();
+            statisticData = ExtractUtil.getValue(data, "timing", statisticData);
+            if (statisticData.isEmpty()) {
+                return null;
+            } else {
+                Timing timing = new Timing();
+                timing.requestTime = optValue(statisticData, "requestTime");
+                if (timing.requestTime == 0) {
+                    return null;
+                }
+                timing.proxyStart = optValue(statisticData, "sendBeforeTime") + optValue(statisticData, "waitingTime");
+                timing.proxyEnd = timing.proxyStart + 0;
+                timing.dnsStart = timing.proxyEnd + 0;
+                timing.dnsEnd = timing.dnsStart + 0;
+                timing.connectStart = timing.dnsEnd + 0;
+                timing.sslStart = timing.connectStart + 0;
+                timing.sendEnd = timing.sslStart + 0;
+                timing.connectEnd = timing.connectStart + optValue(statisticData, "firstDataTime");
+                timing.sendStart = timing.connectEnd + 0;
+                timing.sendEnd = timing.sendStart + optValue(statisticData, "sendDataTime");
+                timing.receiveHeadersEnd = timing.sendEnd + optValue(statisticData, "serverRT") + optValue(statisticData, "recDataTime");
+                return timing;
+            }
+        }
+
+
+        private double optValue(Map<String, Object> data, String key) {
+            try {
+                Object val = data.get(key);
+                if (val == null || val.toString().isEmpty()) {
+                    return 0;
+                }
+                return Double.valueOf(data.get(key).toString());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
     }
 }

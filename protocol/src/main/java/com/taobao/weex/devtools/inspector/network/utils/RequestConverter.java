@@ -31,7 +31,7 @@ public class RequestConverter {
         @Nullable
         @Override
         public Integer friendlyNameExtra() {
-            return null;
+            return ExtractUtil.getValue(data, "friendlyNameExtra", null);
         }
 
         @Override
@@ -57,7 +57,7 @@ public class RequestConverter {
                 }
             }
 
-            return null;
+            return new byte[0];
         }
 
         @Override
