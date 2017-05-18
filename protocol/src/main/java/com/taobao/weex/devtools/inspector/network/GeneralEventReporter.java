@@ -52,7 +52,7 @@ public class GeneralEventReporter {
             InputStream wrappedStream =  mReporter.interpretResponseStream(requestId, contentType, contentEncoding, stream, defaultHandler);
             if (!continueRead) {
                 try {
-                    read(stream);
+                    read(wrappedStream);
                     if (wrappedStream != null) {
                         wrappedStream.close();
                     }
