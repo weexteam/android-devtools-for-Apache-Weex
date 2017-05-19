@@ -52,15 +52,9 @@ dependencies {
     }
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    //compile project(':weex_sdk')
-    provided "com.taobao.android:weex_sdk:${project.weexSdkVersion}"
-    provided "com.alibaba:fastjson:${project.fastjsonVersion}"
-    provided "com.taobao.android.weex_inspection:protocol:${project.protocolVersion}"
-//    provided 'com.squareup.okio:okio:1.6.0'
-//    compile 'com.squareup.okhttp3:okhttp:3.4.1'
-//    compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
-//    compile 'com.squareup.okhttp:okhttp:2.3.0'
-//    compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
+    provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
+    provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 }
 
 //apply from: rootProject.file('release.gradle')
@@ -92,5 +86,19 @@ android.libraryVariants.all { variant ->
         from variant.javaCompile.destinationDir
         from "build/commons-cli-tidy-${name}"
         from "build/metainf-${name}"
+    }
+}
+
+apply from: './bintray-build.gradle'
+buildscript {
+    repositories {
+        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
     }
 }
