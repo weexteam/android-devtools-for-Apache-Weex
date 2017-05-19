@@ -89,16 +89,9 @@ android.libraryVariants.all { variant ->
     }
 }
 
-apply from: './bintray-build.gradle'
-buildscript {
-    repositories {
-        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
-        mavenCentral()
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
-    }
+ext {
+    PUBLISH_GROUP_ID = 'com.taobao.android'
+    PUBLISH_ARTIFACT_ID = 'weex_inspector'
+    PUBLISH_VERSION = '0.11.0'
 }
+apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
