@@ -92,9 +92,10 @@ public class NetworkEventReporterImpl implements NetworkEventReporter {
       String requestFriendlyName = request.friendlyName();
       Integer requestPriority = request.friendlyNameExtra();
       Network.Initiator initiatorJSON = new Network.Initiator();
-      initiatorJSON.type = Network.InitiatorType.SCRIPT;
-      initiatorJSON.stackTrace = new ArrayList<Console.CallFrame>();
-      initiatorJSON.stackTrace.add(new Console.CallFrame(requestFriendlyName,
+      initiatorJSON.type = "script";
+      initiatorJSON.url = requestFriendlyName;
+      initiatorJSON.stack = new ArrayList<Console.CallFrame>();
+      initiatorJSON.stack.add(new Console.CallFrame(requestFriendlyName,
           requestFriendlyName,
           requestPriority != null ? requestPriority : 0 /* lineNumber */,
           0 /* columnNumber */));

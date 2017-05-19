@@ -214,10 +214,13 @@ public class Network implements ChromeDevtoolsDomain {
 
   public static class Initiator {
     @JsonProperty(required = true)
-    public InitiatorType type;
+    public String type;
 
     @JsonProperty
-    public List<Console.CallFrame> stackTrace;
+    public List<Console.CallFrame> stack;
+
+    @JsonProperty
+    public String url;
   }
 
   public enum InitiatorType {
