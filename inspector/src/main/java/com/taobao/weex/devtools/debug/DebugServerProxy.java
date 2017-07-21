@@ -42,7 +42,7 @@ import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
-  private static final String DEVTOOL_VERSION = "0.8.0.0";
+  private static final String DEVTOOL_VERSION = "0.12.0";
   private SocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;
@@ -84,14 +84,19 @@ public class DebugServerProxy implements IWXDebugProxy {
     return deviceId;
   }
 
+  @Override
   public void start() {
     synchronized (DebugServerProxy.class) {
+      if (mContext == null) {
+        new IllegalArgumentException("Context is null").printStackTrace();
+        return;
+      }
       WXEnvironment.sDebugServerConnectable = true;
       WeexInspector.initializeWithDefaults(mContext);
       mBridge = DebugBridge.getInstance();
       mBridge.setSession(mWebSocketClient);
       mBridge.setBridgeManager(mJsManager);
-      mWebSocketClient.connect(mRemoteUrl, new OkHttp3SocketClient.Callback() {
+      mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
 
         private String getShakeHandsMessage() {
           Map<String, Object> func = new HashMap<>();
@@ -148,7 +153,8 @@ public class DebugServerProxy implements IWXDebugProxy {
             if (mBridge != null) {
               mBridge.onDisConnected();
             }
-            Log.d(TAG, "connect debugger server failure!! " + cause.toString());
+            Log.w(TAG, "connect debugger server failure!!");
+            cause.printStackTrace();
           }
         }
 
@@ -156,7 +162,7 @@ public class DebugServerProxy implements IWXDebugProxy {
     }
   }
 
-  //@Override
+  @Override
   public void stop(boolean reload) {
     synchronized (DebugServerProxy.class) {
       if (mWebSocketClient != null) {

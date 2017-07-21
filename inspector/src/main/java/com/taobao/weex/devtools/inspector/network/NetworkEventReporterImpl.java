@@ -157,7 +157,7 @@ public class NetworkEventReporterImpl implements NetworkEventReporter {
       responseJSON.fromDiskCache = response.fromDiskCache();
 
       try {
-        if (NetworkEventReporterManager.getParam("reportTiming", false)) {
+        if (NetworkEventReporterManager.getParam("reportTiming", true)) {
           if (response instanceof TimingInspectorResponse) {
             Timing timing = ((TimingInspectorResponse) response).resourceTiming();
             responseJSON.timing = createTimingFrom(timing);

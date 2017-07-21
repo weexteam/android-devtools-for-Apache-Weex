@@ -11,10 +11,10 @@ package com.taobao.weex.devtools;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.taobao.weex.devtools.common.LogUtil;
+import com.taobao.weex.devtools.debug.IWebSocketClient;
 import com.taobao.weex.devtools.inspector.console.RuntimeReplFactory;
 import com.taobao.weex.devtools.inspector.database.DatabaseFilesProvider;
 import com.taobao.weex.devtools.inspector.database.DefaultDatabaseFilesProvider;
@@ -42,13 +42,6 @@ import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
-//import com.taobao.weex.devtools.server.AddressNameHelper;
-//import com.taobao.weex.devtools.server.LazySocketHandler;
-//import com.taobao.weex.devtools.server.LocalSocketServer;
-//import com.taobao.weex.devtools.server.ProtocolDetectingSocketHandler;
-//import com.taobao.weex.devtools.server.ServerManager;
-//import com.taobao.weex.devtools.server.SocketHandler;
-//import com.taobao.weex.devtools.server.SocketHandlerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,6 +62,7 @@ import javax.annotation.Nullable;
  * the {@code stetho-sample} for more information.
  */
 public class WeexInspector {
+  private static IWebSocketClient customerWSClient;
   private WeexInspector() {
   }
 
@@ -121,15 +115,6 @@ public class WeexInspector {
     // initializer.start();
   }
 
-//  public static DumperPluginsProvider defaultDumperPluginsProvider(final Context context) {
-//    return new DumperPluginsProvider() {
-//      @Override
-//      public Iterable<DumperPlugin> get() {
-//        return new DefaultDumperPluginsBuilder(context).finish();
-//      }
-//    };
-//  }
-
   public static InspectorModulesProvider defaultInspectorModulesProvider(final Context context) {
     return new InspectorModulesProvider() {
       @Override
@@ -178,43 +163,6 @@ public class WeexInspector {
       return mPlugins;
     }
   }
-
-  /**
-   * Convenience mechanism to extend the default set of dumper plugins provided by WeexInspector.
-   *
-   * @see #initializeWithDefaults(Context)
-   */
-//  public static final class DefaultDumperPluginsBuilder {
-//    private final Context mContext;
-//    private final PluginBuilder<DumperPlugin> mDelegate = new PluginBuilder<>();
-//
-//    public DefaultDumperPluginsBuilder(Context context) {
-//      mContext = context;
-//    }
-//
-//    public DefaultDumperPluginsBuilder provide(DumperPlugin plugin) {
-//      mDelegate.provide(plugin.getName(), plugin);
-//      return this;
-//    }
-//
-//    private DefaultDumperPluginsBuilder provideIfDesired(DumperPlugin plugin) {
-//      mDelegate.provideIfDesired(plugin.getName(), plugin);
-//      return this;
-//    }
-//
-//    public DefaultDumperPluginsBuilder remove(String pluginName) {
-//      mDelegate.remove(pluginName);
-//      return this;
-//    }
-//
-//    public Iterable<DumperPlugin> finish() {
-//      provideIfDesired(new HprofDumperPlugin(mContext));
-//      provideIfDesired(new SharedPreferencesDumperPlugin(mContext));
-//      provideIfDesired(new CrashDumperPlugin());
-//      provideIfDesired(new FilesDumperPlugin(mContext));
-//      return mDelegate.finish();
-//    }
-//  }
 
   /**
    * Configuration mechanism to customize the behaviour of the standard set of inspector
@@ -363,6 +311,14 @@ public class WeexInspector {
       }
       return null;
     }
+  }
+
+  public static void overrideWebSocketClient(IWebSocketClient webSocketClient) {
+    WeexInspector.customerWSClient = webSocketClient;
+  }
+
+  public static IWebSocketClient getCustomerWSClient() {
+    return WeexInspector.customerWSClient;
   }
 
   /**

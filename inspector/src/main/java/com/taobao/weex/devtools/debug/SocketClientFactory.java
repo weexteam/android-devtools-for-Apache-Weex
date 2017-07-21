@@ -7,12 +7,15 @@ import com.taobao.weex.devtools.common.ReflectionUtil;
  */
 public class SocketClientFactory {
   public static SocketClient create(DebugServerProxy proxy) {
-    if (ReflectionUtil.tryGetClassForName("okhttp3.WebSocketListener") != null) {
-      return new OkHttp35SocketClient(proxy);
+    CustomerWSClient wsClient = new CustomerWSClient(proxy);
+    if (wsClient.isAvailed()) {
+      return wsClient;
     } else if (ReflectionUtil.tryGetClassForName("okhttp3.ws.WebSocketListener") != null) {
       return new OkHttp3SocketClient(proxy);
     } else if (ReflectionUtil.tryGetClassForName("com.squareup.okhttp.ws.WebSocketListener") != null) {
       return new OkHttpSocketClient(proxy);
+    } else {
+      new RuntimeException("No suitable websocket client found, trying to using WeexInspector.overrideWebSocketClient() to setting one").printStackTrace();
     }
     return null;
   }

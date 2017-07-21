@@ -125,7 +125,7 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public int execJSService(String javascript) {
-    if(!TextUtils.isEmpty(javascript)){
+    if (!TextUtils.isEmpty(javascript)) {
       Map<String, Object> params = new HashMap<>();
       params.put(WXDebugConstants.PARAM_JS_SOURCE, javascript);
 
@@ -177,6 +177,76 @@ public class DebugBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
+  public int callCreateBody(String s, String s1, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callCreateBody(s, s1, s2);
+    }
+    return 0;
+  }
+
+  public int callUpdateFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callCreateFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callCreateFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callRefreshFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callRefreshFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callUpdateAttrs(String s, String s1, byte[] bytes, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateAttrs(s, s1, new String(bytes), s2);
+    }
+    return 0;
+  }
+
+  public int callUpdateStyle(String s, String s1, byte[] bytes, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateStyle(s, s1, new String(bytes), s2);
+    }
+    return 0;
+  }
+
+  public int callRemoveElement(String s, String s1, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callRemoveElement(s, s1, s2);
+    }
+    return 0;
+  }
+
+  public int callMoveElement(String s, String s1, String s2, String s3, String s4) {
+    if (mJsManager != null) {
+      return mJsManager.callMoveElement(s, s1, s2, s3, s4);
+    }
+    return 0;
+  }
+
+  public int callAddEvent(String s, String s1, String s2, String s3) {
+    if (mJsManager != null) {
+      return mJsManager.callAddEvent(s, s1, s2, s3);
+    }
+    return 0;
+  }
+
+  public int callRemoveEvent(String s, String s1, String s2, String s3) {
+    if (mJsManager != null) {
+      return mJsManager.callRemoveEvent(s, s1, s2, s3);
+    }
+    return 0;
+  }
+
   public void onConnected() {
     Log.v(TAG, "connect to debug server success");
     synchronized (mLock) {
@@ -205,5 +275,9 @@ public class DebugBridge implements IWXBridge {
 
   public void takeHeapSnapshot(String filename) {
     LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
+  }
+
+  public int callCreateBody(String instanceId, byte[] tasks, String callback) {
+    return callCreateBody(instanceId, new String(tasks), callback);
   }
 }

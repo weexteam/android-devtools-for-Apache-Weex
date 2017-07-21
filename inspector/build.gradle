@@ -10,6 +10,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
         mavenCentral()
         jcenter()
     }
@@ -81,7 +82,7 @@ android.libraryVariants.all { variant ->
         into "build/metainf-${name}/META-INF"
     }
 
-    task "fatjar${name}"(type: Jar, dependsOn: [ "jar${name}", "tidyCommonsCli${name}", "metainf${name}" ]) {
+    task "fatjar${name}"(type: Jar, dependsOn: ["jar${name}", "tidyCommonsCli${name}", "metainf${name}"]) {
         classifier = 'fatjar'
         from variant.javaCompile.destinationDir
         from "build/commons-cli-tidy-${name}"
