@@ -1,0 +1,3 @@
+[submodule "playground/incubator-weex"]
+	path = playground/incubator-weex
+	url = https://github.com/misakuo/incubator-weex.git
