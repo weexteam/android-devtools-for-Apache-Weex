@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
@@ -97,6 +98,10 @@ public class DebugBridge implements IWXBridge {
     environment.put(WXDebugConstants.ENV_INFO_COLLECT, params.getShouldInfoCollect());
     environment.put(WXDebugConstants.ENV_DEVICE_WIDTH, params.getDeviceWidth());
     environment.put(WXDebugConstants.ENV_DEVICE_HEIGHT, params.getDeviceHeight());
+    environment.put("runtime", "devtools");
+
+    environment.putAll(WXEnvironment.getCustomOptions());
+
     return environment;
   }
 

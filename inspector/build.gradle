@@ -56,6 +56,9 @@ dependencies {
     provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
     provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
     provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
+
+    provided 'com.squareup.okhttp:okhttp:2.3.0'
+    provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
 }
 
 //apply from: rootProject.file('release.gradle')
@@ -93,6 +96,6 @@ android.libraryVariants.all { variant ->
 ext {
     PUBLISH_GROUP_ID = 'com.taobao.android'
     PUBLISH_ARTIFACT_ID = 'weex_inspector'
-    PUBLISH_VERSION = '0.11.0'
+    PUBLISH_VERSION = '0.12.2'
 }
 apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
