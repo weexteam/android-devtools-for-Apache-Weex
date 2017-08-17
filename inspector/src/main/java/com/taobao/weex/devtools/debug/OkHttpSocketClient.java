@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.ReflectionUtil;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -144,6 +145,7 @@ public class OkHttpSocketClient extends SocketClient {
           new Class[]{int.class, String.class});
       ReflectionUtil.tryInvokeMethod(mWebSocket, closeMethod, 1000, "End of session");
       mWebSocket = null;
+      WXLogUtils.w(TAG, "Close websocket connection");
     }
   }
 
@@ -172,9 +174,8 @@ public class OkHttpSocketClient extends SocketClient {
 
 
   private void abort(String message, Throwable cause) {
-    Log.v(TAG, "Error occurred, shutting down websocket connection: " + message);
+    Log.w(TAG, "Error occurred, shutting down websocket connection: " + message);
     close();
-
     // Trigger failure callbacks
     if (mConnectCallback != null) {
       mConnectCallback.onFailure(cause);
@@ -193,7 +194,7 @@ public class OkHttpSocketClient extends SocketClient {
           mConnectCallback.onSuccess(null);
         }
       } else if ("onFailure".equals(method.getName())) {
-        abort("Websocket exception", (IOException) args[0]);
+        abort("Websocket onFailure", (IOException) args[0]);
       } else if ("onMessage".equals(method.getName())) {
         Object bufferedSource = mBufferedSourceClazz.cast(args[0]);
         Method readUtf8 = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "readUtf8");
@@ -202,7 +203,7 @@ public class OkHttpSocketClient extends SocketClient {
           mProxy.handleMessage(message);
         } catch (Exception e) {
           if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
-            LogRedirector.v(TAG, "Unexpected I/O exception processing message: " + e);
+            LogRedirector.w(TAG, "Unexpected I/O exception processing message: " + e);
           }
         } finally {
           Method closeMethod = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "close");

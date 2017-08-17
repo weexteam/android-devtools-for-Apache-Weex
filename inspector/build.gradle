@@ -24,7 +24,7 @@ android {
     buildToolsVersion '23.0.2'
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -59,6 +59,7 @@ dependencies {
 
     provided 'com.squareup.okhttp:okhttp:2.3.0'
     provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    provided 'com.android.support:recyclerview-v7:23.1.1'
 }
 
 //apply from: rootProject.file('release.gradle')

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.ReflectionUtil;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -155,6 +156,7 @@ public class OkHttp3SocketClient extends SocketClient {
 
       ReflectionUtil.tryInvokeMethod(mWebSocket, closeMethod, 1000, "End of session");
       mWebSocket = null;
+      WXLogUtils.w(TAG, "Close websocket connection");
     }
   }
 
@@ -188,7 +190,7 @@ public class OkHttp3SocketClient extends SocketClient {
 
 
   private void abort(String message, Throwable cause) {
-    Log.v(TAG, "Error occurred, shutting down websocket connection: " + message);
+    Log.w(TAG, "Error occurred, shutting down websocket connection: " + message);
     close();
 
     // Trigger failure callbacks
@@ -209,7 +211,7 @@ public class OkHttp3SocketClient extends SocketClient {
           mConnectCallback.onSuccess(null);
         }
       } else if ("onFailure".equals(method.getName())) {
-        abort("Websocket exception", (IOException) args[0]);
+        abort("Websocket onFailure", (IOException) args[0]);
       } else if ("onMessage".equals(method.getName())) {
         Method source = ReflectionUtil.tryGetMethod(mResponseBodyClazz, "source");
         Object payload = mResponseBodyClazz.cast(args[0]);

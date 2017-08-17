@@ -13,6 +13,9 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.devtools.adapter.JsLogAdapter;
+import com.taobao.weex.devtools.adapter.WXTracingAdapter;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.debug.IWebSocketClient;
 import com.taobao.weex.devtools.inspector.console.RuntimeReplFactory;
@@ -42,11 +45,14 @@ import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
+import com.taobao.weex.devtools.toolbox.JsExceptionPrompt;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
@@ -63,6 +69,7 @@ import javax.annotation.Nullable;
  */
 public class WeexInspector {
   private static IWebSocketClient customerWSClient;
+  private static volatile AtomicBoolean sInited = new AtomicBoolean(false);
   private WeexInspector() {
   }
 
@@ -84,11 +91,6 @@ public class WeexInspector {
    */
   public static void initializeWithDefaults(final Context context) {
     initialize(new Initializer(context) {
-//      @Override
-//      protected Iterable<DumperPlugin> getDumperPlugins() {
-//        return new DefaultDumperPluginsBuilder(context).finish();
-//      }
-
       @Override
       protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
         return new DefaultInspectorModulesBuilder(context).finish();
@@ -105,14 +107,26 @@ public class WeexInspector {
   public static void initialize(final Initializer initializer) {
     // Hook activity tracking so that after WeexInspector is attached we can figure out what
     // activities are present.
+    if (sInited.get()) {
+      LogUtil.w("WeexInspector initialized");
+      return;
+    }
     boolean isTrackingActivities = ActivityTracker.get().beginTrackingIfPossible(
         (Application)initializer.mContext.getApplicationContext());
+
+    try {
+      WXSDKManager.getInstance().setTracingAdapter(new WXTracingAdapter());
+      WXSDKManager.getInstance().setIWXJSExceptionAdapter(new JsExceptionPrompt());
+      WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
+    } catch (Throwable throwable) {
+      throwable.printStackTrace();
+    }
+
+    sInited.set(isTrackingActivities);
     if (!isTrackingActivities) {
       LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
           "ActivityTracker methods manually!");
     }
-
-    // initializer.start();
   }
 
   public static InspectorModulesProvider defaultInspectorModulesProvider(final Context context) {

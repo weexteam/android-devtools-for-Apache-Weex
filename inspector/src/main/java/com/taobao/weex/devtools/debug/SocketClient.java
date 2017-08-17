@@ -79,6 +79,13 @@ public abstract class SocketClient implements SimpleSession {
     return mWebSocket != null;
   }
 
+  @Override
+  public void post(Runnable runnable) {
+    if (mHandler != null) {
+      mHandler.post(runnable);
+    }
+  }
+
   protected abstract void connect(String url);
 
   protected abstract void close();

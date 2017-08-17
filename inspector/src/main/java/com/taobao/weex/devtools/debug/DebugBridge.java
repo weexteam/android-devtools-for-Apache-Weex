@@ -260,7 +260,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   public void onDisConnected() {
-    Log.v(TAG, "connect to debug server failed");
+    Log.w(TAG, "WebSocket disconnected");
     synchronized (mLock) {
       mSession = null;
       mLock.notify();
@@ -276,6 +276,22 @@ public class DebugBridge implements IWXBridge {
       WXBridgeManager.getInstance().stopRemoteDebug();
       return 0;
     }
+  }
+
+  public void sendToRemote(String message) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.sendText(message);
+    }
+  }
+
+  public void post(Runnable runnable) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.post(runnable);
+    }
+  }
+
+  public boolean isSessionActive() {
+    return mSession != null && mSession.isOpen();
   }
 
   public void takeHeapSnapshot(String filename) {
