@@ -66,6 +66,7 @@ dependencies {
     // compile 'commons-cli:commons-cli:1.2'
     provided 'com.google.code.findbugs:jsr305:2.0.1'
     provided 'com.android.support:appcompat-v7:23.0.1'
+    provided 'com.android.support:recyclerview-v7:23.1.1'
     // optional
     testCompile 'junit:junit:4.12'
     testCompile('org.robolectric:robolectric:2.4') {
