@@ -301,4 +301,9 @@ public class DebugBridge implements IWXBridge {
   public int callCreateBody(String instanceId, byte[] tasks, String callback) {
     return callCreateBody(instanceId, new String(tasks), callback);
   }
+
+  @Override
+  public void reportServerCrash(String instanceId, String crashFile) {
+    LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
+  }
 }
