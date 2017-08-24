@@ -65,6 +65,11 @@ public class EventDetailFragment extends Fragment {
 
     for (int i = 0; i < rootEvent.subEvents.size(); i++) {
       WXTracing.TraceEvent event = rootEvent.subEvents.valueAt(i);
+
+      if ("DomExecute".equals(event.fname) || "UIExecute".equals(event.fname)) {
+        continue;
+      }
+
       EventView eventView = new EventView(getContext());
       eventView.desc.setText(event.fname);
       subEvents.addView(eventView);

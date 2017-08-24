@@ -109,7 +109,7 @@ public class DebugServerProxy implements IWXDebugProxy {
           if (WXEnvironment.sLogLevel != null) {
             func.put("logLevel", WXEnvironment.sLogLevel.getName());
           }
-          func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
+          func.put("remoteDebug", false);
 
           Map<String, Object> map = new HashMap<>();
           map.put("id", "0");

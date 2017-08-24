@@ -45,7 +45,6 @@ import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
-import com.taobao.weex.devtools.toolbox.JsExceptionPrompt;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
@@ -116,7 +115,7 @@ public class WeexInspector {
 
     try {
       WXSDKManager.getInstance().setTracingAdapter(new WXTracingAdapter());
-      WXSDKManager.getInstance().setIWXJSExceptionAdapter(new JsExceptionPrompt());
+      //WXSDKManager.getInstance().setIWXJSExceptionAdapter(new JsExceptionPrompt());
       WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
     } catch (Throwable throwable) {
       throwable.printStackTrace();

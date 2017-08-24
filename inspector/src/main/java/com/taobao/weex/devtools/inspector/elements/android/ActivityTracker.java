@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Looper;
 
 import com.taobao.weex.devtools.common.Util;
-import com.taobao.weex.devtools.toolbox.PopupManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,7 +177,7 @@ public final class ActivityTracker {
 
         @Override
         public void onActivityPaused(Activity activity) {
-          PopupManager.dismiss();
+
         }
 
         @Override

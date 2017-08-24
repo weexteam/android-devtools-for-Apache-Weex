@@ -1,13 +1,19 @@
 package com.taobao.weex.devtools.adapter;
 
+import android.graphics.Color;
 import android.util.SparseArray;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.taobao.weex.RenderContainer;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.debug.DebugBridge;
+import com.taobao.weex.devtools.toolbox.PerformanceActivity;
 import com.taobao.weex.devtools.trace.DomTracker;
 import com.taobao.weex.devtools.trace.HealthReport;
 import com.taobao.weex.tracing.WXTracing;
@@ -66,6 +72,7 @@ public class WXTracingAdapter implements ITracingAdapter {
       head = new WXTracing.TraceEvent();
       head.traceId = instanceId;
       head.ts = event.ts;
+      head.subEvents = new SparseArray<>();
       head.extParams = new HashMap<>();
       traceEvents.append(instanceId, head);
     }
@@ -76,6 +83,7 @@ public class WXTracingAdapter implements ITracingAdapter {
         event.duration = 0;
         head.subEvents.append(event.traceId, event);
         sendTracingData(event.iid);
+        enableMonitor(event.iid);
       }
       return;
     }
@@ -114,6 +122,27 @@ public class WXTracingAdapter implements ITracingAdapter {
     return results;
   }
 
+  private void enableMonitor(final String instanceId) {
+    final WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);
+    if (instance != null) {
+      RenderContainer container = (RenderContainer) instance.getContainerView();
+      TextView textView = new TextView(instance.getUIContext());
+      textView.setText("Weex MNT:" + instanceId);
+      textView.setBackgroundColor(Color.parseColor("#1E90FF"));
+      textView.setTextColor(Color.WHITE);
+      textView.setPadding(10, 10, 10, 10);
+      textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+      container.addView(textView);
+      textView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          PerformanceActivity.start(instance.getUIContext(), Integer.parseInt(instanceId));
+        }
+      });
+    }
+  }
+
   private void sendTracingData(final String instanceId) {
 
     if (!DebugBridge.getInstance().isSessionActive()) {
@@ -141,6 +170,8 @@ public class WXTracingAdapter implements ITracingAdapter {
         sendSummaryInfo(String.valueOf(instanceId));
       }
     });
+
+    WXLogUtils.d("WXTracingAdapter", "Send tracing data with instance id " + instanceId);
   }
 
   private void collectNativeTracingData(WXTracing.TraceEvent head, JSONArray out) {
