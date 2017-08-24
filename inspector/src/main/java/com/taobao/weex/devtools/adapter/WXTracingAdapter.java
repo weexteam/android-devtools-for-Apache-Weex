@@ -85,7 +85,7 @@ public class WXTracingAdapter implements ITracingAdapter {
         event.duration = 0;
         head.subEvents.append(event.traceId, event);
         sendTracingData(event.iid);
-        enableMonitor(event.iid);
+        //enableMonitor(event.iid);
       }
       return;
     }
@@ -114,14 +114,6 @@ public class WXTracingAdapter implements ITracingAdapter {
 
   public WXTracing.TraceEvent getTraceEventByInstanceId(final int iid) {
     return traceEvents.get(iid);
-  }
-
-  public String[] instanceIds() {
-    String[] results = new String[traceEvents.size()];
-    for (int i = 0; i < traceEvents.size(); i++) {
-      results[i] = String.valueOf(traceEvents.keyAt(i));
-    }
-    return results;
   }
 
   private void enableMonitor(final String instanceId) {

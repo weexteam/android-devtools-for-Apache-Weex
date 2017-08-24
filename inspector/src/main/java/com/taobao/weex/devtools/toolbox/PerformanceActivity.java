@@ -38,13 +38,6 @@ public class PerformanceActivity extends FragmentActivity {
       }
     });
 
-    /* addTab("DOM树", false, new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        switchFragment(new DOMTreeFragment());
-      }
-    }); */
-
     addTab("JS LOG", false, new View.OnClickListener() {
       @Override
       public void onClick(View v) {
