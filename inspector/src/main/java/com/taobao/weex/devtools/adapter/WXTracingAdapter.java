@@ -2,8 +2,10 @@ package com.taobao.weex.devtools.adapter;
 
 import android.graphics.Color;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.taobao.weex.RenderContainer;
@@ -128,10 +130,12 @@ public class WXTracingAdapter implements ITracingAdapter {
       RenderContainer container = (RenderContainer) instance.getContainerView();
       TextView textView = new TextView(instance.getUIContext());
       textView.setText("Weex MNT:" + instanceId);
-      textView.setBackgroundColor(Color.parseColor("#1E90FF"));
+      textView.setBackgroundColor(Color.parseColor("#AA1E90FF"));
       textView.setTextColor(Color.WHITE);
       textView.setPadding(10, 10, 10, 10);
-      textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+      lp.gravity = Gravity.RIGHT | Gravity.CENTER;
+      textView.setLayoutParams(lp);
 
       container.addView(textView);
       textView.setOnClickListener(new View.OnClickListener() {
