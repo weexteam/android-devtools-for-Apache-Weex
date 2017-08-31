@@ -13,12 +13,11 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.devtools.adapter.WXTracingAdapter;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.debug.IWebSocketClient;
 import com.taobao.weex.devtools.inspector.console.RuntimeReplFactory;
-import com.taobao.weex.devtools.inspector.database.DatabaseFilesProvider;
-import com.taobao.weex.devtools.inspector.database.DefaultDatabaseFilesProvider;
-import com.taobao.weex.devtools.inspector.database.SqliteDatabaseDriver;
 import com.taobao.weex.devtools.inspector.elements.Document;
 import com.taobao.weex.devtools.inspector.elements.DocumentProviderFactory;
 import com.taobao.weex.devtools.inspector.elements.android.ActivityTracker;
@@ -28,16 +27,11 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.module.CSS;
 import com.taobao.weex.devtools.inspector.protocol.module.Console;
 import com.taobao.weex.devtools.inspector.protocol.module.DOM;
-import com.taobao.weex.devtools.inspector.protocol.module.DOMStorage;
-import com.taobao.weex.devtools.inspector.protocol.module.Database;
-import com.taobao.weex.devtools.inspector.protocol.module.DatabaseConstants;
 import com.taobao.weex.devtools.inspector.protocol.module.Debugger;
-import com.taobao.weex.devtools.inspector.protocol.module.HeapProfiler;
 import com.taobao.weex.devtools.inspector.protocol.module.Input;
 import com.taobao.weex.devtools.inspector.protocol.module.Inspector;
 import com.taobao.weex.devtools.inspector.protocol.module.Network;
 import com.taobao.weex.devtools.inspector.protocol.module.Page;
-import com.taobao.weex.devtools.inspector.protocol.module.Profiler;
 import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
@@ -45,8 +39,8 @@ import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFacto
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
 
@@ -63,6 +57,7 @@ import javax.annotation.Nullable;
  */
 public class WeexInspector {
   private static IWebSocketClient customerWSClient;
+  private static volatile AtomicBoolean sInited = new AtomicBoolean(false);
   private WeexInspector() {
   }
 
@@ -84,11 +79,6 @@ public class WeexInspector {
    */
   public static void initializeWithDefaults(final Context context) {
     initialize(new Initializer(context) {
-//      @Override
-//      protected Iterable<DumperPlugin> getDumperPlugins() {
-//        return new DefaultDumperPluginsBuilder(context).finish();
-//      }
-
       @Override
       protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
         return new DefaultInspectorModulesBuilder(context).finish();
@@ -105,14 +95,26 @@ public class WeexInspector {
   public static void initialize(final Initializer initializer) {
     // Hook activity tracking so that after WeexInspector is attached we can figure out what
     // activities are present.
+    if (sInited.get()) {
+      LogUtil.w("WeexInspector initialized");
+      return;
+    }
     boolean isTrackingActivities = ActivityTracker.get().beginTrackingIfPossible(
         (Application)initializer.mContext.getApplicationContext());
+
+    try {
+      WXSDKManager.getInstance().setTracingAdapter(new WXTracingAdapter());
+      //WXSDKManager.getInstance().setIWXJSExceptionAdapter(new JsExceptionPrompt());
+      //WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
+    } catch (Throwable throwable) {
+      throwable.printStackTrace();
+    }
+
+    sInited.set(isTrackingActivities);
     if (!isTrackingActivities) {
       LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
           "ActivityTracker methods manually!");
     }
-
-    // initializer.start();
   }
 
   public static InspectorModulesProvider defaultInspectorModulesProvider(final Context context) {
@@ -177,8 +179,6 @@ public class WeexInspector {
 
     @Nullable private DocumentProviderFactory mDocumentProvider;
     @Nullable private RuntimeReplFactory mRuntimeRepl;
-    @Nullable private DatabaseFilesProvider mDatabaseFilesProvider;
-    @Nullable private List<Database.DatabaseDriver> mDatabaseDrivers;
 
     public DefaultInspectorModulesBuilder(Context context) {
       mContext = (Application)context.getApplicationContext();
@@ -205,29 +205,6 @@ public class WeexInspector {
      */
     public DefaultInspectorModulesBuilder runtimeRepl(RuntimeReplFactory factory) {
       mRuntimeRepl = factory;
-      return this;
-    }
-
-    /**
-     * Customize the location of database files that WeexInspector will propogate in the UI.  Android's
-     * {@link Context#getDatabasePath} method will be used by default if not overridden here.
-     */
-    public DefaultInspectorModulesBuilder databaseFiles(DatabaseFilesProvider provider) {
-      mDatabaseFilesProvider = provider;
-      return this;
-    }
-
-    /**
-     * Extend and provide additional database drivers. Currently two database drivers are supported
-     * in this lib: <br>
-     *   1. <code>SqliteDatabaseDriver</code> - Presents sqlite databases and all tables of the app.<br>
-     *   2. <code>ContentProviderDatabaseDriver</code> - Configure and present content providers data.
-     */
-    public DefaultInspectorModulesBuilder provideDatabaseDriver(Database.DatabaseDriver databaseDriver) {
-      if (mDatabaseDrivers == null) {
-        mDatabaseDrivers = new ArrayList<>();
-      }
-      mDatabaseDrivers.add(databaseDriver);
       return this;
     }
 
@@ -273,31 +250,15 @@ public class WeexInspector {
         provideIfDesired(new CSS(document));
       }
       provideIfDesired(new Input());
-      provideIfDesired(new DOMStorage(mContext));
-      provideIfDesired(new HeapProfiler());
       provideIfDesired(new Inspector());
       provideIfDesired(new Network(mContext));
       provideIfDesired(new Page(mContext));
-      provideIfDesired(new Profiler());
       provideIfDesired(
           new Runtime(
               mRuntimeRepl != null ?
               mRuntimeRepl :
               new RhinoDetectingRuntimeReplFactory(mContext)));
       provideIfDesired(new Worker());
-      if (Build.VERSION.SDK_INT >= DatabaseConstants.MIN_API_LEVEL) {
-        Database database = new Database();
-        database.add(new SqliteDatabaseDriver(mContext,
-            mDatabaseFilesProvider != null ?
-                mDatabaseFilesProvider :
-                new DefaultDatabaseFilesProvider(mContext)));
-        if (mDatabaseDrivers != null) {
-          for (Database.DatabaseDriver databaseDriver : mDatabaseDrivers) {
-            database.add(databaseDriver);
-          }
-        }
-        provideIfDesired(database);
-      }
       return mDelegate.finish();
     }
 

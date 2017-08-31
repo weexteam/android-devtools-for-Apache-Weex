@@ -8,6 +8,12 @@
         android:targetSdkVersion="19"
         tools:overrideLibrary="com.taobao.weappplus_sdk"/>
 
-    <application/>
+    <application android:allowBackup="false">
+        <activity
+            android:exported="false"
+            android:name="com.taobao.weex.devtools.toolbox.PerformanceActivity"
+            android:screenOrientation="portrait">
+        </activity>
+    </application>
 
 </manifest>

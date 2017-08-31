@@ -15,6 +15,7 @@ package com.taobao.weex.devtools.websocket;
 public interface SimpleSession {
   void sendText(String payload);
   void sendBinary(byte[] payload);
+  void post(Runnable runnable);
 
   /**
    * Request that the session be closed.
