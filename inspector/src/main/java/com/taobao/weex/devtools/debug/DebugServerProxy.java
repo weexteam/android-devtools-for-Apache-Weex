@@ -29,6 +29,7 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcRequest;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -109,7 +110,7 @@ public class DebugServerProxy implements IWXDebugProxy {
           if (WXEnvironment.sLogLevel != null) {
             func.put("logLevel", WXEnvironment.sLogLevel.getName());
           }
-          func.put("remoteDebug", false);
+          func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
 
           Map<String, Object> map = new HashMap<>();
           map.put("id", "0");
@@ -185,6 +186,9 @@ public class DebugServerProxy implements IWXDebugProxy {
 
   @Override
   public IWXBridge getWXBridge() {
+    if (mBridge == null) {
+      WXLogUtils.e(TAG, "DebugBridge is null!");
+    }
     return mBridge;
   }
 
