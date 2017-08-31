@@ -98,6 +98,10 @@ public class WXTracingAdapter implements ITracingAdapter {
         head.subEvents.append(event.traceId, event);
       } else if ("E".equals(event.ph)) {
         WXTracing.TraceEvent beginEvent = head.subEvents.get(event.traceId);
+        if (beginEvent == null) {
+          WXLogUtils.w("WXTracingAdapter", "begin event not found: " + event.fname + "@" + event.traceId);
+          return;
+        }
         beginEvent.duration = event.ts - beginEvent.ts;
         beginEvent.ph = "X";
       }
