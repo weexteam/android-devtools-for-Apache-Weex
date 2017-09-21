@@ -43,7 +43,7 @@ import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
   private static final String TAG = "DebugServerProxy";
-  private static final String DEVTOOL_VERSION = "0.12.0";
+  private static final String DEVTOOL_VERSION = "0.13.2";
   private SocketClient mWebSocketClient;
   private ObjectMapper mObjectMapper = new ObjectMapper();
   private MethodDispatcher mMethodDispatcher;
@@ -94,8 +94,13 @@ public class DebugServerProxy implements IWXDebugProxy {
       }
 
       if (mWebSocketClient.isOpen() && mBridge != null) {
-        WXLogUtils.w(TAG, "Inspector session is active, skip start proxy");
-        return;
+        if (WXEnvironment.sRemoteDebugProxyUrl.equals(mRemoteUrl)) {
+          WXLogUtils.w(TAG, "Inspector session is active, skip start proxy");
+          return;
+        } else {
+          WXLogUtils.w(TAG, "WS changed");
+          stop(false);
+        }
       }
 
       WXEnvironment.sDebugServerConnectable = true;
