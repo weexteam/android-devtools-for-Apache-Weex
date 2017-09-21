@@ -92,6 +92,12 @@ public class DebugServerProxy implements IWXDebugProxy {
         new IllegalArgumentException("Context is null").printStackTrace();
         return;
       }
+
+      if (mWebSocketClient.isOpen() && mBridge != null) {
+        WXLogUtils.w(TAG, "Inspector session is active, skip start proxy");
+        return;
+      }
+
       WXEnvironment.sDebugServerConnectable = true;
       WeexInspector.initializeWithDefaults(mContext);
       mBridge = DebugBridge.getInstance();
@@ -175,7 +181,6 @@ public class DebugServerProxy implements IWXDebugProxy {
         switchLocalRuntime();
       }
     }
-
   }
 
   private void switchLocalRuntime() {
