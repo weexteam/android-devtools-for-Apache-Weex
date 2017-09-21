@@ -100,6 +100,7 @@ public class DebugServerProxy implements IWXDebugProxy {
         } else {
           WXLogUtils.w(TAG, "WS changed");
           stop(false);
+          mWebSocketClient = SocketClientFactory.create(this);
         }
       }
 
