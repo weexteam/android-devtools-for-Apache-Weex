@@ -67,6 +67,11 @@ public class DebugBridge implements IWXBridge {
     return sendMessage(getInitFrameworkMessage(framework, params));
   }
 
+  @Override
+  public int initFrameworkEnv(String s, WXParams wxParams, String s1, boolean b) {
+    return initFramework(s, wxParams);
+  }
+
   private String getInitFrameworkMessage(String framework, WXParams params) {
     Map<String, Object> func = new HashMap<>();
     func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);

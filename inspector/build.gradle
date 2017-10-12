@@ -97,6 +97,6 @@ android.libraryVariants.all { variant ->
 ext {
     PUBLISH_GROUP_ID = 'com.taobao.android'
     PUBLISH_ARTIFACT_ID = 'weex_inspector'
-    PUBLISH_VERSION = '0.13.2'
+    PUBLISH_VERSION = '0.12.2'
 }
 apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
