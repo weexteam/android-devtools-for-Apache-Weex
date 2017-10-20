@@ -147,13 +147,22 @@ public class OkHttpSocketClient extends SocketClient {
     }
   }
 
+  @Override
   protected void sendProtocolMessage(int requestID, String message) {
     if (mWebSocket == null) {
       return;
     }
     try {
-      Field textField = ReflectionUtil.tryGetDeclaredField(mMediaTypeClazz, "TEXT");
-      Object textValue = ReflectionUtil.getFieldValue(textField, null);
+      Field textField;
+      Object textValue;
+      try {
+        textField = ReflectionUtil.tryGetDeclaredField(mMediaTypeClazz, "TEXT");
+        textValue = ReflectionUtil.getFieldValue(textField, null);
+      } catch (Exception e) {
+        textField = ReflectionUtil.tryGetDeclaredField(mWebSocketClazz, "TEXT");
+        textValue = ReflectionUtil.getFieldValue(textField, null);
+      }
+
       Method sendMessageMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz,
           "sendMessage", new Class[]{mMediaTypeClazz, mBufferClazz});
 
