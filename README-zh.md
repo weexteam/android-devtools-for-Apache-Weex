@@ -1,10 +1,10 @@
 # Weex Devtools接入指南
 [![GitHub release](https://img.shields.io/github/release/weexteam/weex_devtools_android.svg)](https://github.com/weexteam/weex_devtools_android/releases)   [![Codacy Badge](https://api.codacy.com/project/badge/Grade/af0790bf45c9480fb0ec90ad834b89a3)](https://www.codacy.com/app/weex_devtools/weex_devtools_android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=weexteam/weex_devtools_android&amp;utm_campaign=Badge_Grade) 	[![GitHub issues](https://img.shields.io/github/issues/weexteam/weex_devtools_android.svg)](https://github.com/weexteam/weex_devtools_android/issues)  [ ![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_inspector/images/download.svg) ](https://bintray.com/alibabaweex/maven/weex_inspector/_latestVersion)
 
-Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的一款调试神器.其主要功能简介请点击[这里](http://www.atatech.org/articles/58022)查看.这篇文章重点介绍Android端的接入问题及注意事项.
+Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的一款调试神器.其主要功能简介请点击[这里](https://yq.aliyun.com/articles/57651)查看.这篇文章重点介绍Android端的接入问题及注意事项.
 
 - **Inspector**
- Inspector 用来查看运行状态如`Element` \ `Network` \ `Console log` \ `ScreenCast` \ `BoxModel` \ `DOM Tree` \ `Element Select` \ `DataBase` 等.
+ Inspector 用来查看运行状态如`Element` \ `Console log` \ `ScreenCast` \ `BoxModel` \ `DOM Tree` \ `Element Select` \ `DataBase` 等.
 
 - **Debugger**
  Debugger 用来调试weex bundle和jsframework. 可以设置断点和查看调用栈.
@@ -14,7 +14,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 #### 添加依赖
 可以通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
 
-  * *Gradle依赖*.  
+  * *Gradle依赖*.
   ```
   dependencies {
      compile 'com.taobao.android:weex_inspector:0.10.0.5'
@@ -48,20 +48,29 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
  dependencies {
      provided 'com.google.code.findbugs:jsr305:2.0.1'
      provided 'com.android.support:appcompat-v7:23.1.1'
-     provided 'com.taobao.android:weex_sdk:0.9.5'
+     provided 'com.taobao.android:weex_sdk:0.10.0'
      provided 'com.alibaba:fastjson:1.1.45+'
      ...
  }
  ```
  
- * **compile方式引用的包**
+ * **反射引用的包(0.8.0.0以上版本)**
  ```
- dependencies {
+  dependencies {
      compile 'com.squareup.okhttp:okhttp:2.3.0'
      compile 'com.squareup.okhttp:okhttp-ws:2.3.0'
-     ...
-}
+      ...
+  }
  ```
+ 
+ 或者
+  ```
+   dependencies {
+      compile 'com.squareup.okhttp3:okhttp:3.4.1'
+      compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
+       ...
+   }
+  ```
 
 ##### 版本兼容
 
@@ -192,21 +201,6 @@ Playground集成的具体代码可参考如下两个文件:
   3. 启动App并确认打开调试模式. 你将在上一步中打开的网页中看到一个设备列表, 每个设备项都有两个按钮,分别是`Debugger`和`Inspector`. 
   4. 点击`Inspector` chrome将创建Inspector网页; 点击 `Debugger` chrome hrome将创建Debugger网页; 二者是相互独立的功能, 不相互依赖.
 
----
-
-#### 可选项
-##### [**OPTION**] *网络访问探测.*
-```
-OkHttpClient client = new OkHttpClient();
-client.networkInterceptors().add(new OkHttpInterceptor());
-```
-
-###### 注意
-  网络访问探测当前仅支持OKHttpClient 2.x!!! 如果想要使用该功能, 必须确定能从网络成功获取要探测的bundle, 比如在Playground中, 你可以把`IndexActivity.java`中的变量`DEFAULT_IP` 的值从`"your_current_IP"`修改为一个服务器IP, 比如`"30.30.30.150"`.
-
-  ```
-      private static final String DEFAULT_IP = "30.30.30.150"; // "your_current_IP";
-  ```
 ---
 
 ## 背景知识
