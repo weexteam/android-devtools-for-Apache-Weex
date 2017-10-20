@@ -29,7 +29,7 @@ import com.taobao.weex.devtools.inspector.protocol.module.Page;
 import java.io.ByteArrayOutputStream;
 
 public final class ScreencastDispatcher {
-  private static final long FRAME_DELAY = 250l;
+  private static final long FRAME_DELAY = 200L;
   private static float sBitmapScale = 1.0f;
 
   private final Handler mMainHandler = new Handler(Looper.getMainLooper());
@@ -94,6 +94,10 @@ public final class ScreencastDispatcher {
         if (mBitmap == null) {
           int viewWidth = rootView.getWidth();
           int viewHeight = rootView.getHeight();
+          if (viewWidth <= 0 || viewHeight <= 0) {
+            return;
+          }
+
           float scale = Math.min((float) mRequest.maxWidth / (float) viewWidth,
               (float) mRequest.maxHeight / (float) viewHeight);
           sBitmapScale = scale;
@@ -143,7 +147,6 @@ public final class ScreencastDispatcher {
         mPeer.invokeMethod("Page.screencastFrame", mEvent, null);
         mMainHandler.postDelayed(mEndAction, FRAME_DELAY);
       }
-
     }
   }
 

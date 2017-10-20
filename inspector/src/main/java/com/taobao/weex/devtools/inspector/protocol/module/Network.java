@@ -16,6 +16,7 @@ import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcException;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcError;
+import com.taobao.weex.devtools.inspector.network.AsyncPrettyPrinter;
 import com.taobao.weex.devtools.inspector.network.AsyncPrettyPrinterInitializer;
 import com.taobao.weex.devtools.inspector.network.NetworkPeerManager;
 import com.taobao.weex.devtools.inspector.network.ResponseBodyData;
@@ -57,31 +58,31 @@ public class Network implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public JsonRpcResult getResponseBody(JsonRpcPeer peer, JSONObject params)
-      throws JsonRpcException {
+          throws JsonRpcException {
     try {
       String requestId = params.getString("requestId");
       return readResponseBody(requestId);
     } catch (IOException e) {
       throw new JsonRpcException(new JsonRpcError(JsonRpcError.ErrorCode.INTERNAL_ERROR,
-          e.toString(),
-          null /* data */));
+              e.toString(),
+              null /* data */));
     } catch (JSONException e) {
       throw new JsonRpcException(new JsonRpcError(JsonRpcError.ErrorCode.INTERNAL_ERROR,
-          e.toString(),
-          null /* data */));
+              e.toString(),
+              null /* data */));
     }
   }
 
   private GetResponseBodyResponse readResponseBody(String requestId)
-      throws IOException, JsonRpcException {
+          throws IOException, JsonRpcException {
     GetResponseBodyResponse response = new GetResponseBodyResponse();
     ResponseBodyData bodyData;
     try {
       bodyData = mResponseBodyFileManager.readFile(requestId);
     } catch (OutOfMemoryError e) {
       throw new JsonRpcException(new JsonRpcError(JsonRpcError.ErrorCode.INTERNAL_ERROR,
-          e.toString(),
-          null /* data */));
+              e.toString(),
+              null /* data */));
     }
     response.body = bodyData.data;
     response.base64Encoded = bodyData.base64Encoded;
@@ -91,7 +92,7 @@ public class Network implements ChromeDevtoolsDomain {
   /**
    * Method that allows callers to provide an {@link AsyncPrettyPrinterInitializer} that is
    * responsible for registering all
-   * {@link com.taobao.weex.devtools.inspector.network.AsyncPrettyPrinter}.
+   * {@link AsyncPrettyPrinter}.
    * Note that AsyncPrettyPrinterInitializer cannot be null and can only be set once.
    * @param initializer
    */
@@ -213,10 +214,13 @@ public class Network implements ChromeDevtoolsDomain {
 
   public static class Initiator {
     @JsonProperty(required = true)
-    public InitiatorType type;
+    public String type;
 
     @JsonProperty
-    public List<Console.CallFrame> stackTrace;
+    public List<Console.CallFrame> stack;
+
+    @JsonProperty
+    public String url;
   }
 
   public enum InitiatorType {
@@ -291,10 +295,10 @@ public class Network implements ChromeDevtoolsDomain {
     public double dnsEnd;
 
     @JsonProperty(required = true)
-    public double connectionStart;
+    public double connectStart;
 
     @JsonProperty(required = true)
-    public double connectionEnd;
+    public double connectEnd;
 
     @JsonProperty(required = true)
     public double sslStart;
@@ -309,6 +313,116 @@ public class Network implements ChromeDevtoolsDomain {
     public double sendEnd;
 
     @JsonProperty(required = true)
-    public double receivedHeadersEnd;
+    public double receiveHeadersEnd;
+  }
+
+  public static class WebSocketCreatedParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public String url;
+  }
+
+  public static class WebSocketClosedParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+  }
+
+  public static class WebSocketWillSendHandshakeRequestParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+
+    @JsonProperty(required = true)
+    public double wallTime;
+
+    @JsonProperty(required = true)
+    public WebSocketRequest request;
+  }
+
+  public static class WebSocketRequest {
+    @JsonProperty(required = true)
+    public JSONObject headers;
+  }
+
+  public static class WebSocketHandshakeResponseReceivedParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+
+    @JsonProperty(required = true)
+    public WebSocketResponse response;
+  }
+
+  public static class WebSocketResponse {
+    @JsonProperty(required = true)
+    public int status;
+
+    @JsonProperty(required = true)
+    public String statusText;
+
+    @JsonProperty(required = true)
+    public JSONObject headers;
+
+    @JsonProperty
+    public String headersText;
+
+    @JsonProperty
+    public JSONObject requestHeaders;
+
+    @JsonProperty
+    public String requestHeadersText;
+  }
+
+  public static class WebSocketFrameReceivedParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+
+    @JsonProperty(required = true)
+    public WebSocketFrame response;
+  }
+
+  public static class WebSocketFrameSentParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+
+    @JsonProperty(required = true)
+    public WebSocketFrame response;
+  }
+
+  public static class WebSocketFrame {
+    @JsonProperty(required = true)
+    public int opcode;
+
+    @JsonProperty(required = true)
+    public boolean mask;
+
+    @JsonProperty(required = true)
+    public String payloadData;
+  }
+
+  public static class WebSocketFrameErrorParams {
+    @JsonProperty(required = true)
+    public String requestId;
+
+    @JsonProperty(required = true)
+    public double timestamp;
+
+    @JsonProperty(required = true)
+    public String errorMessage;
   }
 }

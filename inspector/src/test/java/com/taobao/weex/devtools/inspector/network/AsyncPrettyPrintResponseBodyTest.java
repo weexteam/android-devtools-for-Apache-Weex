@@ -65,7 +65,6 @@ public class AsyncPrettyPrintResponseBodyTest {
     AsyncPrettyPrinterExecutorHolder.ensureInitialized();
   }
 
-  @Test
   public void testAsyncPrettyPrinterResult() throws IOException {
     StringWriter out = new StringWriter();
     PrintWriter writer = new PrintWriter(out);

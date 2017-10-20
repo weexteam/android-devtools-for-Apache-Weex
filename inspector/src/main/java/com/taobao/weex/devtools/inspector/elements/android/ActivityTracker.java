@@ -171,7 +171,7 @@ public final class ActivityTracker {
         }
 
         @Override
-        public void onActivityResumed(Activity activity) {
+        public void onActivityResumed(final Activity activity) {
 
         }
 

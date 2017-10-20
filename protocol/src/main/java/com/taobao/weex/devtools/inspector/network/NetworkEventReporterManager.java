@@ -208,6 +208,8 @@ import android.util.Log;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by moxun on 16/12/19.
@@ -217,6 +219,7 @@ public class NetworkEventReporterManager {
 
     private static final String DEFAULT_NETWORK_EVENT_REPORTER_IMPL_CLASS = "com.taobao.weex.devtools.inspector.network.NetworkEventReporterImpl";
     private static NetworkEventReporter sReporter = null;
+    private static Map<String, Object> inspectParams;
 
     public static
     @Nullable
@@ -239,6 +242,20 @@ public class NetworkEventReporterManager {
         } else {
             return null;
         }
+    }
+
+    public static void putParam(String key, Object value) {
+        if (inspectParams == null) {
+            inspectParams = new HashMap<>();
+        }
+        inspectParams.put(key, value);
+    }
+
+    public static <T> T getParam(String key, T defValue) {
+        if (inspectParams == null) {
+            return defValue;
+        }
+        return (T) inspectParams.get(key);
     }
 
     public static NetworkEventReporter newEmptyReporter() {
@@ -302,6 +319,46 @@ public class NetworkEventReporterManager {
         @Override
         public void dataReceived(String requestId, int dataLength, int encodedDataLength) {
             //do nothing
+        }
+
+        @Override
+        public String nextRequestId() {
+            return null;
+        }
+
+        @Override
+        public void webSocketCreated(String requestId, String url) {
+
+        }
+
+        @Override
+        public void webSocketClosed(String requestId) {
+
+        }
+
+        @Override
+        public void webSocketWillSendHandshakeRequest(InspectorWebSocketRequest request) {
+
+        }
+
+        @Override
+        public void webSocketHandshakeResponseReceived(InspectorWebSocketResponse response) {
+
+        }
+
+        @Override
+        public void webSocketFrameSent(InspectorWebSocketFrame frame) {
+
+        }
+
+        @Override
+        public void webSocketFrameReceived(InspectorWebSocketFrame frame) {
+
+        }
+
+        @Override
+        public void webSocketFrameError(String requestId, String errorMessage) {
+
         }
     }
 }

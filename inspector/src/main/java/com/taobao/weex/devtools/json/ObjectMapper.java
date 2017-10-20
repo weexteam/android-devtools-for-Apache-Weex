@@ -234,6 +234,11 @@ public class ObjectMapper {
   private JSONObject _convertToJSONObject(Object fromValue)
       throws JSONException, InvocationTargetException, IllegalAccessException {
     JSONObject jsonObject = new JSONObject();
+
+    if(fromValue instanceof Map) {
+      return new JSONObject((Map) fromValue);
+    }
+
     Field[] fields = fromValue.getClass().getFields();
     for (int i = 0; i < fields.length; ++i) {
       JsonProperty property = fields[i].getAnnotation(JsonProperty.class);

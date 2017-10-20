@@ -5,10 +5,12 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
+import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 
 import java.util.ArrayList;
@@ -65,6 +67,11 @@ public class DebugBridge implements IWXBridge {
     return sendMessage(getInitFrameworkMessage(framework, params));
   }
 
+  @Override
+  public int initFrameworkEnv(String s, WXParams wxParams, String s1, boolean b) {
+    return initFramework(s, wxParams);
+  }
+
   private String getInitFrameworkMessage(String framework, WXParams params) {
     Map<String, Object> func = new HashMap<>();
     func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);
@@ -96,6 +103,10 @@ public class DebugBridge implements IWXBridge {
     environment.put(WXDebugConstants.ENV_INFO_COLLECT, params.getShouldInfoCollect());
     environment.put(WXDebugConstants.ENV_DEVICE_WIDTH, params.getDeviceWidth());
     environment.put(WXDebugConstants.ENV_DEVICE_HEIGHT, params.getDeviceHeight());
+    environment.put("runtime", "devtools");
+
+    environment.putAll(WXEnvironment.getCustomOptions());
+
     return environment;
   }
 
@@ -124,7 +135,7 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public int execJSService(String javascript) {
-    if(!TextUtils.isEmpty(javascript)){
+    if (!TextUtils.isEmpty(javascript)) {
       Map<String, Object> params = new HashMap<>();
       params.put(WXDebugConstants.PARAM_JS_SOURCE, javascript);
 
@@ -176,6 +187,76 @@ public class DebugBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
+  public int callCreateBody(String s, String s1, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callCreateBody(s, s1, s2);
+    }
+    return 0;
+  }
+
+  public int callUpdateFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callCreateFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callCreateFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callRefreshFinish(String s, byte[] bytes, String s1) {
+    if (mJsManager != null) {
+      return mJsManager.callRefreshFinish(s, s1);
+    }
+    return 0;
+  }
+
+  public int callUpdateAttrs(String s, String s1, byte[] bytes, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateAttrs(s, s1, new String(bytes), s2);
+    }
+    return 0;
+  }
+
+  public int callUpdateStyle(String s, String s1, byte[] bytes, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callUpdateStyle(s, s1, new String(bytes), s2);
+    }
+    return 0;
+  }
+
+  public int callRemoveElement(String s, String s1, String s2) {
+    if (mJsManager != null) {
+      return mJsManager.callRemoveElement(s, s1, s2);
+    }
+    return 0;
+  }
+
+  public int callMoveElement(String s, String s1, String s2, String s3, String s4) {
+    if (mJsManager != null) {
+      return mJsManager.callMoveElement(s, s1, s2, s3, s4);
+    }
+    return 0;
+  }
+
+  public int callAddEvent(String s, String s1, String s2, String s3) {
+    if (mJsManager != null) {
+      return mJsManager.callAddEvent(s, s1, s2, s3);
+    }
+    return 0;
+  }
+
+  public int callRemoveEvent(String s, String s1, String s2, String s3) {
+    if (mJsManager != null) {
+      return mJsManager.callRemoveEvent(s, s1, s2, s3);
+    }
+    return 0;
+  }
+
   public void onConnected() {
     Log.v(TAG, "connect to debug server success");
     synchronized (mLock) {
@@ -184,7 +265,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   public void onDisConnected() {
-    Log.v(TAG, "connect to debug server failed");
+    Log.w(TAG, "WebSocket disconnected");
     synchronized (mLock) {
       mSession = null;
       mLock.notify();
@@ -200,5 +281,34 @@ public class DebugBridge implements IWXBridge {
       WXBridgeManager.getInstance().stopRemoteDebug();
       return 0;
     }
+  }
+
+  public void sendToRemote(String message) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.sendText(message);
+    }
+  }
+
+  public void post(Runnable runnable) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.post(runnable);
+    }
+  }
+
+  public boolean isSessionActive() {
+    return mSession != null && mSession.isOpen();
+  }
+
+  public void takeHeapSnapshot(String filename) {
+    LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
+  }
+
+  public int callCreateBody(String instanceId, byte[] tasks, String callback) {
+    return callCreateBody(instanceId, new String(tasks), callback);
+  }
+
+  @Override
+  public void reportServerCrash(String instanceId, String crashFile) {
+    LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
   }
 }

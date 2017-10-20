@@ -16,8 +16,8 @@ project(":appframework").projectDir = new File("../appframework")
 //include ":okhttp3_interceptor"
 //project(":okhttp3_interceptor").projectDir = new File("../okhttp3_interceptor")
 
-include ":urlconnection_interceptor"
-project(":urlconnection_interceptor").projectDir = new File("../urlconnection_interceptor")
+//include ":urlconnection_interceptor"
+//project(":urlconnection_interceptor").projectDir = new File("../urlconnection_interceptor")
 
 include ":protocol"
 project(":protocol").projectDir = new File("../protocol")
