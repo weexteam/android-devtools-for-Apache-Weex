@@ -182,7 +182,7 @@ public class DebugServerProxy implements IWXDebugProxy {
   }
 
   private void switchLocalRuntime() {
-    WXEnvironment.sDebugServerConnectable = false;
+//    WXEnvironment.sDebugServerConnectable = false;
     WXSDKEngine.reload(WXEnvironment.getApplication(), false);
     WXEnvironment.getApplication().sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
   }
