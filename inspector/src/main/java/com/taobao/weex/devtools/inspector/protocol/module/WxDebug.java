@@ -144,6 +144,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
     try {
       boolean enabled = params.getBoolean("enable");
       NetworkEventReporterImpl.setEnabled(enabled);
+	  WXEnvironment.sDebugNetworkEventReporterEnable = enabled;
     } catch (JSONException e) {
       e.printStackTrace();
     }

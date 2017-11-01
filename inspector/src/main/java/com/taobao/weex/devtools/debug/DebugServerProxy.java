@@ -110,6 +110,7 @@ public class DebugServerProxy implements IWXDebugProxy {
           func.put("devtoolVersion", DEVTOOL_VERSION);
           func.put("platform", WXEnvironment.OS);
           func.put("deviceId", getDeviceId(mContext));
+		  func.put("network", WXEnvironment.sDebugNetworkEventReporterEnable);
           if (WXEnvironment.sLogLevel != null) {
             func.put("logLevel", WXEnvironment.sLogLevel.getName());
           }

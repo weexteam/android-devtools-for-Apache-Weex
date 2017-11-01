@@ -23,7 +23,7 @@ public class ConsolePeerManager extends ChromePeerManager {
 
   @Nullable
   public static synchronized ConsolePeerManager getInstanceOrNull() {
-    return sInstance;
+    return getOrCreateInstance();
   }
 
   public static synchronized ConsolePeerManager getOrCreateInstance() {
