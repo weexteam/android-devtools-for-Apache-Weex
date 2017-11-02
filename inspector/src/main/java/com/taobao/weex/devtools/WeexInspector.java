@@ -104,17 +104,19 @@ public class WeexInspector {
     boolean isTrackingActivities = ActivityTracker.get().beginTrackingIfPossible(
         (Application)initializer.mContext.getApplicationContext());
 
+    sInited.set(isTrackingActivities);
+    if (!isTrackingActivities) {
+      LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
+          "ActivityTracker methods manually!");
+    }
+  }
+
+  public static void initToolbox() {
     try {
       WXSDKManager.getInstance().setTracingAdapter(new WXTracingAdapter());
       WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
     } catch (Throwable throwable) {
       throwable.printStackTrace();
-    }
-
-    sInited.set(isTrackingActivities);
-    if (!isTrackingActivities) {
-      LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
-          "ActivityTracker methods manually!");
     }
   }
 

@@ -51,6 +51,10 @@ public class PerformanceActivity extends ActionBarActivity {
         switchFragment(new EnvironmentFragment());
       }
     });
+
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setTitle("Weex Monitor");
+    }
   }
 
   private void switchFragment(Fragment fragment) {
@@ -114,5 +118,15 @@ public class PerformanceActivity extends ActionBarActivity {
       textView.setTextColor(Color.parseColor("#1E90FF"));
     }
     segmentHost.addView(textView);
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    boolean handled = super.onSupportNavigateUp();
+    if (!handled) {
+      finish();
+      return true;
+    }
+    return handled;
   }
 }
