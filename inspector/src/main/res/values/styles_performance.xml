@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="browser_activity_bg">#f5f5f5</color>
+	
+	<style name="Theme.Performance" parent="Theme.AppCompat.Light">
+        <item name="android:windowBackground">@color/browser_activity_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="actionBarDivider">@null</item>
+    </style>	
+</resources>

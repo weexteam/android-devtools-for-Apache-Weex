@@ -12,6 +12,7 @@
         <activity
             android:exported="false"
             android:name="com.taobao.weex.devtools.toolbox.PerformanceActivity"
+            android:theme="@style/Theme.Performance"
             android:screenOrientation="portrait">
         </activity>
     </application>
