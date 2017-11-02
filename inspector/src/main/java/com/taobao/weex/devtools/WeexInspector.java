@@ -14,6 +14,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.taobao.weex.WXSDKManager;
+import com.taobao.weex.devtools.adapter.JsLogAdapter;
 import com.taobao.weex.devtools.adapter.WXTracingAdapter;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.debug.IWebSocketClient;
@@ -36,6 +37,7 @@ import com.taobao.weex.devtools.inspector.protocol.module.Runtime;
 import com.taobao.weex.devtools.inspector.protocol.module.Worker;
 import com.taobao.weex.devtools.inspector.protocol.module.WxDebug;
 import com.taobao.weex.devtools.inspector.runtime.RhinoDetectingRuntimeReplFactory;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -104,8 +106,7 @@ public class WeexInspector {
 
     try {
       WXSDKManager.getInstance().setTracingAdapter(new WXTracingAdapter());
-      //WXSDKManager.getInstance().setIWXJSExceptionAdapter(new JsExceptionPrompt());
-      //WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
+      WXLogUtils.setJsLogWatcher(JsLogAdapter.getInstance());
     } catch (Throwable throwable) {
       throwable.printStackTrace();
     }

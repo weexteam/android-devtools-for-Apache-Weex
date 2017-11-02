@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.inspector.R;
 
-public class PerformanceActivity extends FragmentActivity {
+public class PerformanceActivity extends ActionBarActivity {
 
   private LinearLayout segmentHost;
 

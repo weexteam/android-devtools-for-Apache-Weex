@@ -12,7 +12,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.SearchView
+        <SearchView
             android:id="@+id/search_view"
             android:layout_width="0dp"
             android:layout_height="match_parent"
