@@ -103,9 +103,9 @@ public class OkHttpSocketClient extends SocketClient {
           "setReadTimeout",
           new Class[]{long.class, TimeUnit.class});
 
-      ReflectionUtil.tryInvokeMethod(mWebSocket, connectTimeout, 30, TimeUnit.SECONDS);
-      ReflectionUtil.tryInvokeMethod(mWebSocket, writeTimeout, 30, TimeUnit.SECONDS);
-      ReflectionUtil.tryInvokeMethod(mWebSocket, readTimeout, 0, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, connectTimeout, 30, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, writeTimeout, 30, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, readTimeout, 0, TimeUnit.SECONDS);
 
       if (!TextUtils.isEmpty(url)) {
         Object requestBuilder = mRequestBuilderClazz.newInstance();
