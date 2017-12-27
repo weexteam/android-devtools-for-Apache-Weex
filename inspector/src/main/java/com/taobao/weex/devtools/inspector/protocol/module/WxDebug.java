@@ -50,7 +50,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, true);
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -59,7 +62,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, false);
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -127,7 +133,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     WXSDKEngine.reload();
     Context context = WXEnvironment.getApplication();
     if (context != null) {
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -135,7 +144,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
   public void refresh(JsonRpcPeer peer, JSONObject params) {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
