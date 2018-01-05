@@ -158,12 +158,10 @@ task androidJavadocs(type: Javadoc) {
     ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
     classpath += files(ext.androidJar)
 }
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 bintray {
-    Properties properties = new Properties()
-    InputStream stream = project.rootProject.file('local.properties').newDataInputStream();
-    properties.load(stream)
-
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.key")
 
