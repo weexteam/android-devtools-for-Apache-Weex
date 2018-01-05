@@ -100,9 +100,83 @@ android.libraryVariants.all { variant ->
     }
 }
 
-ext {
-    PUBLISH_GROUP_ID = 'com.taobao.android'
-    PUBLISH_ARTIFACT_ID = 'weex_inspector'
-    PUBLISH_VERSION = '0.13.3'
+
+group = 'com.taobao.android'
+description = """weex_inspector"""
+version '0.13.3'
+
+def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
+def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'
+
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                name 'weex_inspector'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'weex alibaba'
+                        name 'weex alibaba'
+                        email 'alibabaweex@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
 }
-apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
+
+task sourcesJar(type: Jar) {
+    from('src/main/java') {
+        include '**'
+    }
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+task androidJavadocs(type: Javadoc) {
+    failOnError = false
+    options.encoding = "utf-8"
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath += files(ext.androidJar)
+}
+
+bintray {
+    Properties properties = new Properties()
+    InputStream stream = project.rootProject.file('local.properties').newDataInputStream();
+    properties.load(stream)
+
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.key")
+
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = 'weex_inspector'
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
+
+
+//apply from: 'https://raw.githubusercontent.com/blundell/release-android-library/master/android-release-aar.gradle'
