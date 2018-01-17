@@ -94,9 +94,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void callNative(JsonRpcPeer peer, JSONObject params) {
     if (params != null) {
+      com.alibaba.fastjson.JSONArray tasks = JSON.parseArray(params.optString("tasks"));
       DebugBridge.getInstance().callNative(
           params.optString("instance"),
-          params.optString("tasks"),
+          tasks,
           params.optString("callback"));
     }
     // another way to handle call native
@@ -119,10 +120,11 @@ public class WxDebug implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void callAddElement(JsonRpcPeer peer, JSONObject params) {
     if (params != null) {
+      com.alibaba.fastjson.JSONObject dom = JSON.parseObject(params.optString("dom"));
       DebugBridge.getInstance().callAddElement(
           params.optString("instance"),
           params.optString("ref"),
-          params.optString("dom"),
+          dom,
           params.optString("index"),
           params.optString("callback"));
     }

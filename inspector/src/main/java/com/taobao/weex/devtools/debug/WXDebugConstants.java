@@ -10,6 +10,7 @@ public class WXDebugConstants {
 
   public static final String METHOD_INIT_RUNTIME = "WxDebug.initJSRuntime";
   public static final String METHOD_CALL_JS = "WxDebug.callJS";
+  public static final String METHOD_CALL_JS_RESULT = "WxDebug.callJsResult";
   public static final String METHOD_IMPORT_JS = "WxDebug.importScript";
 
   public static final String PARAM_INIT_ENV = "env";
