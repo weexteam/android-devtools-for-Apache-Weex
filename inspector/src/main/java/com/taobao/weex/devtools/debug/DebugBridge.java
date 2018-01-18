@@ -12,16 +12,12 @@ import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.common.LogUtil;
-import com.taobao.weex.devtools.inspector.helper.ChromePeerManager;
-import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
-import com.taobao.weex.devtools.inspector.jsonrpc.PendingRequestCallback;
-import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.websocket.SimpleSession;
+import com.taobao.weex.wson.Wson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by budao on 16/6/25.
@@ -122,10 +118,13 @@ public class DebugBridge implements IWXBridge {
     ArrayList<Object> array = new ArrayList<>();
     int argsCount = args == null ? 0 : args.length;
     for (int i = 0; i < argsCount; i++) {
-      if (args[i].type != WXJSObject.String) {
-        array.add(JSON.parse(args[i].data.toString()));
-      } else {
+      if (args[i].type == WXJSObject.String) {
         array.add(args[i].data);
+      } else if (args[i].type == WXJSObject.WSON) {
+        byte[] wsonData = (byte[]) args[i].data;
+        array.add(Wson.parse(wsonData));
+      } else {
+        array.add(JSON.parse(args[i].data.toString()));
       }
     }
 
@@ -142,43 +141,57 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
-    ArrayList<Object> array = new ArrayList<>();
-    int argsCount = args == null ? 0 : args.length;
-    for (int i = 0; i < argsCount; i++) {
-      if (args[i].type != WXJSObject.String) {
-        array.add(JSON.parse(args[i].data.toString()));
-      } else {
-        array.add(args[i].data);
-      }
-    }
-
-    Map<String, Object> params = new HashMap<>();
-    params.put(WXDebugConstants.METHOD, function);
-    params.put(WXDebugConstants.ARGS, array);
-
-    //    // Log.v(TAG, "callJS: function is " + function + ", args " + array);
-    //    Map<String, Object> map = new HashMap<>(2);
-    //    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS_RESULT);
-    //    map.put(WXDebugConstants.PARAMS, params);
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    final Map<String, org.json.JSONObject> responseVal = new HashMap<>(1);
-    final String resultKey = "result";
-    new ChromePeerManager().invokeMethodOnPeers(WXDebugConstants.METHOD_CALL_JS_RESULT, params, new PendingRequestCallback() {
-      @Override
-      public void onResponse(JsonRpcPeer peer, JsonRpcResponse response) {
-        responseVal.put(resultKey, response.result);
-        latch.countDown();
-      }
-    });
-    byte[] data = null;
-    try {
-      latch.wait();
-      data = responseVal.get(resultKey).getJSONArray(resultKey).toString().getBytes();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return data;
+    //not need impl in dev-tool @gb
+    return null;
+//    ArrayList<Object> array = new ArrayList<>();
+//    int argsCount = args == null ? 0 : args.length;
+//    for (int i = 0; i < argsCount; i++) {
+//      if (args[i].type == WXJSObject.String) {
+//        array.add(args[i].data);
+//      } else if (args[i].type == WXJSObject.WSON) {
+//        byte[] wsonData = (byte[]) args[i].data;
+//        array.add(Wson.parse(wsonData));
+//      } else {
+//        array.add(JSON.parse(args[i].data.toString()));
+//      }
+//    }
+//
+//    Map<String, Object> params = new HashMap<>();
+//    params.put(WXDebugConstants.METHOD, function);
+//    params.put(WXDebugConstants.ARGS, array);
+//
+//    //    // Log.v(TAG, "callJS: function is " + function + ", args " + array);
+//    //    Map<String, Object> map = new HashMap<>(2);
+//    //    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS_RESULT);
+//    //    map.put(WXDebugConstants.PARAMS, params);
+//
+//    final CountDownLatch latch = new CountDownLatch(1);
+//    final Map<String, org.json.JSONObject> responseVal = new HashMap<>(1);
+//    final String resultKey = "result";
+//    NetworkPeerManager networkPeerManager = NetworkPeerManager.getInstanceOrNull();
+//    if (null == networkPeerManager) {
+//      Log.e(TAG, "execJSWithResult: null == networkPeerManager !");
+//      return null;
+//    }
+//    networkPeerManager.invokeMethodOnPeers(WXDebugConstants.METHOD_CALL_JS_RESULT, params, new
+//        PendingRequestCallback() {
+//          @Override
+//          public void onResponse(JsonRpcPeer peer, JsonRpcResponse response) {
+//            responseVal.put(resultKey, response.result);
+//            latch.countDown();
+//          }
+//        });
+//    byte[] data = null;
+//    try {
+//      latch.await(5, TimeUnit.MILLISECONDS);
+//      data = responseVal.get(resultKey).getJSONArray(resultKey).toString().getBytes();
+//      if (WXEnvironment.isApkDebugable()) {
+//        Log.d(TAG, "execJSWithResult,data :" + data);
+//      }
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//    return data;
   }
 
 

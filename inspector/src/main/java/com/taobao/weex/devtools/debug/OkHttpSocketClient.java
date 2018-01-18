@@ -3,6 +3,7 @@ package com.taobao.weex.devtools.debug;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.ReflectionUtil;
 import com.taobao.weex.utils.WXLogUtils;
@@ -142,7 +143,7 @@ public class OkHttpSocketClient extends SocketClient {
   protected void close() {
     if (mWebSocket != null) {
       Method closeMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz, "close",
-          new Class[]{int.class, String.class});
+                                                       new Class[]{int.class, String.class});
       ReflectionUtil.tryInvokeMethod(mWebSocket, closeMethod, 1000, "End of session");
       mWebSocket = null;
       WXLogUtils.w(TAG, "Close websocket connection");
@@ -166,14 +167,19 @@ public class OkHttpSocketClient extends SocketClient {
       }
 
       Method sendMessageMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz,
-          "sendMessage", new Class[]{mMediaTypeClazz, mBufferClazz});
+                                                             "sendMessage", new Class[]{mMediaTypeClazz, mBufferClazz});
 
       Object buffer = mBufferClazz.newInstance();
       Method writeUtf8 = ReflectionUtil.tryGetMethod(mBufferClazz, "writeUtf8",
-          new Class[]{String.class});
+                                                     new Class[]{String.class});
 
       ReflectionUtil.tryInvokeMethod(mWebSocket, sendMessageMethod, textValue,
-          ReflectionUtil.tryInvokeMethod(buffer, writeUtf8, message));
+                                     ReflectionUtil.tryInvokeMethod(buffer, writeUtf8, message));
+
+      if (WXEnvironment.isApkDebugable()) {
+        Log.d(TAG, "sendProtocolMessage :" + message);
+      }
+
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InstantiationException e) {
