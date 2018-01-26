@@ -2,6 +2,7 @@ package com.taobao.weex.devtools.inspector.protocol.module;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
@@ -118,7 +119,24 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void callAddElement(JsonRpcPeer peer, JSONObject params) {
-    if (params != null) {
+    if (null == params){
+      Log.e(TAG, "callAddElement: params==null !");
+      return;
+    }
+    String instanceInd = params.optString("instance");
+    String ref = params.optString("ref");
+    String index = params.optString("index");
+    String callBack = params.optString("callback");
+    String dom = params.optString("dom");
+
+
+
+
+
+
+
+
+
       DebugBridge.getInstance().callAddElement(
           params.optString("instance"),
           params.optString("ref"),

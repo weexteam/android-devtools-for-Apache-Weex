@@ -12,18 +12,22 @@ import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
+import com.taobao.weex.dom.CSSShorthand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
- * Created by budao on 16/6/25.
+ * Created by budao on 16/6/25
+ * .
  */
 public class DebugBridge implements IWXBridge {
+
   private static final String TAG = "DebugBridge";
   private static volatile DebugBridge sInstance;
-  private Object mLock = new Object();
+  private final Object mLock = new Object();
   private WXBridgeManager mJsManager;
   private volatile SimpleSession mSession;
 
@@ -43,14 +47,6 @@ public class DebugBridge implements IWXBridge {
     return sInstance;
   }
 
-  public void setSession(SimpleSession session) {
-    mSession = session;
-  }
-
-  public void setBridgeManager(WXBridgeManager bridgeManager) {
-    mJsManager = bridgeManager;
-  }
-
   @Override
   public int initFramework(String framework, WXParams params) {
     while (mSession == null || (mSession != null && !mSession.isOpen())) {
@@ -68,46 +64,8 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
-  public int initFrameworkEnv(String s, WXParams wxParams, String s1, boolean b) {
-    return initFramework(s, wxParams);
-  }
-
-  private String getInitFrameworkMessage(String framework, WXParams params) {
-    Map<String, Object> func = new HashMap<>();
-    func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);
-    if (params != null) {
-      Map<String, Object> environmentMap = getEnvironmentMap(params);
-      if (environmentMap != null && environmentMap.size() > 0) {
-        Map<String, Object> wxEnvironment = new HashMap<>();
-        wxEnvironment.put(WXDebugConstants.ENV_WX_ENVIRONMENT, environmentMap);
-        func.put(WXDebugConstants.PARAM_INIT_ENV, wxEnvironment);
-      }
-    }
-
-    Map<String, Object> map = new HashMap<>();
-    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_INIT_RUNTIME);
-    map.put(WXDebugConstants.PARAMS, func);
-
-    return JSON.toJSONString(map);
-  }
-
-  private Map<String, Object> getEnvironmentMap(WXParams params) {
-    Map<String, Object> environment = new HashMap<>();
-    environment.put(WXDebugConstants.ENV_APP_NAME, params.getAppName());
-    environment.put(WXDebugConstants.ENV_APP_VERSION, params.getAppVersion());
-    environment.put(WXDebugConstants.ENV_PLATFORM, params.getPlatform());
-    environment.put(WXDebugConstants.ENV_OS_VERSION, params.getOsVersion());
-    environment.put(WXDebugConstants.ENV_LOG_LEVEL, params.getLogLevel());
-    environment.put(WXDebugConstants.ENV_WEEX_VERSION, params.getWeexVersion());
-    environment.put(WXDebugConstants.ENV_DEVICE_MODEL, params.getDeviceModel());
-    environment.put(WXDebugConstants.ENV_INFO_COLLECT, params.getShouldInfoCollect());
-    environment.put(WXDebugConstants.ENV_DEVICE_WIDTH, params.getDeviceWidth());
-    environment.put(WXDebugConstants.ENV_DEVICE_HEIGHT, params.getDeviceHeight());
-    environment.put("runtime", "devtools");
-
-    environment.putAll(WXEnvironment.getCustomOptions());
-
-    return environment;
+  public int initFrameworkEnv(String framework, WXParams wxParams, String cacheDir, boolean pieSupport) {
+    return initFramework(framework, wxParams);
   }
 
   @Override
@@ -148,20 +106,21 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
+  public void onVsync(String s) {
+
+  }
+
+  @Override
+  public void takeHeapSnapshot(String filename) {
+    LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
+  }
+
+  @Override
   public int callNative(String instanceId, String tasks, String callback) {
     if (mJsManager != null) {
       return mJsManager.callNative(instanceId, tasks, callback);
     } else {
       return 0;
-    }
-  }
-
-  @Override
-  public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
-    if (mJsManager != null) {
-      return mJsManager.callAddElement(instanceId, ref, dom, index, callback);
-    } else {
-      return 1;
     }
   }
 
@@ -187,100 +146,181 @@ public class DebugBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
-  public int callCreateBody(String s, String s1, String s2) {
+  @Override
+  public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
     if (mJsManager != null) {
-      return mJsManager.callCreateBody(s, s1, s2);
+      //?
+      return mJsManager.callUpdateFinish(instanceId, callback);
     }
     return 0;
   }
 
-  public int callUpdateFinish(String s, byte[] bytes, String s1) {
+  @Override
+  public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
     if (mJsManager != null) {
-      return mJsManager.callUpdateFinish(s, s1);
+      return mJsManager.callRefreshFinish(instanceId, callback);
     }
     return 0;
   }
 
-  public int callCreateFinish(String s, byte[] bytes, String s1) {
-    if (mJsManager != null) {
-      return mJsManager.callCreateFinish(s, s1);
+  @Override
+  public int callAddEvent(String s, String s1, String s2) {
+    return 0;
+  }
+
+  @Override
+  public int callRemoveEvent(String s, String s1, String s2) {
+    return 0;
+  }
+
+  @Override
+  public void reportServerCrash(String instanceId, String crashFile) {
+    LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
+  }
+
+  @Override
+  public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
+    if (null != mJsManager) {
+      return mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events,
+                                                 paddings, margins, borders);
     }
     return 0;
   }
 
-  public int callRefreshFinish(String s, byte[] bytes, String s1) {
+  @Override
+  public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
+                                      HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
+                                      HashMap<String, String> paddings, HashMap<String, String> margins,
+                                      HashMap<String, String> borders) {
     if (mJsManager != null) {
-      return mJsManager.callRefreshFinish(s, s1);
+      return mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
+                                                 styles, attributes, events, paddings, margins, borders);
+    }
+    return 1;
+  }
+
+
+  @Override
+  public int callRemoveElement(String instanceId, String ref) {
+    if (mJsManager != null) {
+      return mJsManager.callRemoveElement(instanceId, ref);
     }
     return 0;
   }
 
-  public int callUpdateAttrs(String s, String s1, byte[] bytes, String s2) {
+  @Override
+  public int callMoveElement(String instanceId, String ref, String parentRef, int index) {
     if (mJsManager != null) {
-      return mJsManager.callUpdateAttrs(s, s1, new String(bytes), s2);
+      return mJsManager.callMoveElement(instanceId, ref, parentRef, index);
     }
     return 0;
   }
 
-  public int callUpdateStyle(String s, String s1, byte[] bytes, String s2) {
-    if (mJsManager != null) {
-      return mJsManager.callUpdateStyle(s, s1, new String(bytes), s2);
+  @Override
+  public int callUpdateStyleByWeexCore(String instanceId, String ref,
+                                       HashMap<String, Object> styles,
+                                       HashMap<String, String> paddings,
+                                       HashMap<String, String> margins,
+                                       HashMap<String, String> borders) {
+    if (null != mJsManager) {
+      return mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
     }
     return 0;
   }
 
-  public int callRemoveElement(String s, String s1, String s2) {
-    if (mJsManager != null) {
-      return mJsManager.callRemoveElement(s, s1, s2);
+
+  @Override
+  public int callUpdateAttrsByWeexCore(String instanceId, String ref,
+                                       HashMap<String, String> attrs) {
+    if (null != mJsManager) {
+      return mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
     }
     return 0;
   }
 
-  public int callMoveElement(String s, String s1, String s2, String s3, String s4) {
-    if (mJsManager != null) {
-      return mJsManager.callMoveElement(s, s1, s2, s3, s4);
+  @Override
+  public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int
+      right,
+                                  int height, int width) {
+    if (null != mJsManager) {
+      return mJsManager.callLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
     }
     return 0;
   }
 
-  public int callAddEvent(String s, String s1, String s2, String s3) {
-    if (mJsManager != null) {
-      return mJsManager.callAddEvent(s, s1, s2, s3);
+  @Override
+  public int callCreateFinishByWeexCore(String instanceId) {
+    if (null != mJsManager) {
+      mJsManager.callCreateFinishByWeexCore(instanceId);
     }
     return 0;
   }
 
-  public int callRemoveEvent(String s, String s1, String s2, String s3) {
-    if (mJsManager != null) {
-      return mJsManager.callRemoveEvent(s, s1, s2, s3);
+  @Override
+  public void callLogOfFirstScreen(String message) {
+    LogUtil.i("callLogOfFirstScreen :" + message);
+  }
+
+  @Override
+  public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
+    if (null != mJsManager) {
+      return mJsManager.callHasTransitionPros(instanceId, ref, styles);
     }
     return 0;
   }
 
-  public void onConnected() {
-    Log.v(TAG, "connect to debug server success");
-    synchronized (mLock) {
-      mLock.notify();
+  @Override
+  public void setStyleWidth(String instanceId, String ref, float value) {
+    if (null != mJsManager) {
+      mJsManager.setStyleWidth(instanceId, ref, value);
     }
   }
 
-  public void onDisConnected() {
-    Log.w(TAG, "WebSocket disconnected");
-    synchronized (mLock) {
-      mSession = null;
-      mLock.notify();
+  @Override
+  public void setStyleHeight(String instanceId, String ref, float value) {
+    if (null != mJsManager) {
+      mJsManager.setStyleHeight(instanceId, ref, value);
     }
   }
 
-  private int sendMessage(String message) {
-    if (mSession != null && mSession.isOpen()) {
-      mSession.sendText(message);
-      return 1;
-    } else {
-      // session error, we need stop debug mode and switch to local runtime
-      WXBridgeManager.getInstance().stopRemoteDebug();
-      return 0;
+  @Override
+  public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    if (null != mJsManager) {
+      mJsManager.setMargin(instanceId, ref, edge, value);
     }
+  }
+
+  @Override
+  public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    if (null != mJsManager) {
+      mJsManager.setPadding(instanceId, ref, edge, value);
+    }
+  }
+
+  @Override
+  public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
+    if (null != mJsManager) {
+      mJsManager.setPosition(instanceId, ref, edge, value);
+    }
+  }
+
+  @Override
+  public void calculateLayout(String instanceId, String ref) {
+    if (null != mJsManager) {
+      mJsManager.calculateLayout(instanceId, ref);
+    }
+  }
+
+
+  public void setSession(SimpleSession session) {
+    mSession = session;
+  }
+
+  public void setBridgeManager(WXBridgeManager bridgeManager) {
+    mJsManager = bridgeManager;
   }
 
   public void sendToRemote(String message) {
@@ -299,16 +339,67 @@ public class DebugBridge implements IWXBridge {
     return mSession != null && mSession.isOpen();
   }
 
-  public void takeHeapSnapshot(String filename) {
-    LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
+  public void onConnected() {
+    Log.v(TAG, "connect to debug server success");
+    synchronized (mLock) {
+      mLock.notify();
+    }
   }
 
-  public int callCreateBody(String instanceId, byte[] tasks, String callback) {
-    return callCreateBody(instanceId, new String(tasks), callback);
+  public void onDisConnected() {
+    Log.w(TAG, "WebSocket disconnected");
+    synchronized (mLock) {
+      mSession = null;
+      mLock.notify();
+    }
   }
 
-  @Override
-  public void reportServerCrash(String instanceId, String crashFile) {
-    LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
+  private String getInitFrameworkMessage(String framework, WXParams params) {
+    Map<String, Object> func = new HashMap<>();
+    func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);
+    if (params != null) {
+      Map<String, Object> environmentMap = getEnvironmentMap(params);
+      if (environmentMap != null && environmentMap.size() > 0) {
+        Map<String, Object> wxEnvironment = new HashMap<>();
+        wxEnvironment.put(WXDebugConstants.ENV_WX_ENVIRONMENT, environmentMap);
+        func.put(WXDebugConstants.PARAM_INIT_ENV, wxEnvironment);
+      }
+    }
+
+    Map<String, Object> map = new HashMap<>();
+    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_INIT_RUNTIME);
+    map.put(WXDebugConstants.PARAMS, func);
+
+    return JSON.toJSONString(map);
+  }
+
+  private Map<String, Object> getEnvironmentMap(WXParams params) {
+    Map<String, Object> environment = new HashMap<>();
+    environment.put(WXDebugConstants.ENV_APP_NAME, params.getAppName());
+    environment.put(WXDebugConstants.ENV_APP_VERSION, params.getAppVersion());
+    environment.put(WXDebugConstants.ENV_PLATFORM, params.getPlatform());
+    environment.put(WXDebugConstants.ENV_OS_VERSION, params.getOsVersion());
+    environment.put(WXDebugConstants.ENV_LOG_LEVEL, params.getLogLevel());
+    environment.put(WXDebugConstants.ENV_WEEX_VERSION, params.getWeexVersion());
+    environment.put(WXDebugConstants.ENV_DEVICE_MODEL, params.getDeviceModel());
+    environment.put(WXDebugConstants.ENV_INFO_COLLECT, params.getShouldInfoCollect());
+    environment.put(WXDebugConstants.ENV_DEVICE_WIDTH, params.getDeviceWidth());
+    environment.put(WXDebugConstants.ENV_DEVICE_HEIGHT, params.getDeviceHeight());
+    environment.put("runtime", "devtools");
+
+    environment.putAll(WXEnvironment.getCustomOptions());
+
+    return environment;
+  }
+
+  private int sendMessage(String message) {
+    if (mSession != null && mSession.isOpen()) {
+      mSession.sendText(message);
+      return 1;
+    } else {
+      // session error, we need stop debug mode and switch to local runtime
+      WXBridgeManager.getInstance().stopRemoteDebug();
+      return 0;
+    }
   }
 }

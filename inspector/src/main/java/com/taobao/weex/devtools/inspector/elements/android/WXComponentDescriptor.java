@@ -9,7 +9,6 @@ import com.taobao.weex.devtools.inspector.elements.AbstractChainedDescriptor;
 import com.taobao.weex.devtools.inspector.elements.AttributeAccumulator;
 import com.taobao.weex.devtools.inspector.elements.StyleAccumulator;
 import com.taobao.weex.devtools.inspector.elements.W3CStyleConstants;
-import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -90,32 +89,24 @@ public class WXComponentDescriptor extends AbstractChainedDescriptor<WXComponent
   }
 
   public HashMap<String, String> getStyles(WXComponent element) {
-    HashMap<String, String> map = null;
-    ImmutableDomObject domObject = element.getDomObject();
-    if (domObject != null && domObject.getStyles() != null) {
-      map = new HashMap<>();
-      for (Map.Entry<String, Object> entry : domObject.getStyles().entrySet()) {
+    //todo not include margin/padding/border
+    HashMap<String, String> map = new HashMap<>();
+      for (Map.Entry<String, Object> entry : element.getStyles().entrySet()) {
         if (entry.getValue() != null) {
           map.put(entry.getKey(), entry.getValue().toString());
         }
-
       }
-    }
     return map;
   }
 
   public HashMap<String, String> getAttribute(WXComponent element) {
-    HashMap<String, String> map = null;
-    ImmutableDomObject domObject = element.getDomObject();
-    if (domObject != null && domObject.getAttrs() != null) {
-      map = new HashMap<>();
-      for (Map.Entry<String, Object> entry : domObject.getAttrs().entrySet()) {
+    HashMap<String, String> map = new HashMap<>();
+      for (Map.Entry<String, Object> entry : element.getAttrs().entrySet()) {
         if (entry.getValue() != null) {
           map.put(entry.getKey(), entry.getValue().toString());
         }
 
       }
-    }
     return map;
   }
 
