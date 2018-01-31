@@ -28,6 +28,7 @@ import java.util.List;
  * Created by budao on 16/6/24.
  */
 public class WxDebug implements ChromeDevtoolsDomain {
+
   private static final String TAG = "WxDebug";
   private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
 
@@ -94,32 +95,24 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void callNative(JsonRpcPeer peer, JSONObject params) {
+    //TODO CREATEBODY  callCreateBody
+
     if (params != null) {
       DebugBridge.getInstance().callNative(
           params.optString("instance"),
           params.optString("tasks"),
           params.optString("callback"));
     }
-    // another way to handle call native
-//        CallNative callNative = mObjectMapper.convertValue(params, CallNative.class);
-//        if (callNative != null) {
-//            try {
-//                String tasks = mObjectMapper.convertListToJsonArray(callNative.tasks).toString();
-//                Log.v(TAG, "WxDebug.callNative tasks " + tasks);
-//                DebugBridge.getInstance().callNative(callNative.instance,
-//                        tasks,
-//                        callNative.callback);
-//            } catch (InvocationTargetException e) {
-//                e.printStackTrace();
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-//        }
   }
+
+  public void callCreateBody(JSONObject params) {
+
+  }
+
 
   @ChromeDevtoolsMethod
   public void callAddElement(JsonRpcPeer peer, JSONObject params) {
-    if (null == params){
+    if (null == params) {
       Log.e(TAG, "callAddElement: params==null !");
       return;
     }
@@ -129,21 +122,13 @@ public class WxDebug implements ChromeDevtoolsDomain {
     String callBack = params.optString("callback");
     String dom = params.optString("dom");
 
-
-
-
-
-
-
-
-
-      DebugBridge.getInstance().callAddElement(
-          params.optString("instance"),
-          params.optString("ref"),
-          params.optString("dom"),
-          params.optString("index"),
-          params.optString("callback"));
-    }
+    //      DebugBridge.getInstance().callAddElement(
+    //          params.optString("instance"),
+    //          params.optString("ref"),
+    //          params.optString("dom"),
+    //          params.optString("index"),
+    //          params.optString("callback"));
+    //   }
   }
 
   @ChromeDevtoolsMethod
@@ -174,7 +159,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
     try {
       boolean enabled = params.getBoolean("enable");
       NetworkEventReporterImpl.setEnabled(enabled);
-	  WXEnvironment.sDebugNetworkEventReporterEnable = enabled;
+      WXEnvironment.sDebugNetworkEventReporterEnable = enabled;
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -226,6 +211,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   public static class SyncCallResponse implements JsonRpcResult {
+
     @JsonProperty
     public String method;
     @JsonProperty
@@ -233,6 +219,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   public static class SyncCallResponseParams {
+
     @JsonProperty
     public Integer syncId;
     @JsonProperty
@@ -240,6 +227,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   public static class CallNative {
+
     @JsonProperty(required = true)
     public String instance;
     @JsonProperty(required = true)
@@ -249,6 +237,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   public static class CallJS {
+
     @JsonProperty(required = true)
     public String method;
     @JsonProperty(required = true)
@@ -256,6 +245,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
   }
 
   public static class Task {
+
     @JsonProperty(required = true)
     public String module;
     @JsonProperty(required = true)

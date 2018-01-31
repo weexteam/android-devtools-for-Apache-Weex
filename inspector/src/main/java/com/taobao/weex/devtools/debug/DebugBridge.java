@@ -4,8 +4,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
@@ -30,9 +30,11 @@ public class DebugBridge implements IWXBridge {
   private final Object mLock = new Object();
   private WXBridgeManager mJsManager;
   private volatile SimpleSession mSession;
+  private IWXBridge mOriginBridge;
 
   private DebugBridge() {
-
+    //TODO params
+    mOriginBridge = new WXBridge();
   }
 
   public static DebugBridge getInstance() {
@@ -106,7 +108,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
-  public void onVsync(String s) {
+  public void onVsync(String instanceId) {
 
   }
 
@@ -115,62 +117,71 @@ public class DebugBridge implements IWXBridge {
     LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
   }
 
+  /**
+   * js call native
+   */
   @Override
   public int callNative(String instanceId, String tasks, String callback) {
-    if (mJsManager != null) {
-      return mJsManager.callNative(instanceId, tasks, callback);
-    } else {
-      return 0;
-    }
+//    if (mJsManager != null) {
+//      return mJsManager.callNative(instanceId, tasks, callback);
+//    } else {
+//      return 0;
+//    }
+    return mOriginBridge.callNative(instanceId,tasks,callback);
   }
 
   @Override
   public void reportJSException(String instanceId, String func, String exception) {
-    if (mJsManager != null) {
-      mJsManager.reportJSException(instanceId, func, exception);
-    }
+//    if (mJsManager != null) {
+//      mJsManager.reportJSException(instanceId, func, exception);
+//    }
+    mOriginBridge.reportJSException(instanceId,func,exception);
   }
 
   @Override
   public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-    if (mJsManager != null) {
-      JSONArray argArray = JSON.parseArray(new String(arguments));
-      return mJsManager.callNativeModule(instanceId, module, method, argArray, options);
-    }
-    return null;
+//    if (mJsManager != null) {
+//      JSONArray argArray = JSON.parseArray(new String(arguments));
+//      return mJsManager.callNativeModule(instanceId, module, method, argArray, options);
+//    }
+//    return null;
+    return mOriginBridge.callNativeModule(instanceId,module,method,arguments,options);
   }
 
   @Override
   public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
-    JSONArray argArray = JSON.parseArray(new String(arguments));
-    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
+//    JSONArray argArray = JSON.parseArray(new String(arguments));
+//    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
+    mOriginBridge.callNativeComponent(instanceId,componentRef,method,arguments,options);
   }
 
   @Override
   public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
-    if (mJsManager != null) {
-      //?
-      return mJsManager.callUpdateFinish(instanceId, callback);
-    }
-    return 0;
+//    if (mJsManager != null) {
+//      //?
+//      return mJsManager.callUpdateFinish(instanceId, callback);
+//    }
+//    return 0;
+   return mOriginBridge.callUpdateFinish(instanceId,tasks,callback);
   }
 
   @Override
   public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
-    if (mJsManager != null) {
-      return mJsManager.callRefreshFinish(instanceId, callback);
-    }
-    return 0;
+//    if (mJsManager != null) {
+//      return mJsManager.callRefreshFinish(instanceId, callback);
+//    }
+//    return 0;
+    return mOriginBridge.callRefreshFinish(instanceId,tasks,callback);
   }
 
   @Override
-  public int callAddEvent(String s, String s1, String s2) {
-    return 0;
+  public int callAddEvent(String instanceId, String ref, String event) {
+    return mOriginBridge.callAddEvent(instanceId,ref,event);
   }
 
   @Override
-  public int callRemoveEvent(String s, String s1, String s2) {
-    return 0;
+  public int callRemoveEvent(String instanceId, String ref, String event) {
+    return mOriginBridge.callRemoveEvent(instanceId,ref,event);
   }
 
   @Override
@@ -183,11 +194,13 @@ public class DebugBridge implements IWXBridge {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
-    if (null != mJsManager) {
-      return mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events,
-                                                 paddings, margins, borders);
-    }
-    return 0;
+//    if (null != mJsManager) {
+//      return mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events,
+//                                                 paddings, margins, borders);
+//    }
+//    return 0;
+    return mOriginBridge.callCreateBodyByWeexCore(pageId,componentType,ref,styles,attributes,
+                                                  events,paddings,margins,borders);
   }
 
   @Override
@@ -195,28 +208,33 @@ public class DebugBridge implements IWXBridge {
                                       HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
                                       HashMap<String, String> paddings, HashMap<String, String> margins,
                                       HashMap<String, String> borders) {
-    if (mJsManager != null) {
-      return mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
-                                                 styles, attributes, events, paddings, margins, borders);
-    }
-    return 1;
+//    if (mJsManager != null) {
+//      return mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
+//                                                 styles, attributes, events, paddings, margins, borders);
+//    }
+//    return 1;
+    return mOriginBridge.callAddElementByWeexCore(pageId,componentType,ref,index,parentRef,
+                                                  styles,attributes,events,paddings,margins,
+                                                  borders);
   }
 
 
   @Override
   public int callRemoveElement(String instanceId, String ref) {
-    if (mJsManager != null) {
-      return mJsManager.callRemoveElement(instanceId, ref);
-    }
-    return 0;
+//    if (mJsManager != null) {
+//      return mJsManager.callRemoveElement(instanceId, ref);
+//    }
+//    return 0;
+    return mOriginBridge.callRemoveElement(instanceId,ref);
   }
 
   @Override
   public int callMoveElement(String instanceId, String ref, String parentRef, int index) {
-    if (mJsManager != null) {
-      return mJsManager.callMoveElement(instanceId, ref, parentRef, index);
-    }
-    return 0;
+//    if (mJsManager != null) {
+//      return mJsManager.callMoveElement(instanceId, ref, parentRef, index);
+//    }
+//    return 0;
+    return mOriginBridge.callMoveElement(instanceId,ref,parentRef,index);
   }
 
   @Override
@@ -225,86 +243,102 @@ public class DebugBridge implements IWXBridge {
                                        HashMap<String, String> paddings,
                                        HashMap<String, String> margins,
                                        HashMap<String, String> borders) {
-    if (null != mJsManager) {
-      return mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
-    }
-    return 0;
+//    if (null != mJsManager) {
+//      return mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
+//    }
+//    return 0;
+    return mOriginBridge.callUpdateStyleByWeexCore(instanceId,ref,styles,paddings,margins,borders);
   }
 
 
   @Override
   public int callUpdateAttrsByWeexCore(String instanceId, String ref,
                                        HashMap<String, String> attrs) {
-    if (null != mJsManager) {
-      return mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
-    }
-    return 0;
+//    if (null != mJsManager) {
+//      return mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
+//    }
+//    return 0;
+
+    return mOriginBridge.callUpdateAttrsByWeexCore(instanceId,ref,attrs);
   }
 
   @Override
   public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int
-      right,
-                                  int height, int width) {
-    if (null != mJsManager) {
-      return mJsManager.callLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
-    }
-    return 0;
+      right, int height, int width) {
+//    if (null != mJsManager) {
+//      return mJsManager.callLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
+//    }
+//    return 0;
+    return mOriginBridge.callLayoutByWeexCore(pageId,ref,top,bottom,left,right,height,width);
   }
 
   @Override
   public int callCreateFinishByWeexCore(String instanceId) {
-    if (null != mJsManager) {
-      mJsManager.callCreateFinishByWeexCore(instanceId);
-    }
-    return 0;
+//    if (null != mJsManager) {
+//      mJsManager.callCreateFinishByWeexCore(instanceId);
+//    }
+//    return 0;
+    return mOriginBridge.callCreateFinishByWeexCore(instanceId);
   }
 
   @Override
   public void callLogOfFirstScreen(String message) {
     LogUtil.i("callLogOfFirstScreen :" + message);
+
+     mOriginBridge.callLogOfFirstScreen(message);
+
   }
 
   @Override
   public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
-    if (null != mJsManager) {
-      return mJsManager.callHasTransitionPros(instanceId, ref, styles);
-    }
-    return 0;
+//    if (null != mJsManager) {
+//      return mJsManager.callHasTransitionPros(instanceId, ref, styles);
+//    }
+//    return 0;
+
+    return mOriginBridge.callHasTransitionPros(instanceId,ref,styles);
   }
 
   @Override
   public void setStyleWidth(String instanceId, String ref, float value) {
-    if (null != mJsManager) {
-      mJsManager.setStyleWidth(instanceId, ref, value);
-    }
+//    if (null != mJsManager) {
+//      mJsManager.setStyleWidth(instanceId, ref, value);
+//    }
+    mOriginBridge.setStyleWidth(instanceId,ref,value);
   }
 
   @Override
   public void setStyleHeight(String instanceId, String ref, float value) {
-    if (null != mJsManager) {
-      mJsManager.setStyleHeight(instanceId, ref, value);
-    }
+//    if (null != mJsManager) {
+//      mJsManager.setStyleHeight(instanceId, ref, value);
+//    }
+
+    mOriginBridge.setStyleHeight(instanceId,ref,value);
   }
 
   @Override
   public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    if (null != mJsManager) {
-      mJsManager.setMargin(instanceId, ref, edge, value);
-    }
+//    if (null != mJsManager) {
+//      mJsManager.setMargin(instanceId, ref, edge, value);
+//    }
+    mOriginBridge.setMargin(instanceId, ref, edge, value);
   }
 
   @Override
   public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    if (null != mJsManager) {
-      mJsManager.setPadding(instanceId, ref, edge, value);
-    }
+//    if (null != mJsManager) {
+//      mJsManager.setPadding(instanceId, ref, edge, value);
+//    }
+
+    mOriginBridge.setPadding(instanceId, ref, edge, value);
   }
 
   @Override
   public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-    if (null != mJsManager) {
-      mJsManager.setPosition(instanceId, ref, edge, value);
-    }
+//    if (null != mJsManager) {
+//      mJsManager.setPosition(instanceId, ref, edge, value);
+//    }
+    mOriginBridge.setPosition(instanceId, ref, edge, value);
   }
 
   @Override
