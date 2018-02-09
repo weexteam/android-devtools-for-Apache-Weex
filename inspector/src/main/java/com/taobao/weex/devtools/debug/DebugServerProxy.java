@@ -42,6 +42,7 @@ import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
 public class DebugServerProxy implements IWXDebugProxy {
+
   private static final String TAG = "DebugServerProxy";
   private static final String DEVTOOL_VERSION = "0.12.0";
   private SocketClient mWebSocketClient;
@@ -110,7 +111,7 @@ public class DebugServerProxy implements IWXDebugProxy {
           func.put("devtoolVersion", DEVTOOL_VERSION);
           func.put("platform", WXEnvironment.OS);
           func.put("deviceId", getDeviceId(mContext));
-		  func.put("network", WXEnvironment.sDebugNetworkEventReporterEnable);
+          func.put("network", WXEnvironment.sDebugNetworkEventReporterEnable);
           if (WXEnvironment.sLogLevel != null) {
             func.put("logLevel", WXEnvironment.sLogLevel.getName());
           }
@@ -183,9 +184,12 @@ public class DebugServerProxy implements IWXDebugProxy {
   }
 
   private void switchLocalRuntime() {
-//    WXEnvironment.sDebugServerConnectable = false;
+    //    WXEnvironment.sDebugServerConnectable = false;
     WXSDKEngine.reload(WXEnvironment.getApplication(), false);
-    WXEnvironment.getApplication().sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+    WXEnvironment.getApplication().sendBroadcast(new Intent()
+                                                     .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                                     .putExtra("params", "")
+                                                );
   }
 
   @Override
@@ -210,6 +214,9 @@ public class DebugServerProxy implements IWXDebugProxy {
   private void handleRemoteMessage(JsonRpcPeer peer, String message)
       throws IOException, MessageHandlingException, JSONException {
     // Parse as a generic JSONObject first since we don't know if this is a request or response.
+    if (WXEnvironment.isApkDebugable()) {
+      Log.d(TAG, "handleRemoteMessage :" + message);
+    }
     JSONObject messageNode = new JSONObject(message);
     if (messageNode.has("method")) {
       handleRemoteRequest(peer, messageNode);
@@ -231,8 +238,8 @@ public class DebugServerProxy implements IWXDebugProxy {
     JSONObject error = null;
     try {
       result = mMethodDispatcher.dispatch(peer,
-          request.method,
-          request.params);
+                                          request.method,
+                                          request.params);
     } catch (JsonRpcException e) {
       logDispatchException(e);
       error = mObjectMapper.convertValue(e.getErrorMessage(), JSONObject.class);

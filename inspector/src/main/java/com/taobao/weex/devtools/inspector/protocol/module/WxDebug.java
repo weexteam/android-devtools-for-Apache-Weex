@@ -50,7 +50,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, true);
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -59,7 +62,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, false);
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -88,9 +94,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void callNative(JsonRpcPeer peer, JSONObject params) {
     if (params != null) {
+      com.alibaba.fastjson.JSONArray tasks = JSON.parseArray(params.optString("tasks"));
       DebugBridge.getInstance().callNative(
           params.optString("instance"),
-          params.optString("tasks"),
+          tasks,
           params.optString("callback"));
     }
     // another way to handle call native
@@ -113,10 +120,11 @@ public class WxDebug implements ChromeDevtoolsDomain {
   @ChromeDevtoolsMethod
   public void callAddElement(JsonRpcPeer peer, JSONObject params) {
     if (params != null) {
+      com.alibaba.fastjson.JSONObject dom = JSON.parseObject(params.optString("dom"));
       DebugBridge.getInstance().callAddElement(
           params.optString("instance"),
           params.optString("ref"),
-          params.optString("dom"),
+          dom,
           params.optString("index"),
           params.optString("callback"));
     }
@@ -127,7 +135,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     WXSDKEngine.reload();
     Context context = WXEnvironment.getApplication();
     if (context != null) {
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 
@@ -135,7 +146,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
   public void refresh(JsonRpcPeer peer, JSONObject params) {
     Context context = WXEnvironment.getApplication();
     if (context != null) {
-      context.sendBroadcast(new Intent(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH));
+      context.sendBroadcast(new Intent()
+                                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                                .putExtra("params", null == params ? "" : params.toString())
+                           );
     }
   }
 

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
@@ -12,6 +13,7 @@ import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
+import com.taobao.weex.wson.Wson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import java.util.Map;
  * Created by budao on 16/6/25.
  */
 public class DebugBridge implements IWXBridge {
+
   private static final String TAG = "DebugBridge";
   private static volatile DebugBridge sInstance;
   private Object mLock = new Object();
@@ -115,10 +118,13 @@ public class DebugBridge implements IWXBridge {
     ArrayList<Object> array = new ArrayList<>();
     int argsCount = args == null ? 0 : args.length;
     for (int i = 0; i < argsCount; i++) {
-      if (args[i].type != WXJSObject.String) {
-        array.add(JSON.parse(args[i].data.toString()));
-      } else {
+      if (args[i].type == WXJSObject.String) {
         array.add(args[i].data);
+      } else if (args[i].type == WXJSObject.WSON) {
+        byte[] wsonData = (byte[]) args[i].data;
+        array.add(Wson.parse(wsonData));
+      } else {
+        array.add(JSON.parse(args[i].data.toString()));
       }
     }
 
@@ -132,6 +138,62 @@ public class DebugBridge implements IWXBridge {
     map.put(WXDebugConstants.PARAMS, func);
     return sendMessage(JSON.toJSONString(map));
   }
+
+  @Override
+  public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
+    //not need impl in dev-tool @gb
+    return null;
+//    ArrayList<Object> array = new ArrayList<>();
+//    int argsCount = args == null ? 0 : args.length;
+//    for (int i = 0; i < argsCount; i++) {
+//      if (args[i].type == WXJSObject.String) {
+//        array.add(args[i].data);
+//      } else if (args[i].type == WXJSObject.WSON) {
+//        byte[] wsonData = (byte[]) args[i].data;
+//        array.add(Wson.parse(wsonData));
+//      } else {
+//        array.add(JSON.parse(args[i].data.toString()));
+//      }
+//    }
+//
+//    Map<String, Object> params = new HashMap<>();
+//    params.put(WXDebugConstants.METHOD, function);
+//    params.put(WXDebugConstants.ARGS, array);
+//
+//    //    // Log.v(TAG, "callJS: function is " + function + ", args " + array);
+//    //    Map<String, Object> map = new HashMap<>(2);
+//    //    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS_RESULT);
+//    //    map.put(WXDebugConstants.PARAMS, params);
+//
+//    final CountDownLatch latch = new CountDownLatch(1);
+//    final Map<String, org.json.JSONObject> responseVal = new HashMap<>(1);
+//    final String resultKey = "result";
+//    NetworkPeerManager networkPeerManager = NetworkPeerManager.getInstanceOrNull();
+//    if (null == networkPeerManager) {
+//      Log.e(TAG, "execJSWithResult: null == networkPeerManager !");
+//      return null;
+//    }
+//    networkPeerManager.invokeMethodOnPeers(WXDebugConstants.METHOD_CALL_JS_RESULT, params, new
+//        PendingRequestCallback() {
+//          @Override
+//          public void onResponse(JsonRpcPeer peer, JsonRpcResponse response) {
+//            responseVal.put(resultKey, response.result);
+//            latch.countDown();
+//          }
+//        });
+//    byte[] data = null;
+//    try {
+//      latch.await(5, TimeUnit.MILLISECONDS);
+//      data = responseVal.get(resultKey).getJSONArray(resultKey).toString().getBytes();
+//      if (WXEnvironment.isApkDebugable()) {
+//        Log.d(TAG, "execJSWithResult,data :" + data);
+//      }
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//    return data;
+  }
+
 
   @Override
   public int execJSService(String javascript) {
@@ -148,7 +210,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
-  public int callNative(String instanceId, String tasks, String callback) {
+  public int callNative(String instanceId, JSONArray tasks, String callback) {
     if (mJsManager != null) {
       return mJsManager.callNative(instanceId, tasks, callback);
     } else {
@@ -157,7 +219,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   @Override
-  public int callAddElement(String instanceId, String ref, String dom, String index, String callback) {
+  public int callAddElement(String instanceId, String ref, JSONObject dom, String index, String callback) {
     if (mJsManager != null) {
       return mJsManager.callAddElement(instanceId, ref, dom, index, callback);
     } else {
@@ -187,13 +249,15 @@ public class DebugBridge implements IWXBridge {
     WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
   }
 
-  public int callCreateBody(String s, String s1, String s2) {
+  @Override
+  public int callCreateBody(String instanceId, String tasks, String callback) {
     if (mJsManager != null) {
-      return mJsManager.callCreateBody(s, s1, s2);
+      return mJsManager.callCreateBody(instanceId, tasks, callback);
     }
     return 0;
   }
 
+  @Override
   public int callUpdateFinish(String s, byte[] bytes, String s1) {
     if (mJsManager != null) {
       return mJsManager.callUpdateFinish(s, s1);
@@ -201,6 +265,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callCreateFinish(String s, byte[] bytes, String s1) {
     if (mJsManager != null) {
       return mJsManager.callCreateFinish(s, s1);
@@ -208,6 +273,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callRefreshFinish(String s, byte[] bytes, String s1) {
     if (mJsManager != null) {
       return mJsManager.callRefreshFinish(s, s1);
@@ -215,6 +281,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callUpdateAttrs(String s, String s1, byte[] bytes, String s2) {
     if (mJsManager != null) {
       return mJsManager.callUpdateAttrs(s, s1, new String(bytes), s2);
@@ -222,6 +289,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callUpdateStyle(String s, String s1, byte[] bytes, String s2) {
     if (mJsManager != null) {
       return mJsManager.callUpdateStyle(s, s1, new String(bytes), s2);
@@ -229,6 +297,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callRemoveElement(String s, String s1, String s2) {
     if (mJsManager != null) {
       return mJsManager.callRemoveElement(s, s1, s2);
@@ -236,6 +305,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callMoveElement(String s, String s1, String s2, String s3, String s4) {
     if (mJsManager != null) {
       return mJsManager.callMoveElement(s, s1, s2, s3, s4);
@@ -243,6 +313,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callAddEvent(String s, String s1, String s2, String s3) {
     if (mJsManager != null) {
       return mJsManager.callAddEvent(s, s1, s2, s3);
@@ -250,6 +321,7 @@ public class DebugBridge implements IWXBridge {
     return 0;
   }
 
+  @Override
   public int callRemoveEvent(String s, String s1, String s2, String s3) {
     if (mJsManager != null) {
       return mJsManager.callRemoveEvent(s, s1, s2, s3);
@@ -299,6 +371,7 @@ public class DebugBridge implements IWXBridge {
     return mSession != null && mSession.isOpen();
   }
 
+  @Override
   public void takeHeapSnapshot(String filename) {
     LogUtil.log("warning", "Ignore invoke takeSnapshot: " + filename);
   }
@@ -311,4 +384,5 @@ public class DebugBridge implements IWXBridge {
   public void reportServerCrash(String instanceId, String crashFile) {
     LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
   }
+
 }
