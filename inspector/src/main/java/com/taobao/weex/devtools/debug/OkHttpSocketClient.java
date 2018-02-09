@@ -207,16 +207,6 @@ public class OkHttpSocketClient extends SocketClient {
         ReflectionUtil.tryInvokeMethod(mWebSocket, sendMessageMethod, requestBody);
       }
 
-      Method sendMessageMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz,
-                                                             "sendMessage", new Class[]{mMediaTypeClazz, mBufferClazz});
-
-      Object buffer = mBufferClazz.newInstance();
-      Method writeUtf8 = ReflectionUtil.tryGetMethod(mBufferClazz, "writeUtf8",
-                                                     new Class[]{String.class});
-
-      ReflectionUtil.tryInvokeMethod(mWebSocket, sendMessageMethod, textValue,
-                                     ReflectionUtil.tryInvokeMethod(buffer, writeUtf8, message));
-
       if (WXEnvironment.isApkDebugable()) {
         Log.d(TAG, "sendProtocolMessage :" + message);
       }
