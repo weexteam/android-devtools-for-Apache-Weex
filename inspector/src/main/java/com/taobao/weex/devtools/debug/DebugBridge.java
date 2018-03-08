@@ -38,6 +38,7 @@ public class DebugBridge implements IWXBridge {
   }
 
   public static DebugBridge getInstance() {
+    Log.e("listen", "DebugBridge instance");
     if (sInstance == null) {
       synchronized (DebugBridge.class) {
         if (sInstance == null) {
