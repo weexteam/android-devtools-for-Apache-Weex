@@ -17,6 +17,7 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void enable(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> enable=" + params);
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, true);
@@ -61,6 +63,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void disable(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> disable=" + params);
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       WXSDKEngine.reload(context, false);
@@ -73,6 +76,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void setLogLevel(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> setLogLevel=" + params);
     if (params != null) {
       LogLevel logLevel = sLevelMap.get(params.optString("logLevel"));
       if (logLevel != null) {
@@ -83,6 +87,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void setElementMode(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> setElementMode=" + params);
     if (params != null) {
       String mode = params.optString("mode");
       if ("vdom".equals(mode)) {
@@ -95,6 +100,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void callNative(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> callNative=" + params);
     //TODO CREATEBODY  callCreateBody
 
     if (params != null) {
@@ -105,13 +111,10 @@ public class WxDebug implements ChromeDevtoolsDomain {
     }
   }
 
-  public void callCreateBody(JSONObject params) {
-
-  }
-
 
   @ChromeDevtoolsMethod
   public void callAddElement(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> callAddElement=" + params);
     if (null == params) {
       Log.e(TAG, "callAddElement: params==null !");
       return;
@@ -133,6 +136,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void reload(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> reload=" + params);
     WXSDKEngine.reload();
     Context context = WXEnvironment.getApplication();
     if (context != null) {
@@ -145,6 +149,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void refresh(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> refresh=" + params);
     Context context = WXEnvironment.getApplication();
     if (context != null) {
       context.sendBroadcast(new Intent()
@@ -156,6 +161,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public void network(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> network=" + params);
     try {
       boolean enabled = params.getBoolean("enable");
       NetworkEventReporterImpl.setEnabled(enabled);
@@ -167,6 +173,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 
   @ChromeDevtoolsMethod
   public SyncCallResponse syncCall(JsonRpcPeer peer, JSONObject params) {
+    WXLogUtils.e("WxDebug-new >>>> syncCall=" + params);
     SyncCallResponse response = new SyncCallResponse();
     int syncId = params.optInt("syncId");
     String syncMethod = params.optString("method");
