@@ -8,7 +8,7 @@
 #include <jni.h>
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 JNIEXPORT
