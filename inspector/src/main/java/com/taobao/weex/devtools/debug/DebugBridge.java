@@ -194,6 +194,20 @@ public class DebugBridge implements IWXBridge {
 //    return data;
   }
 
+  @Override
+  public int createInstanceContext(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return execJS(instanceId, namespace, function, args);
+  }
+
+  @Override
+  public int destoryInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+    return execJS(instanceId, namespace, function, args);
+  }
+
+  @Override
+  public String execJSOnInstance(String instanceId, String function, int type) {
+    return null;
+  }
 
   @Override
   public int execJSService(String javascript) {
