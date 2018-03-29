@@ -196,7 +196,29 @@ public class DebugBridge implements IWXBridge {
 
   @Override
   public int createInstanceContext(String instanceId, String namespace, String function, WXJSObject[] args) {
-    return execJS(instanceId, namespace, function, args);
+    // return execJS(instanceId, namespace, function, args);
+    ArrayList<Object> array = new ArrayList<>();
+    int argsCount = args == null ? 0 : args.length;
+    for (int i = 0; i < argsCount; i++) {
+      if (args[i].type == WXJSObject.String) {
+        array.add(args[i].data);
+      } else if (args[i].type == WXJSObject.WSON) {
+        byte[] wsonData = (byte[]) args[i].data;
+        array.add(Wson.parse(wsonData));
+      } else {
+        array.add(JSON.parse(args[i].data.toString()));
+      }
+    }
+
+    Map<String, Object> func = new HashMap<>();
+    func.put(WXDebugConstants.METHOD, function);
+    func.put(WXDebugConstants.ARGS, array);
+
+    // Log.v(TAG, "callJS: function is " + function + ", args " + array);
+    Map<String, Object> map = new HashMap<>();
+    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_CREATEINSTANCE);
+    map.put(WXDebugConstants.PARAMS, func);
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
