@@ -4,6 +4,7 @@
 
 #include "jni.h"
 #include "native_bridge.h"
+#include <stdlib.h>
 
 
 #define JNIREG_CLASS "com/taobao/weex/devtools/inspector/protocol/JsBridgeCall"
