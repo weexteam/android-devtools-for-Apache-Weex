@@ -94,8 +94,8 @@ public class ViewUtils {
   }
 
   public static boolean isVerticalScroller(@NonNull WXScroller scroller) {
-    return scroller.getDomObject() != null && scroller.getDomObject().getAttrs() != null
-        && "vertical".equals(scroller.getDomObject().getAttrs().getScrollDirection());
+    return scroller != null && scroller.getAttrs() != null
+        && "vertical".equals(scroller.getAttrs().getScrollDirection());
   }
 
   @Nullable

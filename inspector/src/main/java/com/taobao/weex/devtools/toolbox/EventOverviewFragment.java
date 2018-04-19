@@ -114,8 +114,8 @@ public class EventOverviewFragment extends Fragment {
       if (event.ref != null) {
         WXRenderManager renderManager = WXSDKManager.getInstance().getWXRenderManager();
         WXComponent component = renderManager.getWXComponent(event.iid, event.ref);
-        if (component != null && component.getDomObject() != null) {
-          String type = component.getDomObject().getType();
+        if (component != null) {
+          String type = component.getComponentType();
           holder.compType.setText("<" + type + "/>");
           if (component.getRealView() != null) {
             holder.viewType.setText(component.getRealView().getClass().getSimpleName());

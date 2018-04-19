@@ -2,10 +2,13 @@ package com.taobao.weex.devtools.inspector.protocol.module;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Debug;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.devtools.debug.DebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
@@ -16,6 +19,7 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +31,7 @@ import java.util.List;
  * Created by budao on 16/6/24.
  */
 public class WxDebug implements ChromeDevtoolsDomain {
+
   private static final String TAG = "WxDebug";
   private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
 
