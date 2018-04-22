@@ -39,3 +39,6 @@ captures/
 # Keystore files
 *.jks
 android_gradle_build.json
+
+inspect/.externalNativeBuild
+.externalNativeBuild
