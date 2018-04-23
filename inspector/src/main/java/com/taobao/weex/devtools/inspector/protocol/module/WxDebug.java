@@ -135,7 +135,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
         final String index = params.optString("index");
-        final String callBack = params.optString("callback");
+//        final String callBack = params.optString("callback");
         final String dom = params.optString("dom");
 
         //      DebugBridge.getInstance().callAddElement(
@@ -149,7 +149,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugBridge.getInstance().getJsFunctions().jsHandleCallAddElement(instanceInd, ref, dom, index, callBack);
+                DebugBridge.getInstance().getJsFunctions().jsHandleCallAddElement(instanceInd, ref, dom, index);
             }
         });
     }

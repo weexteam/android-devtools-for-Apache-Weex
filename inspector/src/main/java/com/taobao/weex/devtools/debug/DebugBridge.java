@@ -177,6 +177,7 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
+        Log.e("Dyy", "callUpdateFinish is running and id = " + instanceId + " callback is " + callback);
         return mOriginBridge.callUpdateFinish(instanceId, tasks, callback);
     }
 
@@ -206,12 +207,14 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
-        return mOriginBridge.callLayout(pageId, ref, top, bottom, left, right, height, width);
+    public int callLayout(String s, String s1, int i, int i1, int i2, int i3, int i4, int i5, int i6) {
+        return mOriginBridge.callLayout(s, s1, i, i1, i2, i3, i4, i5, i6);
     }
+
 
     @Override
     public int callCreateFinish(String instanceId) {
+        Log.e("Dyy", "callCreateFinish is running");
         return mOriginBridge.callCreateFinish(instanceId);
     }
 
@@ -227,6 +230,15 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+
+        Log.e("Dyy", "callAddElement is running and id = " + pageId + " componentType is " + componentType
+                + " componentType is " + componentType
+                + " ref is " + ref
+                + " index is " + index
+                + " parentRef is " + parentRef
+                + " styles is " + JSON.toJSONString(styles)
+                + " attributes is " + JSON.toJSONString(attributes));
+
         return mOriginBridge.callAddElement(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
     }
 
@@ -255,16 +267,17 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
 
+        mOriginBridge.bindMeasurementToWXCore(s, s1, contentBoxMeasurement);
     }
 
     @Override
     public void setRenderContainerWrapContent(boolean b, String s) {
-
+        mOriginBridge.setRenderContainerWrapContent(b, s);
     }
 
     @Override
     public int printFirstScreenRenderTime(String s) {
-        return 0;
+        return mOriginBridge.printFirstScreenRenderTime(s);
     }
 
     @Override
@@ -275,21 +288,23 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void setDefaultHeightAndWidthIntoRootDom(String s, float v, float v1, boolean b, boolean b1) {
 
+        mOriginBridge.setDefaultHeightAndWidthIntoRootDom(s, v, v1, b, b1);
     }
 
     @Override
     public void onInstanceClose(String s) {
 
+        mOriginBridge.onInstanceClose(s);
     }
 
     @Override
     public void forceLayout(String s) {
-
+mOriginBridge.forceLayout(s);
     }
 
     @Override
     public boolean notifyLayout(String s) {
-        return false;
+        return mOriginBridge.notifyLayout(s);
     }
 
     @Override
