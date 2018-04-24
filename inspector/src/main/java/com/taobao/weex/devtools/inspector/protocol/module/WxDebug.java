@@ -160,10 +160,12 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e(TAG, "callCreateBody: params==" + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String domStr = params.optString("domStr");
-
+        if (instanceInd == null || instanceInd.isEmpty() || domStr == null || domStr.isEmpty())
+            return;
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
@@ -184,6 +186,9 @@ public class WxDebug implements ChromeDevtoolsDomain {
         final String domStr = params.optString("domStr");
         final String task = params.optString("tasks");
 
+        if (instanceInd == null || instanceInd.isEmpty() || domStr == null || domStr.isEmpty())
+            return;
+
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
@@ -200,7 +205,6 @@ public class WxDebug implements ChromeDevtoolsDomain {
             Log.e(TAG, "callCreateFinish: params==null !");
             return;
         }
-
 
         final String instanceInd = params.optString("instance");
 
@@ -225,7 +229,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
         final String instanceInd = params.optString("instance");
         final String callback = params.optString("callback");
         final String task = params.optString("tasks");
-
+        if (instanceInd == null || instanceInd.isEmpty())
+            return;
 
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
