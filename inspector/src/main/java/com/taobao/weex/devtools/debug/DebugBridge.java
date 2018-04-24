@@ -14,6 +14,7 @@ import com.taobao.weex.common.IWXJsFunctions;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 import com.taobao.weex.dom.CSSShorthand;
+import com.taobao.weex.layout.ContentBoxMeasurement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +67,6 @@ public class DebugBridge implements IWXBridge {
         }
 
         final String className = this.getClass().getName().replace('.', '/');
-        Log.e("dyy", "Class Name is " + className);
         jsFunctions.initWxBridge(this, className);
         return sendMessage(getInitFrameworkMessage(framework, params));
     }
@@ -128,6 +128,21 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
+    public int createInstanceContext(String s, String s1, String s2, WXJSObject[] wxjsObjects) {
+        return execJS(s, s1, s2, wxjsObjects);
+    }
+
+    @Override
+    public int destoryInstance(String s, String s1, String s2, WXJSObject[] wxjsObjects) {
+        return execJS(s, s1, s2, wxjsObjects);
+    }
+
+    @Override
+    public String execJSOnInstance(String s, String s1, int i) {
+        return mOriginBridge.execJSOnInstance(s, s1, i);
+    }
+
+    @Override
     public int callNative(String instanceId, byte[] tasks, String callback) {
         return callNative(instanceId, new String(tasks), callback);
     }
@@ -137,59 +152,31 @@ public class DebugBridge implements IWXBridge {
      */
     @Override
     public int callNative(String instanceId, String tasks, String callback) {
-//    if (mJsManager != null) {
-//      return mJsManager.callNative(instanceId, tasks, callback);
-//    } else {
-//      return 0;
-//    }
-        Log.e("dyy", "callNative is running");
         return mOriginBridge.callNative(instanceId, tasks, callback);
     }
 
     @Override
     public void reportJSException(String instanceId, String func, String exception) {
-//    if (mJsManager != null) {
-//      mJsManager.reportJSException(instanceId, func, exception);
-//    }
         mOriginBridge.reportJSException(instanceId, func, exception);
     }
 
     @Override
     public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-//    if (mJsManager != null) {
-//      JSONArray argArray = JSON.parseArray(new String(arguments));
-//      return mJsManager.callNativeModule(instanceId, module, method, argArray, options);
-//    }
-//    return null;
-
-        Log.d("dyy", "callNativeModule is running");
-
         return mOriginBridge.callNativeModule(instanceId, module, method, arguments, options);
     }
 
     @Override
     public void callNativeComponent(String instanceId, String componentRef, String method, byte[] arguments, byte[] options) {
-//    JSONArray argArray = JSON.parseArray(new String(arguments));
-//    WXBridgeManager.getInstance().callNativeComponent(instanceId, componentRef, method, argArray, options);
         mOriginBridge.callNativeComponent(instanceId, componentRef, method, arguments, options);
     }
 
     @Override
     public int callUpdateFinish(String instanceId, byte[] tasks, String callback) {
-//    if (mJsManager != null) {
-//      //?
-//      return mJsManager.callUpdateFinish(instanceId, callback);
-//    }
-//    return 0;
         return mOriginBridge.callUpdateFinish(instanceId, tasks, callback);
     }
 
     @Override
     public int callRefreshFinish(String instanceId, byte[] tasks, String callback) {
-//    if (mJsManager != null) {
-//      return mJsManager.callRefreshFinish(instanceId, callback);
-//    }
-//    return 0;
         return mOriginBridge.callRefreshFinish(instanceId, tasks, callback);
     }
 
@@ -214,9 +201,10 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callLayout(String pageId, String ref, int top, int bottom, int left, int right, int height, int width) {
-        return mOriginBridge.callLayout(pageId, ref, top, bottom, left, right, height, width);
+    public int callLayout(String s, String s1, int i, int i1, int i2, int i3, int i4, int i5, int i6) {
+        return mOriginBridge.callLayout(s, s1, i, i1, i2, i3, i4, i5, i6);
     }
+
 
     @Override
     public int callCreateFinish(String instanceId) {
@@ -238,98 +226,17 @@ public class DebugBridge implements IWXBridge {
         return mOriginBridge.callAddElement(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
     }
 
-    public int callCreateBodyByWeexCore(String pageId, String componentType, String ref,
-                                        HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                        HashMap<String, String> paddings, HashMap<String, String> margins,
-                                        HashMap<String, String> borders) {
-//    if (null != mJsManager) {
-//      return mJsManager.callCreateBodyByWeexCore(pageId, componentType, ref, styles, attributes, events,
-//                                                 paddings, margins, borders);
-//    }
-        return 0;
-//    return mOriginBridge.callCreateBodyByWeexCore(pageId,componentType,ref,styles,attributes,
-//                                                  events,paddings,margins,borders);
-    }
-
-    public int callAddElementByWeexCore(String pageId, String componentType, String ref, int index, String parentRef,
-                                        HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events,
-                                        HashMap<String, String> paddings, HashMap<String, String> margins,
-                                        HashMap<String, String> borders) {
-//    if (mJsManager != null) {
-//      return mJsManager.callAddElementByWeexCore(pageId, componentType, ref, index, parentRef,
-//                                                 styles, attributes, events, paddings, margins, borders);
-//    }
-        return 1;
-//    return mOriginBridge.callAddElementByWeexCore(pageId,componentType,ref,index,parentRef,
-//                                                  styles,attributes,events,paddings,margins,
-//                                                  borders);
-    }
-
 
     @Override
     public int callRemoveElement(String instanceId, String ref) {
-//    if (mJsManager != null) {
-//      return mJsManager.callRemoveElement(instanceId, ref);
-//    }
-//    return 0;
         return mOriginBridge.callRemoveElement(instanceId, ref);
     }
 
     @Override
     public int callMoveElement(String instanceId, String ref, String parentRef, int index) {
-//    if (mJsManager != null) {
-//      return mJsManager.callMoveElement(instanceId, ref, parentRef, index);
-//    }
-//    return 0;
         return mOriginBridge.callMoveElement(instanceId, ref, parentRef, index);
     }
 
-    public int callUpdateStyleByWeexCore(String instanceId, String ref,
-                                         HashMap<String, Object> styles,
-                                         HashMap<String, String> paddings,
-                                         HashMap<String, String> margins,
-                                         HashMap<String, String> borders) {
-//    if (null != mJsManager) {
-//      return mJsManager.callUpdateStyleByWeexCore(instanceId, ref, styles, paddings, margins, borders);
-//    }
-        return 0;
-//    return mOriginBridge.callUpdateStyleByWeexCore(instanceId,ref,styles,paddings,margins,borders);
-    }
-
-
-    public int callUpdateAttrsByWeexCore(String instanceId, String ref,
-                                         HashMap<String, String> attrs) {
-//    if (null != mJsManager) {
-//      return mJsManager.callUpdateAttrsByWeexCore(instanceId, ref, attrs);
-//    }
-        return 0;
-
-//    return mOriginBridge.callUpdateAttrsByWeexCore(instanceId,ref,attrs);
-    }
-
-    public int callLayoutByWeexCore(String pageId, String ref, int top, int bottom, int left, int
-            right, int height, int width) {
-//    if (null != mJsManager) {
-//      return mJsManager.callLayoutByWeexCore(pageId, ref, top, bottom, left, right, height, width);
-//    }
-        return 0;
-//    return mOriginBridge.callLayoutByWeexCore(pageId,ref,top,bottom,left,right,height,width);
-    }
-
-    public int callCreateFinishByWeexCore(String instanceId) {
-//    if (null != mJsManager) {
-//      mJsManager.callCreateFinishByWeexCore(instanceId);
-//    }
-        return 0;
-//    return mOriginBridge.callCreateFinishByWeexCore(instanceId);
-    }
-
-    public void callLogOfFirstScreen(String message) {
-        LogUtil.i("callLogOfFirstScreen :" + message);
-
-//     mOriginBridge.callLogOfFirstScreen(message);
-
-    }
 
     @Override
     public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
@@ -339,6 +246,48 @@ public class DebugBridge implements IWXBridge {
 //    return 0;
 
         return mOriginBridge.callHasTransitionPros(instanceId, ref, styles);
+    }
+
+    @Override
+    public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
+
+        mOriginBridge.bindMeasurementToWXCore(s, s1, contentBoxMeasurement);
+    }
+
+    @Override
+    public void setRenderContainerWrapContent(boolean b, String s) {
+        mOriginBridge.setRenderContainerWrapContent(b, s);
+    }
+
+    @Override
+    public int printFirstScreenRenderTime(String s) {
+        return mOriginBridge.printFirstScreenRenderTime(s);
+    }
+
+    @Override
+    public int printRenderFinishTime(String s) {
+        return 0;
+    }
+
+    @Override
+    public void setDefaultHeightAndWidthIntoRootDom(String s, float v, float v1, boolean b, boolean b1) {
+
+        mOriginBridge.setDefaultHeightAndWidthIntoRootDom(s, v, v1, b, b1);
+    }
+
+    @Override
+    public void onInstanceClose(String s) {
+        mOriginBridge.onInstanceClose(s);
+    }
+
+    @Override
+    public void forceLayout(String s) {
+        mOriginBridge.forceLayout(s);
+    }
+
+    @Override
+    public boolean notifyLayout(String s) {
+        return mOriginBridge.notifyLayout(s);
     }
 
     @Override
