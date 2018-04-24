@@ -67,7 +67,6 @@ public class DebugBridge implements IWXBridge {
         }
 
         final String className = this.getClass().getName().replace('.', '/');
-        Log.e("dyy", "Class Name is " + className);
         jsFunctions.initWxBridge(this, className);
         return sendMessage(getInitFrameworkMessage(framework, params));
     }
@@ -153,7 +152,6 @@ public class DebugBridge implements IWXBridge {
      */
     @Override
     public int callNative(String instanceId, String tasks, String callback) {
-        Log.e("dyy", "callNative is running");
         return mOriginBridge.callNative(instanceId, tasks, callback);
     }
 
@@ -164,9 +162,6 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public Object callNativeModule(String instanceId, String module, String method, byte[] arguments, byte[] options) {
-
-        Log.d("dyy", "callNativeModule is running");
-
         return mOriginBridge.callNativeModule(instanceId, module, method, arguments, options);
     }
 
@@ -293,13 +288,12 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public void onInstanceClose(String s) {
-
         mOriginBridge.onInstanceClose(s);
     }
 
     @Override
     public void forceLayout(String s) {
-mOriginBridge.forceLayout(s);
+        mOriginBridge.forceLayout(s);
     }
 
     @Override
