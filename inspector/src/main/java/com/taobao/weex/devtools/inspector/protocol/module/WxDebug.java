@@ -111,6 +111,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 //              params.optString("tasks"),
 //              params.optString("callback"));
 
+            Log.e("dyy", "js CallNative js running and params is " + params.toString());
             final String instance = params.optString("instance");
             final byte[] tasks = params.optString("tasks").getBytes();
             final String callback = params.optString("callback");
@@ -134,7 +135,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
         final String index = params.optString("index");
-//        final String callBack = params.optString("callback");
+        final String callBack = params.optString("callback");
         final String dom = params.optString("dom");
 
         //      DebugBridge.getInstance().callAddElement(
@@ -148,7 +149,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugBridge.getInstance().getJsFunctions().jsHandleCallAddElement(instanceInd, ref, dom, index);
+                DebugBridge.getInstance().getJsFunctions().jsHandleCallAddElement(instanceInd, ref, dom, index, callBack);
             }
         });
     }
@@ -160,12 +161,11 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
-        Log.e(TAG, "callCreateBody: params==" + params.toString());
+        Log.e("dyy", "js callCreateBody is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String domStr = params.optString("domStr");
-        if (instanceInd == null || instanceInd.isEmpty() || domStr == null || domStr.isEmpty())
-            return;
+
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
@@ -181,13 +181,11 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e("dyy", "js callUpdateFinish is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String domStr = params.optString("domStr");
         final String task = params.optString("tasks");
-
-        if (instanceInd == null || instanceInd.isEmpty() || domStr == null || domStr.isEmpty())
-            return;
 
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
@@ -205,6 +203,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
             Log.e(TAG, "callCreateFinish: params==null !");
             return;
         }
+
+        Log.e("dyy", "js callCreateFinish is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
 
@@ -225,12 +225,12 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e("dyy", "js callRefreshFinish is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String callback = params.optString("callback");
         final String task = params.optString("tasks");
-        if (instanceInd == null || instanceInd.isEmpty())
-            return;
+
 
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
@@ -246,6 +246,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
             Log.e(TAG, "callUpdateAttrs: params==null !");
             return;
         }
+
+        Log.e("dyy", "js callUpdateAttrs is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
@@ -266,6 +268,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e("dyy", "js callUpdateStyle is running and params is " + params.toString());
+
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
         final String data = params.optString("data");
@@ -285,6 +289,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e("dyy", "js callRemoveElement is running and params is " + params.toString());
+
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
 
@@ -302,6 +308,9 @@ public class WxDebug implements ChromeDevtoolsDomain {
             Log.e(TAG, "callMoveElement: params==null !");
             return;
         }
+
+        Log.e("dyy", "js callMoveElement is running and params is " + params.toString());
+
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
         final String parentRef = params.optString("parentRef");
@@ -321,6 +330,9 @@ public class WxDebug implements ChromeDevtoolsDomain {
             Log.e(TAG, "callAddEvent: params==null !");
             return;
         }
+
+        Log.e("dyy", "js callAddEvent is running and params is " + params.toString());
+
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
         final String event = params.optString("event");
@@ -340,6 +352,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
             return;
         }
 
+        Log.e("dyy", "js callRemoveEvent is running and params is " + params.toString());
 
         final String instanceInd = params.optString("instance");
         final String ref = params.optString("ref");
