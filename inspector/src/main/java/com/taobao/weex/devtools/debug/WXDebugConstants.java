@@ -14,6 +14,7 @@ public class WXDebugConstants {
 
   public static final String PARAM_INIT_ENV = "env";
   public static final String PARAM_JS_SOURCE = "source";
+  public static final String PARAM_LAYOUT_SANDBOX = "isLayoutAndSandbox";
 
 
   public static final String ENV_WX_ENVIRONMENT = "WXEnvironment";

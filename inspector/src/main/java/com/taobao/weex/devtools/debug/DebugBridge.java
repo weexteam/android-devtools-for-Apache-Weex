@@ -212,6 +212,11 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
+    public int callAppendTreeCreateFinish(String instanceId, String ref) {
+        return mOriginBridge.callAppendTreeCreateFinish(instanceId, ref);
+    }
+
+    @Override
     public void reportServerCrash(String instanceId, String crashFile) {
         LogUtil.e("ServerCrash: instanceId: " + instanceId + ", crashFile: " + crashFile);
     }
@@ -249,10 +254,20 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
-
-        mOriginBridge.bindMeasurementToWXCore(s, s1, contentBoxMeasurement);
+    public void bindMeasurementToWXCore(String instanceId, String ref) {
+        mOriginBridge.bindMeasurementToWXCore(instanceId, ref);
     }
+
+    @Override
+    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+        return mOriginBridge.getMeasurementFunc(instanceId, ref);
+    }
+
+//    @Override
+//    public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
+//
+//        mOriginBridge.bindMeasurementToWXCore(s, s1, contentBoxMeasurement);
+//    }
 
     @Override
     public void setRenderContainerWrapContent(boolean b, String s) {
@@ -396,6 +411,7 @@ public class DebugBridge implements IWXBridge {
     private String getInitFrameworkMessage(String framework, WXParams params) {
         Map<String, Object> func = new HashMap<>();
         func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);
+        func.put(WXDebugConstants.PARAM_LAYOUT_SANDBOX, "true");
         if (params != null) {
             Map<String, Object> environmentMap = getEnvironmentMap(params);
             if (environmentMap != null && environmentMap.size() > 0) {
