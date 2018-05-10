@@ -254,14 +254,19 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public void bindMeasurementToWXCore(String instanceId, String ref) {
-        mOriginBridge.bindMeasurementToWXCore(instanceId, ref);
+    public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
+        mOriginBridge.bindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
     }
 
-    @Override
-    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
-        return mOriginBridge.getMeasurementFunc(instanceId, ref);
-    }
+//    @Override
+//    public void bindMeasurementToWXCore(String instanceId, String ref) {
+//        mOriginBridge.bindMeasurementToWXCore(instanceId, ref);
+//    }
+//
+//    @Override
+//    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+//        return mOriginBridge.getMeasurementFunc(instanceId, ref);
+//    }
 
 //    @Override
 //    public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
