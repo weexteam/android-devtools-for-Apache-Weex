@@ -41,7 +41,6 @@ public class DebugBridge implements IWXBridge {
     }
 
     public static DebugBridge getInstance() {
-        Log.e("listen", "DebugBridge instance");
         if (sInstance == null) {
             synchronized (DebugBridge.class) {
                 if (sInstance == null) {
@@ -227,8 +226,8 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callAddElement(String pageId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
-        return mOriginBridge.callAddElement(pageId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
+    public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
+        return  mOriginBridge.callAddElement(instanceId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
     }
 
 
@@ -280,13 +279,13 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int printFirstScreenRenderTime(String s) {
-        return mOriginBridge.printFirstScreenRenderTime(s);
+    public long[] getFirstScreenRenderTime(String instanceId) {
+        return mOriginBridge.getFirstScreenRenderTime(instanceId);
     }
 
     @Override
-    public int printRenderFinishTime(String s) {
-        return 0;
+    public long[] getRenderFinishTime(String instanceId) {
+        return mOriginBridge.getRenderFinishTime(instanceId);
     }
 
     @Override
@@ -365,6 +364,11 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void setViewPortWidth(String instanceId, float value) {
 
+    }
+
+    @Override
+    public void reportNativeInitStatus(String statusCode, String errorMsg) {
+        mOriginBridge.reportNativeInitStatus(statusCode, errorMsg);
     }
 
     public void calculateLayout(String instanceId, String ref) {
