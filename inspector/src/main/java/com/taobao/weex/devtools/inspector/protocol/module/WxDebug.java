@@ -328,7 +328,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugBridge.getInstance().getJsFunctions().jsFunctionCallUpdateAttrs(instanceInd, ref, event);
+                DebugBridge.getInstance().getJsFunctions().jsFunctionCallAddEvent(instanceInd, ref, event);
             }
         });
     }
