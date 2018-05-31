@@ -226,8 +226,8 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders) {
-        return  mOriginBridge.callAddElement(instanceId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders);
+    public int callAddElement(String instanceId, String componentType, String ref, int index, String parentRef, HashMap<String, String> styles, HashMap<String, String> attributes, HashSet<String> events, float[] margins, float[] paddings, float[] borders, boolean willLayout) {
+        return  mOriginBridge.callAddElement(instanceId, componentType, ref, index, parentRef, styles, attributes, events, margins, paddings, borders, willLayout);
     }
 
 
@@ -244,34 +244,18 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int callHasTransitionPros(String instanceId, String ref, HashMap<String, String> styles) {
-//    if (null != mJsManager) {
-//      return mJsManager.callHasTransitionPros(instanceId, ref, styles);
-//    }
-//    return 0;
-
         return mOriginBridge.callHasTransitionPros(instanceId, ref, styles);
     }
 
     @Override
-    public void bindMeasurementToWXCore(String instanceId, String ref, ContentBoxMeasurement contentBoxMeasurement) {
-        mOriginBridge.bindMeasurementToWXCore(instanceId, ref, contentBoxMeasurement);
+    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
+        return null;
     }
 
-//    @Override
-//    public void bindMeasurementToWXCore(String instanceId, String ref) {
-//        mOriginBridge.bindMeasurementToWXCore(instanceId, ref);
-//    }
-//
-//    @Override
-//    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
-//        return mOriginBridge.getMeasurementFunc(instanceId, ref);
-//    }
-
-//    @Override
-//    public void bindMeasurementToWXCore(String s, String s1, ContentBoxMeasurement contentBoxMeasurement) {
-//
-//        mOriginBridge.bindMeasurementToWXCore(s, s1, contentBoxMeasurement);
-//    }
+    @Override
+    public void bindMeasurementToRenderObject(long ptr) {
+        mOriginBridge.bindMeasurementToRenderObject(ptr);
+    }
 
     @Override
     public void setRenderContainerWrapContent(boolean b, String s) {
