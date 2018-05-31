@@ -413,14 +413,14 @@ public class WxDebug implements ChromeDevtoolsDomain {
             options = jsonObject.toString().getBytes();
         }
         if ("callNativeModule".equals(syncMethod)) {
-            result = DebugBridge.getInstance().callNativeModule(
+            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeModule(
                     instanceId,
                     domain,
                     method,
                     arguments,
                     options);
         } else if ("callNativeComponent".equals(syncMethod)) {
-            DebugBridge.getInstance().callNativeComponent(
+            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeComponent(
                     instanceId,
                     domain,
                     method,

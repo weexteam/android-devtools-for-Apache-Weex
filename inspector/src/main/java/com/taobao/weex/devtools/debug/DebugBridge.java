@@ -15,6 +15,7 @@ import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
+import com.taobao.weex.utils.WXWsonJSONSwitch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class DebugBridge implements IWXBridge {
         int argsCount = args == null ? 0 : args.length;
         for (int i = 0; i < argsCount; i++) {
             if (args[i].type != WXJSObject.String) {
-                array.add(JSON.parse(args[i].data.toString()));
+                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
             } else {
                 array.add(args[i].data);
             }
@@ -248,8 +249,8 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public ContentBoxMeasurement getMeasurementFunc(String instanceId, String ref) {
-        return null;
+    public ContentBoxMeasurement getMeasurementFunc(String instanceId, long renderObjectPtr) {
+        return mOriginBridge.getMeasurementFunc(instanceId, renderObjectPtr);
     }
 
     @Override
