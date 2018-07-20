@@ -11,6 +11,7 @@ public class WXDebugConstants {
   public static final String METHOD_INIT_RUNTIME = "WxDebug.initJSRuntime";
   public static final String METHOD_CALL_JS = "WxDebug.callJS";
   public static final String METHOD_IMPORT_JS = "WxDebug.importScript";
+  public static final String WEEX_CALL_JAVASCRIPT = "__WEEX_CALL_JAVASCRIPT__";
 
   public static final String PARAM_INIT_ENV = "env";
   public static final String PARAM_JS_SOURCE = "source";

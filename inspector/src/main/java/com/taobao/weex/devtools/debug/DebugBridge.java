@@ -89,10 +89,13 @@ public class DebugBridge implements IWXBridge {
         }
 
         Map<String, Object> func = new HashMap<>();
-        func.put(WXDebugConstants.METHOD, function);
+        if (TextUtils.equals(function, "registerComponents") || TextUtils.equals(function, "registerModules") || TextUtils.equals(function, "destroyInstance")) {
+          func.put(WXDebugConstants.METHOD, function);
+        } else {
+          func.put(WXDebugConstants.METHOD, WXDebugConstants.WEEX_CALL_JAVASCRIPT);
+        }
         func.put(WXDebugConstants.ARGS, array);
 
-        // Log.v(TAG, "callJS: function is " + function + ", args " + array);
         Map<String, Object> map = new HashMap<>();
         map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
         map.put(WXDebugConstants.PARAMS, func);
@@ -129,7 +132,78 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int createInstanceContext(String s, String s1, String s2, WXJSObject[] wxjsObjects) {
-        return execJS(s, s1, s2, wxjsObjects);
+
+        WXJSObject wxjsObjects1[] = new WXJSObject[4];
+        WXJSObject wxjsObjects2[] = new WXJSObject[3];
+
+        WXJSObject instanceId = wxjsObjects[0];
+        WXJSObject code = wxjsObjects[1];
+        WXJSObject bundleUrl = wxjsObjects[2];
+        WXJSObject options = wxjsObjects[3];
+        WXJSObject raxApi = wxjsObjects[4];
+
+//        wxjsObjects1[0] = wxjsObjects[0];
+//        wxjsObjects1[1] = wxjsObjects[2];
+//        wxjsObjects1[2] = wxjsObjects[3];
+//        wxjsObjects1[3] = wxjsObjects[4];
+//
+//        wxjsObjects2[0] = wxjsObjects[0];
+//        wxjsObjects2[1] = wxjsObjects[4];
+//        wxjsObjects2[2] = wxjsObjects[2];
+
+        wxjsObjects1[0] = instanceId;
+        wxjsObjects1[1] = bundleUrl;
+        wxjsObjects1[2] = options;
+        wxjsObjects1[3] = raxApi;
+        doCreateInstanceContext(s, s1, "createInstanceContext", wxjsObjects1);
+
+        wxjsObjects2[0] = instanceId;
+        wxjsObjects2[1] = code;
+        wxjsObjects2[2] = bundleUrl;
+        return doImportScript(s, s1, "importScript", wxjsObjects2);
+    }
+
+    private int doCreateInstanceContext(String instanceId, String namespace, String function, WXJSObject[] args) {
+        ArrayList<Object> array = new ArrayList<>();
+        int argsCount = args == null ? 0 : args.length;
+        for (int i = 0; i < argsCount; i++) {
+            if (args[i].type != WXJSObject.String) {
+                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+            } else {
+                array.add(args[i].data);
+            }
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
+
+        Map<String, Object> func = new HashMap<>();
+        func.put(WXDebugConstants.METHOD, function);
+        func.put(WXDebugConstants.ARGS, array);
+
+        map.put(WXDebugConstants.PARAMS, func);
+        return sendMessage(JSON.toJSONString(map));
+    }
+
+    private int doImportScript(String instanceId, String namespace, String function, WXJSObject[] args) {
+        ArrayList<Object> array = new ArrayList<>();
+        int argsCount = args == null ? 0 : args.length;
+        for (int i = 0; i < argsCount; i++) {
+            if (args[i].type != WXJSObject.String) {
+                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+            } else {
+                array.add(args[i].data);
+            }
+        }
+
+        Map<String, Object> func = new HashMap<>();
+        func.put(WXDebugConstants.METHOD, function);
+        func.put(WXDebugConstants.ARGS, array);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
+        map.put(WXDebugConstants.PARAMS, func);
+        return sendMessage(JSON.toJSONString(map));
     }
 
     @Override
@@ -209,6 +283,11 @@ public class DebugBridge implements IWXBridge {
     @Override
     public int callCreateFinish(String instanceId) {
         return mOriginBridge.callCreateFinish(instanceId);
+    }
+
+    @Override
+    public int callRenderSuccess(String s) {
+        return mOriginBridge.callRenderSuccess(s);
     }
 
     @Override
@@ -343,11 +422,6 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public void registerCoreEnv(String key, String value) {
-
-    }
-
-    @Override
-    public void setViewPortWidth(String instanceId, float value) {
 
     }
 
