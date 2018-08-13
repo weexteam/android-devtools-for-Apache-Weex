@@ -2,8 +2,13 @@ package com.taobao.weex.devtools.debug;
 
 import android.text.TextUtils;
 import android.util.Log;
-
+import com.taobao.weex.utils.*;
 import com.alibaba.fastjson.JSON;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
@@ -17,6 +22,7 @@ import com.taobao.weex.dom.CSSShorthand;
 import com.taobao.weex.layout.ContentBoxMeasurement;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +41,12 @@ public class DebugBridge implements IWXBridge {
     private volatile SimpleSession mSession;
     private IWXBridge mOriginBridge;
     private IWXJsFunctions jsFunctions;
+    public static final MediaType MEDIA_TYPE_MARKDOWN
+            = MediaType.parse("application/json; charset=utf-8");
+
+    private final OkHttpClient client = new OkHttpClient();
+    private String syncCallJSURL = "";
+
 
     private DebugBridge() {
         //TODO params
@@ -77,6 +89,11 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
+    public void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
+//        mOriginBridge.refreshInstance(instanceId, namespace, function, args);
+    }
+
+    @Override
     public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
         ArrayList<Object> array = new ArrayList<>();
         int argsCount = args == null ? 0 : args.length;
@@ -104,7 +121,50 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
-        return new byte[0];
+
+        String result = "";
+
+        ArrayList<Object> array = new ArrayList<>();
+        int argsCount = args == null ? 0 : args.length;
+        for (int i = 0; i < argsCount; i++) {
+            if (args[i].type != WXJSObject.String) {
+                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+            } else {
+                array.add(args[i].data);
+            }
+        }
+
+        Map<String, Object> func = new HashMap<>();
+        if (TextUtils.equals(function, "registerComponents") || TextUtils.equals(function, "registerModules") || TextUtils.equals(function, "destroyInstance")) {
+            func.put(WXDebugConstants.METHOD, function);
+        } else {
+            func.put(WXDebugConstants.METHOD, WXDebugConstants.WEEX_CALL_JAVASCRIPT);
+        }
+        func.put(WXDebugConstants.ARGS, array);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
+        map.put(WXDebugConstants.PARAMS, func);
+
+        if (TextUtils.isEmpty(syncCallJSURL))
+            return new byte[0];
+
+        Request request = new Request.Builder()
+                .url(syncCallJSURL)
+                .post(RequestBody.create(MEDIA_TYPE_MARKDOWN, JSON.toJSONString(map)))
+                .build();
+
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+            if (response.isSuccessful()) {
+                result = response.body().string();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return WXWsonJSONSwitch.convertJSONToWsonIfUseWson(result.getBytes());
     }
 
     @Override
@@ -141,15 +201,6 @@ public class DebugBridge implements IWXBridge {
         WXJSObject bundleUrl = wxjsObjects[2];
         WXJSObject options = wxjsObjects[3];
         WXJSObject raxApi = wxjsObjects[4];
-
-//        wxjsObjects1[0] = wxjsObjects[0];
-//        wxjsObjects1[1] = wxjsObjects[2];
-//        wxjsObjects1[2] = wxjsObjects[3];
-//        wxjsObjects1[3] = wxjsObjects[4];
-//
-//        wxjsObjects2[0] = wxjsObjects[0];
-//        wxjsObjects2[1] = wxjsObjects[4];
-//        wxjsObjects2[2] = wxjsObjects[2];
 
         wxjsObjects1[0] = instanceId;
         wxjsObjects1[1] = bundleUrl;
@@ -287,7 +338,7 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public int callRenderSuccess(String s) {
-        return mOriginBridge.callRenderSuccess(s);
+        return -1;
     }
 
     @Override
@@ -439,6 +490,13 @@ public class DebugBridge implements IWXBridge {
 
     public void setSession(SimpleSession session) {
         mSession = session;
+        if (mSession instanceof SocketClient) {
+            String[] temp = ((SocketClient)mSession).getUrl().split("debugProxy/native");
+            if (temp.length < 2)
+                return;
+            syncCallJSURL = temp[0] + "syncCallJS" + temp[1];
+            syncCallJSURL = "http://" + syncCallJSURL.split("://")[1];
+        }
     }
 
     public void setBridgeManager(WXBridgeManager bridgeManager) {

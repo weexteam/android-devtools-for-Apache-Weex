@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import com.taobao.weex.devtools.websocket.SimpleSession;
 
@@ -27,12 +28,14 @@ public abstract class SocketClient implements SimpleSession {
   protected Object mSocketClient;
   protected Object mWebSocketListener;
   protected InvocationHandler mInvocationHandler;
+  private String mUrl;
 
   public SocketClient(DebugServerProxy proxy) {
     init(proxy);
   }
 
   public void connect(String url, Callback callback) {
+    mUrl = url;
     mConnectCallback = callback;
     Message message = Message.obtain();
     message.what = CONNECT_TO_WEB_SOCKET;
@@ -44,7 +47,12 @@ public abstract class SocketClient implements SimpleSession {
     }
   }
 
+  public String getUrl() {
+    return mUrl;
+  }
+
   protected void init(DebugServerProxy proxy) {
+    mUrl = proxy.mRemoteUrl;
     mProxy = proxy;
     mHandlerThread = new HandlerThread("DebugServerProxy");
     mHandlerThread.start();
