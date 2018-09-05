@@ -98,16 +98,20 @@ public class DebugBridge implements IWXBridge {
         ArrayList<Object> array = new ArrayList<>();
         int argsCount = args == null ? 0 : args.length;
         for (int i = 0; i < argsCount; i++) {
-            if (args[i].type != WXJSObject.String) {
-                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
-            } else {
-                array.add(args[i].data);
+            if (args[i] != null) {
+                if (args[i].type != WXJSObject.String) {
+                    array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+                } else {
+                    array.add(args[i].data);
+                }
             }
         }
 
         Map<String, Object> func = new HashMap<>();
         if (TextUtils.equals(function, "registerComponents") || TextUtils.equals(function, "registerModules") || TextUtils.equals(function, "destroyInstance")) {
           func.put(WXDebugConstants.METHOD, function);
+        } else if (TextUtils.equals(function, "createInstance")) {
+          func.put(WXDebugConstants.METHOD, "createInstance");
         } else {
           func.put(WXDebugConstants.METHOD, WXDebugConstants.WEEX_CALL_JAVASCRIPT);
         }
@@ -127,10 +131,12 @@ public class DebugBridge implements IWXBridge {
         ArrayList<Object> array = new ArrayList<>();
         int argsCount = args == null ? 0 : args.length;
         for (int i = 0; i < argsCount; i++) {
-            if (args[i].type != WXJSObject.String) {
-                array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
-            } else {
-                array.add(args[i].data);
+            if (args[i] != null) {
+                if (args[i].type != WXJSObject.String) {
+                    array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+                } else {
+                    array.add(args[i].data);
+                }
             }
         }
 
