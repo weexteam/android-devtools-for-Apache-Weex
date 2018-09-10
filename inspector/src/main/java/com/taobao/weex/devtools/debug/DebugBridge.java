@@ -411,7 +411,6 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public void setDefaultHeightAndWidthIntoRootDom(String s, float v, float v1, boolean b, boolean b1) {
-
         mOriginBridge.setDefaultHeightAndWidthIntoRootDom(s, v, v1, b, b1);
     }
 
@@ -432,54 +431,37 @@ public class DebugBridge implements IWXBridge {
 
     @Override
     public void setStyleWidth(String instanceId, String ref, float value) {
-//    if (null != mJsManager) {
-//      mJsManager.setStyleWidth(instanceId, ref, value);
-//    }
         mOriginBridge.setStyleWidth(instanceId, ref, value);
     }
 
     @Override
     public void setStyleHeight(String instanceId, String ref, float value) {
-//    if (null != mJsManager) {
-//      mJsManager.setStyleHeight(instanceId, ref, value);
-//    }
-
         mOriginBridge.setStyleHeight(instanceId, ref, value);
     }
 
     @Override
     public void setMargin(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-//    if (null != mJsManager) {
-//      mJsManager.setMargin(instanceId, ref, edge, value);
-//    }
         mOriginBridge.setMargin(instanceId, ref, edge, value);
     }
 
     @Override
     public void setPadding(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-//    if (null != mJsManager) {
-//      mJsManager.setPadding(instanceId, ref, edge, value);
-//    }
-
         mOriginBridge.setPadding(instanceId, ref, edge, value);
     }
 
     @Override
     public void setPosition(String instanceId, String ref, CSSShorthand.EDGE edge, float value) {
-//    if (null != mJsManager) {
-//      mJsManager.setPosition(instanceId, ref, edge, value);
-//    }
         mOriginBridge.setPosition(instanceId, ref, edge, value);
     }
 
     @Override
     public void markDirty(String instanceId, String ref, boolean dirty) {
-
+        mOriginBridge.markDirty(instanceId, ref, dirty);
     }
 
     @Override
     public void registerCoreEnv(String key, String value) {
-
+        mOriginBridge.registerCoreEnv(key, value);
     }
 
     @Override
@@ -487,12 +469,15 @@ public class DebugBridge implements IWXBridge {
         mOriginBridge.reportNativeInitStatus(statusCode, errorMsg);
     }
 
-    public void calculateLayout(String instanceId, String ref) {
-        if (null != mJsManager) {
-//      mJsManager.calculateLayout(instanceId, ref);
-        }
+    @Override
+    public void setTimeoutNative(String callbackId, String time) {
+        mOriginBridge.setTimeoutNative(callbackId, time);
     }
 
+    @Override
+    public void setJSFrmVersion(String version) {
+        mOriginBridge.setJSFrmVersion(version);
+    }
 
     public void setSession(SimpleSession session) {
         mSession = session;
