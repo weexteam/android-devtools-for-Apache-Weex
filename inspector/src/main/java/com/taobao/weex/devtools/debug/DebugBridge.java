@@ -78,8 +78,6 @@ public class DebugBridge implements IWXBridge {
             }
         }
 
-        final String className = this.getClass().getName().replace('.', '/');
-        jsFunctions.initWxBridge(this, className);
         return sendMessage(getInitFrameworkMessage(framework, params));
     }
 
@@ -477,6 +475,12 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void setJSFrmVersion(String version) {
         mOriginBridge.setJSFrmVersion(version);
+    }
+
+    @Override
+    public void resetWXBridge(boolean remoteDebug) {
+        final String className = this.getClass().getName().replace('.', '/');
+        jsFunctions.resetWXBridge(this, className);
     }
 
     public void setSession(SimpleSession session) {
