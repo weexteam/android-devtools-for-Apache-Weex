@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.common.IWXDebugProxy;
 import com.taobao.weex.devtools.debug.DebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
@@ -20,6 +21,7 @@ import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXWsonJSONSwitch;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -413,25 +415,39 @@ public class WxDebug implements ChromeDevtoolsDomain {
             options = jsonObject.toString().getBytes();
         }
         if ("callNativeModule".equals(syncMethod)) {
-            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeModule(
-                    instanceId,
+             result = DebugBridge.getInstance().callNativeModule(instanceId,
                     domain,
                     method,
-                    arguments,
-                    options);
+                    WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
+                    WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
+//            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeModule(
+//                    instanceId,
+//                    domain,
+//                    method,
+//                    arguments,
+//                    options);
         } else if ("callNativeComponent".equals(syncMethod)) {
-            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeComponent(
-                    instanceId,
+            DebugBridge.getInstance().callNativeComponent(instanceId,
                     domain,
                     method,
-                    arguments,
-                    options);
+                    WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
+                    WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
+//            DebugBridge.getInstance().getJsFunctions().jsHandleCallNativeComponent(
+//                    instanceId,
+//                    domain,
+//                    method,
+//                    arguments,
+//                    options);
         }
 
         response.method = "WxDebug.syncReturn";
         SyncCallResponseParams param = new SyncCallResponseParams();
         param.syncId = syncId;
-        param.ret = JSON.toJSON(result);
+        if (result instanceof WXJSObject) {
+            param.ret = WXWsonJSONSwitch.fromObjectToJSONString((WXJSObject) result);
+        } else {
+            param.ret = JSON.toJSON(result);
+        }
         response.params = param;
         return response;
     }
