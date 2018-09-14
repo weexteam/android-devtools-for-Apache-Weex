@@ -14,8 +14,8 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IWXDebugProxy;
-import com.taobao.weex.common.IWXJsFunctions;
+import com.taobao.weex.common.IDebugProxy;
+import com.taobao.weex.common.IWXDebugJsBridge;
 import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.Util;
@@ -42,9 +42,10 @@ import java.util.Map;
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
-public class DebugServerProxy implements IWXDebugProxy {
+public class DebugServerProxy implements IDebugProxy {
+
     private static final String TAG = "DebugServerProxy";
-    private static final String DEVTOOL_VERSION = "0.12.0";
+    private static final String DEVTOOL_VERSION = "0.16.21";
     private SocketClient mWebSocketClient;
     private ObjectMapper mObjectMapper = new ObjectMapper();
     private MethodDispatcher mMethodDispatcher;
@@ -53,7 +54,7 @@ public class DebugServerProxy implements IWXDebugProxy {
     public String mRemoteUrl = WXEnvironment.sRemoteDebugProxyUrl;
     private WXBridgeManager mJsManager;
     private Context mContext;
-    private DebugBridge mBridge;
+    private DebugWXBridge mBridge;
 
     public DebugServerProxy(Context context, WXBridgeManager jsManager) {
         if (context == null) {
@@ -90,7 +91,7 @@ public class DebugServerProxy implements IWXDebugProxy {
     }
 
     @Override
-    public void start(IWXJsFunctions jsFunctions) {
+    public void start(IWXDebugJsBridge wxDebugJsBridge) {
         synchronized (DebugServerProxy.class) {
             if (mContext == null) {
                 new IllegalArgumentException("Context is null").printStackTrace();
@@ -98,10 +99,10 @@ public class DebugServerProxy implements IWXDebugProxy {
             }
             WXEnvironment.sDebugServerConnectable = true;
             WeexInspector.initializeWithDefaults(mContext);
-            mBridge = DebugBridge.getInstance();
+            mBridge = DebugWXBridge.getInstance();
             mBridge.setSession(mWebSocketClient);
             mBridge.setBridgeManager(mJsManager);
-            mBridge.setJsFunctions(jsFunctions);
+            mBridge.setWXDebugJsBridge(wxDebugJsBridge);
             mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
 
                 private String getShakeHandsMessage() {
@@ -188,7 +189,7 @@ public class DebugServerProxy implements IWXDebugProxy {
 //    WXEnvironment.sDebugServerConnectable = false;
         WXSDKEngine.reload(WXEnvironment.getApplication(), false);
         WXEnvironment.getApplication().sendBroadcast(new Intent()
-                .setAction(IWXDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
                 .putExtra("params", "")
         );
     }
@@ -196,7 +197,7 @@ public class DebugServerProxy implements IWXDebugProxy {
     @Override
     public IWXBridge getWXBridge() {
         if (mBridge == null) {
-            WXLogUtils.e(TAG, "DebugBridge is null!");
+            WXLogUtils.e(TAG, "DebugWXBridge is null!");
         }
         return mBridge;
     }

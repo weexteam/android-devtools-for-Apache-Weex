@@ -2,7 +2,7 @@ package com.taobao.weex.devtools.debug;
 
 import android.text.TextUtils;
 import android.util.Log;
-import com.taobao.weex.utils.*;
+
 import com.alibaba.fastjson.JSON;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -15,7 +15,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IWXJsFunctions;
+import com.taobao.weex.common.IWXDebugJsBridge;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 import com.taobao.weex.dom.CSSShorthand;
@@ -32,15 +32,15 @@ import java.util.Map;
  * Created by budao on 16/6/25
  * .
  */
-public class DebugBridge implements IWXBridge {
+public class DebugWXBridge implements IWXBridge {
 
-    private static final String TAG = "DebugBridge";
-    private static volatile DebugBridge sInstance;
+    private static final String TAG = "DebugWXBridge";
+    private static volatile DebugWXBridge sInstance;
     private final Object mLock = new Object();
     private WXBridgeManager mJsManager;
     private volatile SimpleSession mSession;
     private IWXBridge mOriginBridge;
-    private IWXJsFunctions jsFunctions;
+    private IWXDebugJsBridge mWXDebugJsBridge;
     public static final MediaType MEDIA_TYPE_MARKDOWN
             = MediaType.parse("application/json; charset=utf-8");
 
@@ -48,16 +48,16 @@ public class DebugBridge implements IWXBridge {
     private String syncCallJSURL = "";
 
 
-    private DebugBridge() {
+    private DebugWXBridge() {
         //TODO params
         mOriginBridge = new WXBridge();
     }
 
-    public static DebugBridge getInstance() {
+    public static DebugWXBridge getInstance() {
         if (sInstance == null) {
-            synchronized (DebugBridge.class) {
+            synchronized (DebugWXBridge.class) {
                 if (sInstance == null) {
-                    sInstance = new DebugBridge();
+                    sInstance = new DebugWXBridge();
                 }
             }
         }
@@ -480,7 +480,7 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void resetWXBridge(boolean remoteDebug) {
         final String className = this.getClass().getName().replace('.', '/');
-        jsFunctions.resetWXBridge(this, className);
+        mWXDebugJsBridge.resetWXBridge(this, className);
     }
 
     public void setSession(SimpleSession session) {
@@ -579,11 +579,11 @@ public class DebugBridge implements IWXBridge {
         }
     }
 
-    public void setJsFunctions(IWXJsFunctions jsFunctions) {
-        this.jsFunctions = jsFunctions;
+    public void setWXDebugJsBridge(IWXDebugJsBridge wxDebugJsBridge) {
+        this.mWXDebugJsBridge = wxDebugJsBridge;
     }
 
-    public IWXJsFunctions getJsFunctions() {
-        return jsFunctions;
+    public IWXDebugJsBridge getWXDebugJsBridge() {
+        return mWXDebugJsBridge;
     }
 }
