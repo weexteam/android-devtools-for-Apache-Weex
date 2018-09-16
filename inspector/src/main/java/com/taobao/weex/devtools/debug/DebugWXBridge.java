@@ -12,10 +12,10 @@ import com.squareup.okhttp.Response;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXDebugJsBridge;
 import com.taobao.weex.bridge.WXJSObject;
 import com.taobao.weex.bridge.WXParams;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IWXDebugJsBridge;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 import com.taobao.weex.dom.CSSShorthand;
@@ -40,7 +40,7 @@ public class DebugWXBridge implements IWXBridge {
     private WXBridgeManager mJsManager;
     private volatile SimpleSession mSession;
     private IWXBridge mOriginBridge;
-    private IWXDebugJsBridge mWXDebugJsBridge;
+    private WXDebugJsBridge mWXDebugJsBridge;
     public static final MediaType MEDIA_TYPE_MARKDOWN
             = MediaType.parse("application/json; charset=utf-8");
 
@@ -579,11 +579,11 @@ public class DebugWXBridge implements IWXBridge {
         }
     }
 
-    public void setWXDebugJsBridge(IWXDebugJsBridge wxDebugJsBridge) {
+    public void setWXDebugJsBridge(WXDebugJsBridge wxDebugJsBridge) {
         this.mWXDebugJsBridge = wxDebugJsBridge;
     }
 
-    public IWXDebugJsBridge getWXDebugJsBridge() {
+    public WXDebugJsBridge getWXDebugJsBridge() {
         return mWXDebugJsBridge;
     }
 }

@@ -11,12 +11,11 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXDebugJsBridge;
 import com.taobao.weex.common.IWXBridge;
-import com.taobao.weex.common.IDebugProxy;
-import com.taobao.weex.common.IWXDebugJsBridge;
 import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.Util;
@@ -43,7 +42,7 @@ import java.util.Map;
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
 
-public class DebugServerProxy implements IDebugProxy {
+public class DebugServerProxy {
 
     private static final String TAG = "DebugServerProxy";
     private static final String DEVTOOL_VERSION = "0.16.21";
@@ -91,7 +90,6 @@ public class DebugServerProxy implements IDebugProxy {
         return deviceId;
     }
 
-    @Override
     public void start(WXDebugJsBridge wxDebugJsBridge) {
         synchronized (DebugServerProxy.class) {
             if (mContext == null) {
@@ -171,7 +169,6 @@ public class DebugServerProxy implements IDebugProxy {
         }
     }
 
-    @Override
     public void stop(boolean reload) {
         synchronized (DebugServerProxy.class) {
             if (mWebSocketClient != null) {
@@ -187,15 +184,13 @@ public class DebugServerProxy implements IDebugProxy {
     }
 
     private void switchLocalRuntime() {
-//    WXEnvironment.sDebugServerConnectable = false;
         WXSDKEngine.reload(WXEnvironment.getApplication(), false);
         WXEnvironment.getApplication().sendBroadcast(new Intent()
-                .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                 .putExtra("params", "")
         );
     }
 
-    @Override
     public IWXBridge getWXBridge() {
         if (mBridge == null) {
             WXLogUtils.e(TAG, "DebugWXBridge is null!");

@@ -7,9 +7,10 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
-import com.taobao.weex.common.IDebugProxy;
+import com.taobao.weex.devtools.debug.DebugServerProxy;
 import com.taobao.weex.devtools.debug.DebugWXBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
@@ -58,7 +59,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         if (context != null) {
             WXSDKEngine.reload(context, true);
             context.sendBroadcast(new Intent()
-                    .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                    .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                     .putExtra("params", null == params ? "" : params.toString())
             );
         }
@@ -71,7 +72,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         if (context != null) {
             WXSDKEngine.reload(context, false);
             context.sendBroadcast(new Intent()
-                    .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                    .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                     .putExtra("params", null == params ? "" : params.toString())
             );
         }
@@ -361,7 +362,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         Context context = WXEnvironment.getApplication();
         if (context != null) {
             context.sendBroadcast(new Intent()
-                    .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                    .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                     .putExtra("params", null == params ? "" : params.toString())
             );
         }
@@ -373,7 +374,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         Context context = WXEnvironment.getApplication();
         if (context != null) {
             context.sendBroadcast(new Intent()
-                    .setAction(IDebugProxy.ACTION_DEBUG_INSTANCE_REFRESH)
+                    .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                     .putExtra("params", null == params ? "" : params.toString())
             );
         }
