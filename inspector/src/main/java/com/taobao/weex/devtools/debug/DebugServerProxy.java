@@ -13,6 +13,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.bridge.WXBridgeManager;
+import com.taobao.weex.bridge.WXDebugJsBridge;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IDebugProxy;
 import com.taobao.weex.common.IWXDebugJsBridge;
@@ -91,7 +92,7 @@ public class DebugServerProxy implements IDebugProxy {
     }
 
     @Override
-    public void start(IWXDebugJsBridge wxDebugJsBridge) {
+    public void start(WXDebugJsBridge wxDebugJsBridge) {
         synchronized (DebugServerProxy.class) {
             if (mContext == null) {
                 new IllegalArgumentException("Context is null").printStackTrace();
