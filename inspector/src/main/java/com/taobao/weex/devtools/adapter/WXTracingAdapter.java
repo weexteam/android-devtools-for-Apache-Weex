@@ -14,7 +14,7 @@ import com.taobao.weex.WXSDKManager;
 import com.taobao.weex.adapter.ITracingAdapter;
 import com.taobao.weex.common.WXPerformance;
 import com.taobao.weex.devtools.common.LogUtil;
-import com.taobao.weex.devtools.debug.DebugWXBridge;
+import com.taobao.weex.devtools.debug.WXDebugBridge;
 import com.taobao.weex.devtools.toolbox.PerformanceActivity;
 import com.taobao.weex.devtools.trace.DomTracker;
 import com.taobao.weex.devtools.trace.HealthReport;
@@ -145,7 +145,7 @@ public class WXTracingAdapter implements ITracingAdapter {
 
   private void sendTracingData(final String instanceId) {
 
-    if (!DebugWXBridge.getInstance().isSessionActive()) {
+    if (!WXDebugBridge.getInstance().isSessionActive()) {
       WXLogUtils.w("WXTracingAdapter", "Debug session not active");
       return;
     }
@@ -159,12 +159,12 @@ public class WXTracingAdapter implements ITracingAdapter {
       rpc.put("method", "WxDebug.sendTracingData");
       rpc.put("params", data);
 
-      DebugWXBridge.getInstance().sendToRemote(rpc.toString());
+      WXDebugBridge.getInstance().sendToRemote(rpc.toString());
     } catch (Throwable throwable) {
       throwable.printStackTrace();
     }
 
-    DebugWXBridge.getInstance().post(new Runnable() {
+    WXDebugBridge.getInstance().post(new Runnable() {
       @Override
       public void run() {
         sendSummaryInfo(String.valueOf(instanceId));
@@ -222,7 +222,7 @@ public class WXTracingAdapter implements ITracingAdapter {
         rpc.put("method", "WxDebug.sendSummaryInfo");
         rpc.put("params", data);
         LogUtil.d("SummaryInfo", params.toString());
-        DebugWXBridge.getInstance().sendToRemote(rpc.toString());
+        WXDebugBridge.getInstance().sendToRemote(rpc.toString());
       } catch (JSONException e) {
         e.printStackTrace();
       }

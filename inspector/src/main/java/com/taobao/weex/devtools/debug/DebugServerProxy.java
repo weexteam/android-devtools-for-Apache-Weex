@@ -55,7 +55,7 @@ public class DebugServerProxy {
     public String mRemoteUrl = WXEnvironment.sRemoteDebugProxyUrl;
     private WXBridgeManager mWXJsManager;
     private WXDebugJsBridge mWXDebugJsBridge;
-    private DebugWXBridge mWXBridge;
+    private WXDebugBridge mWXBridge;
     private Context mContext;
 
     public DebugServerProxy(Context context, IWXDebugConfig wxDebugAdapter) {
@@ -105,7 +105,7 @@ public class DebugServerProxy {
             }
             WXEnvironment.sDebugServerConnectable = true;
             WeexInspector.initializeWithDefaults(mContext);
-            mWXBridge = DebugWXBridge.getInstance();
+            mWXBridge = WXDebugBridge.getInstance();
             mWXBridge.setSession(mWebSocketClient);
             mWXBridge.setBridgeManager(mWXJsManager);
             mWXBridge.setWXDebugJsBridge(mWXDebugJsBridge);
@@ -200,7 +200,7 @@ public class DebugServerProxy {
 
     public IWXBridge getWXBridge() {
         if (mWXBridge == null) {
-            WXLogUtils.e(TAG, "DebugWXBridge is null!");
+            WXLogUtils.e(TAG, "WXDebugBridge is null!");
         }
         return mWXBridge;
     }

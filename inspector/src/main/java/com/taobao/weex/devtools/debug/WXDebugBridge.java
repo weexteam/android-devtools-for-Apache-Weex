@@ -32,10 +32,10 @@ import java.util.Map;
  * Created by budao on 16/6/25
  * .
  */
-public class DebugWXBridge implements IWXBridge {
+public class WXDebugBridge implements IWXBridge {
 
-    private static final String TAG = "DebugWXBridge";
-    private static volatile DebugWXBridge sInstance;
+    private static final String TAG = "WXDebugBridge";
+    private static volatile WXDebugBridge sInstance;
     private final Object mLock = new Object();
     private WXBridgeManager mJsManager;
     private volatile SimpleSession mSession;
@@ -47,17 +47,16 @@ public class DebugWXBridge implements IWXBridge {
     private final OkHttpClient client = new OkHttpClient();
     private String syncCallJSURL = "";
 
-
-    private DebugWXBridge() {
+    private WXDebugBridge() {
         //TODO params
         mOriginBridge = new WXBridge();
     }
 
-    public static DebugWXBridge getInstance() {
+    public static WXDebugBridge getInstance() {
         if (sInstance == null) {
-            synchronized (DebugWXBridge.class) {
+            synchronized (WXDebugBridge.class) {
                 if (sInstance == null) {
-                    sInstance = new DebugWXBridge();
+                    sInstance = new WXDebugBridge();
                 }
             }
         }

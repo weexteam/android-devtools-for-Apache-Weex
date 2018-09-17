@@ -10,8 +10,7 @@ import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
-import com.taobao.weex.devtools.debug.DebugServerProxy;
-import com.taobao.weex.devtools.debug.DebugWXBridge;
+import com.taobao.weex.devtools.debug.WXDebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
 import com.taobao.weex.devtools.inspector.network.NetworkEventReporterImpl;
@@ -108,7 +107,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         //TODO CREATEBODY  callCreateBody
 
         if (params != null) {
-//      DebugWXBridge.getInstance().callNative(
+//      WXDebugBridge.getInstance().callNative(
 //              params.optString("instance"),
 //              params.optString("tasks"),
 //              params.optString("callback"));
@@ -119,7 +118,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
             WXBridgeManager.getInstance().post(new Runnable() {
                 @Override
                 public void run() {
-                    DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallNative(instance, tasks, callback);
+                    WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallNative(instance, tasks, callback);
                 }
             });
         }
@@ -139,7 +138,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
 //        final String callBack = params.optString("callback");
         final String dom = params.optString("dom");
 
-        //      DebugWXBridge.getInstance().callAddElement(
+        //      WXDebugBridge.getInstance().callAddElement(
         //          params.optString("instance"),
         //          params.optString("ref"),
         //          params.optString("dom"),
@@ -150,7 +149,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallAddElement(instanceInd, ref, dom, index);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallAddElement(instanceInd, ref, dom, index);
             }
         });
     }
@@ -171,7 +170,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallCreateBody(instanceInd, domStr);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallCreateBody(instanceInd, domStr);
             }
         });
     }
@@ -194,7 +193,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateFinish(instanceInd, task.getBytes(), domStr);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateFinish(instanceInd, task.getBytes(), domStr);
             }
         });
 
@@ -213,7 +212,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallCreateFinish(instanceInd);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallCreateFinish(instanceInd);
             }
         });
 
@@ -237,7 +236,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallRefreshFinish(instanceInd, task.getBytes(), callback);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallRefreshFinish(instanceInd, task.getBytes(), callback);
             }
         });
     }
@@ -256,7 +255,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateAttrs(instanceInd, ref, data);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateAttrs(instanceInd, ref, data);
             }
         });
     }
@@ -275,7 +274,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateStyle(instanceInd, ref, data);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallUpdateStyle(instanceInd, ref, data);
             }
         });
     }
@@ -293,7 +292,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallRemoveElement(instanceInd, ref);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallRemoveElement(instanceInd, ref);
             }
         });
     }
@@ -312,7 +311,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallMoveElement(instanceInd, ref, parentRef, index_str);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallMoveElement(instanceInd, ref, parentRef, index_str);
             }
         });
     }
@@ -330,7 +329,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallAddEvent(instanceInd, ref, event);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallAddEvent(instanceInd, ref, event);
             }
         });
     }
@@ -350,7 +349,7 @@ public class WxDebug implements ChromeDevtoolsDomain {
         WXBridgeManager.getInstance().post(new Runnable() {
             @Override
             public void run() {
-                DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallRemoveEvent(instanceInd, ref, event);
+                WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallRemoveEvent(instanceInd, ref, event);
             }
         });
     }
@@ -415,24 +414,24 @@ public class WxDebug implements ChromeDevtoolsDomain {
             options = jsonObject.toString().getBytes();
         }
         if ("callNativeModule".equals(syncMethod)) {
-             result = DebugWXBridge.getInstance().callNativeModule(instanceId,
+             result = WXDebugBridge.getInstance().callNativeModule(instanceId,
                     domain,
                     method,
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
-//            DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeModule(
+//            WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeModule(
 //                    instanceId,
 //                    domain,
 //                    method,
 //                    arguments,
 //                    options);
         } else if ("callNativeComponent".equals(syncMethod)) {
-            DebugWXBridge.getInstance().callNativeComponent(instanceId,
+            WXDebugBridge.getInstance().callNativeComponent(instanceId,
                     domain,
                     method,
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
-//            DebugWXBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeComponent(
+//            WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeComponent(
 //                    instanceId,
 //                    domain,
 //                    method,
