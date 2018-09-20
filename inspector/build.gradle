@@ -72,6 +72,7 @@ dependencies {
     provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
 //    debugProvided project(path: ':weex_sdk', configuration: 'debug')
 //    releaseProvided project(path: ':weex_sdk', configuration: 'release')
+    provided "com.taobao.android:windmill_basic:1.0.0.1-SNAPSHOT"
     provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
     provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 
