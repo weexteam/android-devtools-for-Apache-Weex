@@ -37,7 +37,6 @@ public class WXDebugBridge implements IWXBridge {
     private static final String TAG = "WXDebugBridge";
     private static volatile WXDebugBridge sInstance;
     private final Object mLock = new Object();
-    private WXBridgeManager mJsManager;
     private volatile SimpleSession mSession;
     private IWXBridge mOriginBridge;
     private WXDebugJsBridge mWXDebugJsBridge;
@@ -491,10 +490,6 @@ public class WXDebugBridge implements IWXBridge {
             syncCallJSURL = temp[0] + "syncCallJS" + temp[1];
             syncCallJSURL = "http://" + syncCallJSURL.split("://")[1];
         }
-    }
-
-    public void setBridgeManager(WXBridgeManager bridgeManager) {
-        mJsManager = bridgeManager;
     }
 
     public void sendToRemote(String message) {
