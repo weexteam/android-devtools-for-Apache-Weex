@@ -52,57 +52,69 @@ public class WMLDebugBridge implements IWMLBridge {
   }
 
   @Override
-  public int initAppFramework(String s, String s1, WXJSObject[] wxjsObjects) {
-//    while (mSession == null || (mSession != null && !mSession.isOpen())) {
-//      synchronized (mLock) {
-//        try {
-//          Log.v(TAG, "waiting for session now");
-//          mLock.wait(1000);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//      }
-//    }
-//
-//    return sendMessage(getInitFrameworkMessage(framework, params));
-    return mOriginBridge.initAppFramework(s, s1, wxjsObjects);
+  public int initAppFramework(String appId, String framework, String frameworkName, WXJSObject[] args) {
+    while (mSession == null || (mSession != null && !mSession.isOpen())) {
+      synchronized (mLock) {
+        try {
+          Log.v(TAG, "waiting for session now");
+          mLock.wait(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
+    ArrayList<Object> env = new ArrayList<>();
+    int argsCount = args == null ? 0 : args.length;
+    for (int i = 0; i < argsCount; i++) {
+      if (args[i] != null) {
+        if (args[i].type != WXJSObject.String) {
+          env.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+        } else {
+          env.add(args[i].data);
+        }
+      }
+    }
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("appId", appId);
+    params.put("source", framework);
+    params.put("bundleUrl", "windmill.worker.js");
+    params.put("env", env);
+
+    Map<String, Object> map = new HashMap<>();
+    map.put("method", "WMLDebug.initRuntimeWoker");
+    map.put("params", params);
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
-  public int execJsOnApp(String s, String s1, WXJSObject[] wxjsObjects) {
+  public int execJsOnApp(String appId, String function, WXJSObject[] args) {
 
-    //    ArrayList<Object> array = new ArrayList<>();
-//    int argsCount = args == null ? 0 : args.length;
-//    for (int i = 0; i < argsCount; i++) {
-//      if (args[i] != null) {
-//        if (args[i].type != WXJSObject.String) {
-//          array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
-//        } else {
-//          array.add(args[i].data);
-//        }
-//      }
-//    }
-//
-//    Map<String, Object> func = new HashMap<>();
-//    if (TextUtils.equals(function, "registerComponents") || TextUtils.equals(function, "registerModules") || TextUtils.equals(function, "destroyInstance")) {
-//      func.put(WXDebugConstants.METHOD, function);
-//    } else if (TextUtils.equals(function, "createInstance")) {
-//      func.put(WXDebugConstants.METHOD, "createInstance");
-//    } else {
-//      func.put(WXDebugConstants.METHOD, WXDebugConstants.WEEX_CALL_JAVASCRIPT);
-//    }
-//    func.put(WXDebugConstants.ARGS, array);
-//
-//    Map<String, Object> map = new HashMap<>();
-//    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
-//    map.put(WXDebugConstants.PARAMS, func);
-//    return sendMessage(JSON.toJSONString(map));
-//
-    return mOriginBridge.execJsOnApp(s, s1, wxjsObjects);
+    ArrayList<Object> array = new ArrayList<>();
+    int argsCount = args == null ? 0 : args.length;
+    for (int i = 0; i < argsCount; i++) {
+      if (args[i] != null) {
+        if (args[i].type != WXJSObject.String) {
+          array.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
+        } else {
+          array.add(args[i].data);
+        }
+      }
+    }
+
+    Map<String, Object> func = new HashMap<>();
+    func.put("method", function);
+    func.put("args", array);
+
+    Map<String, Object> map = new HashMap<>();
+    map.put("method", "WMLDebug.callJS");
+    map.put("params", func);
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
-  public byte[] execJsOnAppWithResult(String s, String s1, Map<String, Object> map) {
+  public byte[] execJsOnAppWithResult(String appId, String function, Map<String, Object> params) {
 
 //    String result = "";
 //
@@ -150,11 +162,11 @@ public class WMLDebugBridge implements IWMLBridge {
 //
 //    return WXWsonJSONSwitch.convertJSONToWsonIfUseWson(result.getBytes());
 
-    return mOriginBridge.execJsOnAppWithResult(s, s1, map);
+    return mOriginBridge.execJsOnAppWithResult(appId, function, params);
   }
 
   @Override
-  public int createAppContext(String s, String s1, Map<String, Object> map) {
+  public int createAppContext(String appId, String template, Map<String, Object> params) {
 
 //    WXJSObject wxjsObjects1[] = new WXJSObject[4];
 //    WXJSObject wxjsObjects2[] = new WXJSObject[3];
@@ -176,22 +188,22 @@ public class WMLDebugBridge implements IWMLBridge {
 //    wxjsObjects2[2] = bundleUrl;
 //    return doImportScript(s, s1, "importScript", wxjsObjects2);
 
-    return mOriginBridge.createAppContext(s, s1, map);
+    return mOriginBridge.createAppContext(appId, template, params);
   }
 
   @Override
-  public int destoryAppContext(String s) {
-    return mOriginBridge.destoryAppContext(s);
+  public int destoryAppContext(String appId) {
+    return mOriginBridge.destoryAppContext(appId);
   }
 
   @Override
-  public void postMessage(String s, byte[] bytes) {
-    mOriginBridge.postMessage(s, bytes);
+  public void postMessage(String appId, byte[] data) {
+    mOriginBridge.postMessage(appId, data);
   }
 
   @Override
-  public void dispatchMessage(String s, String s1, byte[] bytes, String s2) {
-    mOriginBridge.dispatchMessage(s, s1, bytes, s2);
+  public void dispatchMessage(String clientId, String appId, byte[] params, String callbackId) {
+    mOriginBridge.dispatchMessage(clientId, appId, params, callbackId);
   }
 
   public void setSession(SimpleSession session) {
@@ -211,45 +223,6 @@ public class WMLDebugBridge implements IWMLBridge {
       mSession = null;
       mLock.notify();
     }
-  }
-
-  private String getInitFrameworkMessage(String framework, WXParams params) {
-    Map<String, Object> func = new HashMap<>();
-    func.put(WXDebugConstants.PARAM_JS_SOURCE, framework);
-    func.put(WXDebugConstants.PARAM_LAYOUT_SANDBOX, "true");
-    if (params != null) {
-      Map<String, Object> environmentMap = getEnvironmentMap(params);
-      if (environmentMap != null && environmentMap.size() > 0) {
-        Map<String, Object> wxEnvironment = new HashMap<>();
-        wxEnvironment.put(WXDebugConstants.ENV_WX_ENVIRONMENT, environmentMap);
-        func.put(WXDebugConstants.PARAM_INIT_ENV, wxEnvironment);
-      }
-    }
-
-    Map<String, Object> map = new HashMap<>();
-    map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_INIT_RUNTIME);
-    map.put(WXDebugConstants.PARAMS, func);
-
-    return JSON.toJSONString(map);
-  }
-
-  private Map<String, Object> getEnvironmentMap(WXParams params) {
-    Map<String, Object> environment = new HashMap<>();
-    environment.put(WXDebugConstants.ENV_APP_NAME, params.getAppName());
-    environment.put(WXDebugConstants.ENV_APP_VERSION, params.getAppVersion());
-    environment.put(WXDebugConstants.ENV_PLATFORM, params.getPlatform());
-    environment.put(WXDebugConstants.ENV_OS_VERSION, params.getOsVersion());
-    environment.put(WXDebugConstants.ENV_LOG_LEVEL, params.getLogLevel());
-    environment.put(WXDebugConstants.ENV_WEEX_VERSION, params.getWeexVersion());
-    environment.put(WXDebugConstants.ENV_DEVICE_MODEL, params.getDeviceModel());
-    environment.put(WXDebugConstants.ENV_INFO_COLLECT, params.getShouldInfoCollect());
-    environment.put(WXDebugConstants.ENV_DEVICE_WIDTH, params.getDeviceWidth());
-    environment.put(WXDebugConstants.ENV_DEVICE_HEIGHT, params.getDeviceHeight());
-    environment.put("runtime", "devtools");
-
-    environment.putAll(WXEnvironment.getCustomOptions());
-
-    return environment;
   }
 
   private int sendMessage(String message) {
