@@ -61,18 +61,22 @@ public class DebugServerProxy {
     private Context mContext;
 
     public DebugServerProxy(Context context, IWXDebugConfig wxDebugAdapter) {
+
         if (context == null) {
             throw new IllegalArgumentException("Context of DebugServerProxy should not be null");
         }
         mContext = context;
         mWebSocketClient = SocketClientFactory.create(this);
-        if (wxDebugAdapter.getWXJSManager() != null) {
-            mWXJsManager = wxDebugAdapter.getWXJSManager();
-        }
-        if (wxDebugAdapter.getWXDebugJsBridge() != null) {
-            mWXDebugJsBridge = wxDebugAdapter.getWXDebugJsBridge();
-        }
         mPeer = new JsonRpcPeer(mObjectMapper, mWebSocketClient);
+
+        if (wxDebugAdapter != null) {
+            if (wxDebugAdapter.getWXJSManager() != null) {
+                mWXJsManager = wxDebugAdapter.getWXJSManager();
+            }
+            if (wxDebugAdapter.getWXDebugJsBridge() != null) {
+                mWXDebugJsBridge = wxDebugAdapter.getWXDebugJsBridge();
+            }
+        }
     }
 
     private static void logDispatchException(JsonRpcException e) {
