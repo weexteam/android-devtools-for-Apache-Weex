@@ -2,24 +2,16 @@ package com.taobao.weex.devtools.debug;
 
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
-import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXJSObject;
-import com.taobao.weex.bridge.WXParams;
-import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.devtools.websocket.SimpleSession;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.windmill.bridge.IWMLBridge;
 import com.taobao.windmill.bridge.WMLBridge;
+import com.taobao.windmill.bundle.container.common.WMLConstants;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +73,11 @@ public class WMLDebugBridge implements IWMLBridge {
     params.put("env", env);
 
     Map<String, Object> map = new HashMap<>();
-    map.put("method", "WMLDebug.initRuntimeWoker");
+    if (TextUtils.equals(frameworkName, WMLConstants.NAME_WINDMILL_WORKER_JS)) {
+      map.put("method", "WMLDebug.initRuntimeWorker");
+    } else {
+      map.put("method", "WMLDebug.initAppFrameworkWorker");
+    }
     map.put("params", params);
     return sendMessage(JSON.toJSONString(map));
   }
@@ -102,6 +98,7 @@ public class WMLDebugBridge implements IWMLBridge {
     }
 
     Map<String, Object> func = new HashMap<>();
+    func.put("appId", appId);
     func.put("method", function);
     func.put("args", array);
 

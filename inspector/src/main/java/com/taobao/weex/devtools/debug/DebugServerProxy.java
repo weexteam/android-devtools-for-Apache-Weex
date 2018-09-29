@@ -17,6 +17,7 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXDebugJsBridge;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugConfig;
+import com.taobao.weex.devtools.WMLInspector;
 import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.Util;
@@ -187,6 +188,7 @@ public class DebugServerProxy {
                 new IllegalArgumentException("Context is null").printStackTrace();
                 return;
             }
+            WMLInspector.initializeWithDefaults(mContext);
             mWMLBridge = WMLDebugBridge.getInstance();
             mWMLBridge.setSession(mWebSocketClient);
             mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
@@ -220,7 +222,7 @@ public class DebugServerProxy {
                             if (mWMLBridge != null) {
                                 mWMLBridge.onConnected();
                             }
-                            mDomainModules = new WeexInspector.DefaultInspectorModulesBuilder(mContext).finish();
+                            mDomainModules = new WMLInspector.DefaultInspectorModulesBuilder(mContext).finish();
                             mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
                             WXSDKManager.getInstance().postOnUiThread(
                                     new Runnable() {
