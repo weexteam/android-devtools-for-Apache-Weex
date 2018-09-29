@@ -116,7 +116,7 @@ android.libraryVariants.all { variant ->
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.16.38'
+version '0.16.40'
 
 def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
 def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'

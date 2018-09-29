@@ -31,9 +31,7 @@ public class WMLDebugBridge implements IWMLBridge {
   private final Object mLock = new Object();
   private volatile SimpleSession mSession;
   private IWMLBridge mOriginBridge;
-  public static final MediaType MEDIA_TYPE_MARKDOWN
-          = MediaType.parse("application/json; charset=utf-8");
-  private final OkHttpClient client = new OkHttpClient();
+  private final OkHttpClient mHttpclient = new OkHttpClient();
 
 
   private WMLDebugBridge() {
@@ -79,7 +77,7 @@ public class WMLDebugBridge implements IWMLBridge {
     Map<String, Object> params = new HashMap<>();
     params.put("appId", appId);
     params.put("source", framework);
-    params.put("bundleUrl", "windmill.worker.js");
+    params.put("bundleUrl", frameworkName);
     params.put("env", env);
 
     Map<String, Object> map = new HashMap<>();
@@ -168,32 +166,27 @@ public class WMLDebugBridge implements IWMLBridge {
   @Override
   public int createAppContext(String appId, String template, Map<String, Object> params) {
 
-//    WXJSObject wxjsObjects1[] = new WXJSObject[4];
-//    WXJSObject wxjsObjects2[] = new WXJSObject[3];
-//
-//    WXJSObject instanceId = wxjsObjects[0];
-//    WXJSObject code = wxjsObjects[1];
-//    WXJSObject bundleUrl = wxjsObjects[2];
-//    WXJSObject options = wxjsObjects[3];
-//    WXJSObject raxApi = wxjsObjects[4];
-//
-//    wxjsObjects1[0] = instanceId;
-//    wxjsObjects1[1] = bundleUrl;
-//    wxjsObjects1[2] = options;
-//    wxjsObjects1[3] = raxApi;
-//    doCreateInstanceContext(s, s1, "createInstanceContext", wxjsObjects1);
-//
-//    wxjsObjects2[0] = instanceId;
-//    wxjsObjects2[1] = code;
-//    wxjsObjects2[2] = bundleUrl;
-//    return doImportScript(s, s1, "importScript", wxjsObjects2);
+    Map<String, Object> debugParams = new HashMap<>();
+    debugParams.put("appId", appId);
+    debugParams.put("source", template);
+    debugParams.put("bundleUrl", "app.js");
 
-    return mOriginBridge.createAppContext(appId, template, params);
+    Map<String, Object> map = new HashMap<>();
+    map.put("method", "WMLDebug.importAppJS");
+    map.put("params", debugParams);
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
   public int destoryAppContext(String appId) {
-    return mOriginBridge.destoryAppContext(appId);
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("appId", appId);
+
+    Map<String, Object> map = new HashMap<>();
+    map.put("method", "WMLDebug.destoryAppContext");
+    map.put("params", params);
+    return sendMessage(JSON.toJSONString(map));
   }
 
   @Override
