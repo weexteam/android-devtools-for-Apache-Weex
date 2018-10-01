@@ -54,15 +54,11 @@ public class WMLDebugBridge implements IWMLBridge {
       }
     }
 
-    ArrayList<Object> env = new ArrayList<>();
+    Map<String, Object> env = new HashMap<>();
     int argsCount = args == null ? 0 : args.length;
     for (int i = 0; i < argsCount; i++) {
       if (args[i] != null) {
-        if (args[i].type != WXJSObject.String) {
-          env.add(WXWsonJSONSwitch.convertWXJSObjectDataToJSON(args[i]));
-        } else {
-          env.add(args[i].data);
-        }
+          env.put(args[i].key, args[i].data);
       }
     }
 

@@ -1,5 +1,13 @@
 package com.taobao.weex.devtools.inspector.protocol.module;
 
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
+
+import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.WXSDKEngine;
+import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.devtools.common.LogUtil;
 import com.taobao.weex.devtools.debug.WMLDebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
@@ -7,7 +15,9 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.utils.LogLevel;
+import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.windmill.bridge.WMLBridgeManager;
+import com.taobao.windmill.rt.util.WMLEnv;
 
 import org.json.JSONObject;
 
@@ -35,13 +45,28 @@ public class WMLDebug implements ChromeDevtoolsDomain {
     }
 
     @ChromeDevtoolsMethod
-    public void enable(JsonRpcPeer peer, JSONObject params) {
-        LogUtil.e("WMLDebug-new >>>> enable=" + params);
+    public void remoteDebug(JsonRpcPeer peer, JSONObject params) {
+        Context context = WMLEnv.getApplicationContext();
+        boolean remoteDebug = params.optBoolean("value");
+        if (context != null) {
+            WMLBridgeManager.getInstance().restart(remoteDebug, context);
+            LocalBroadcastManager.getInstance(WMLEnv.getApplicationContext()).sendBroadcast(new Intent("remote_debug_windmill"));
+        }
     }
 
     @ChromeDevtoolsMethod
     public void disable(JsonRpcPeer peer, JSONObject params) {
-        LogUtil.e("WMLDebug-new >>>> disable=" + params);
+
+    }
+
+    @ChromeDevtoolsMethod
+    public void reload(JsonRpcPeer peer, JSONObject params) {
+        String appId = params.optString("appId");
+        if (!TextUtils.isEmpty(appId)) {
+            Intent intent = new Intent("debug_windmill_reload");
+            intent.putExtra("appId", appId);
+            LocalBroadcastManager.getInstance(WMLEnv.getApplicationContext()).sendBroadcast(intent);
+        }
     }
 
     @ChromeDevtoolsMethod
