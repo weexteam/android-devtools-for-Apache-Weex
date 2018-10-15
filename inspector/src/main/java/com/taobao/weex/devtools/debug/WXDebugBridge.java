@@ -10,6 +10,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.taobao.weex.WXEnvironment;
+import com.taobao.weex.bridge.ResultCallback;
 import com.taobao.weex.bridge.WXBridge;
 import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXDebugJsBridge;
@@ -120,8 +121,7 @@ public class WXDebugBridge implements IWXBridge {
     }
 
     @Override
-    public byte[] execJSWithResult(String instanceId, String namespace, String function, WXJSObject[] args) {
-
+    public void execJSWithCallback(String instanceId, String namespace, String function, WXJSObject[] args, ResultCallback resultCallback) {
         String result = "";
 
         ArrayList<Object> array = new ArrayList<>();
@@ -148,8 +148,9 @@ public class WXDebugBridge implements IWXBridge {
         map.put(WXDebugConstants.METHOD, WXDebugConstants.METHOD_CALL_JS);
         map.put(WXDebugConstants.PARAMS, func);
 
-        if (TextUtils.isEmpty(syncCallJSURL))
-            return new byte[0];
+//        if (TextUtils.isEmpty(syncCallJSURL)) {
+//            return new byte[0];
+//        }
 
         Request request = new Request.Builder()
                 .url(syncCallJSURL)
@@ -166,7 +167,7 @@ public class WXDebugBridge implements IWXBridge {
             e.printStackTrace();
         }
 
-        return WXWsonJSONSwitch.convertJSONToWsonIfUseWson(result.getBytes());
+//        return WXWsonJSONSwitch.convertJSONToWsonIfUseWson(result.getBytes());
     }
 
     @Override
@@ -479,6 +480,11 @@ public class WXDebugBridge implements IWXBridge {
     public void resetWXBridge(boolean remoteDebug) {
         final String className = this.getClass().getName().replace('.', '/');
         mWXDebugJsBridge.resetWXBridge(this, className);
+    }
+
+    @Override
+    public void fireEventOnDataRenderNode(String s, String s1, String s2, String s3) {
+        mOriginBridge.fireEventOnDataRenderNode(s, s1, s2, s3);
     }
 
     public void setSession(SimpleSession session) {

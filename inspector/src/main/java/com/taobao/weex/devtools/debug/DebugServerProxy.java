@@ -34,6 +34,8 @@ import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.windmill.bridge.IWMLBridge;
+import com.taobao.windmill.bridge.WMLBridgeManager;
+import com.taobao.windmill.rt.util.WMLEnv;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -195,21 +197,17 @@ public class DebugServerProxy {
 
                 private String getShakeHandsMessage() {
                     Map<String, Object> func = new HashMap<>();
-                    func.put("name", WXEnvironment.getApplication().getPackageName() + " : " + android.os.Process.myPid());
-                    func.put("model", WXEnvironment.SYS_MODEL);
-                    func.put("weexVersion", WXEnvironment.WXSDK_VERSION);
-                    func.put("devtoolVersion", DEVTOOL_VERSION);
-                    func.put("platform", WXEnvironment.OS);
                     func.put("deviceId", getDeviceId(mContext));
-                    func.put("network", WXEnvironment.sDebugNetworkEventReporterEnable);
-                    if (WXEnvironment.sLogLevel != null) {
-                        func.put("logLevel", WXEnvironment.sLogLevel.getName());
-                    }
-                    func.put("remoteDebug", WXEnvironment.sRemoteDebugMode);
+                    func.put("platform", WXEnvironment.OS);
+                    func.put("model", WXEnvironment.SYS_MODEL);
+                    func.put("windmillVersion", WMLEnv.sWindmillVersion);
+                    func.put("devtoolVersion", DEVTOOL_VERSION);
+                    func.put("name", WMLEnv.sAppName);
+
+                    func.put("remoteDebug", WMLBridgeManager.sRemoteDebugMode);
 
                     Map<String, Object> map = new HashMap<>();
-                    map.put("id", "0");
-                    map.put("method", "WxDebug.registerDevice");
+                    map.put("method", "WMLDebug.registerDevice");
                     map.put("params", func);
                     return JSON.toJSONString(map);
                 }

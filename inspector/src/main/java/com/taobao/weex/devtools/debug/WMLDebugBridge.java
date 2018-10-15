@@ -11,6 +11,7 @@ import com.taobao.weex.utils.WXWsonJSONSwitch;
 import com.taobao.windmill.bridge.IWMLBridge;
 import com.taobao.windmill.bridge.WMLBridge;
 import com.taobao.windmill.bundle.container.common.WMLConstants;
+import com.taobao.windmill.bundle.container.utils.WMLLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,10 +25,48 @@ public class WMLDebugBridge implements IWMLBridge {
   private volatile SimpleSession mSession;
   private IWMLBridge mOriginBridge;
   private final OkHttpClient mHttpclient = new OkHttpClient();
-
+  private static WMLLogUtils.WMLDevtoolLogWatcher logWatcher;
 
   private WMLDebugBridge() {
     mOriginBridge = new WMLBridge();
+    WMLLogUtils.setWMLDevtoolLogWatcher(new WMLLogUtils.WMLDevtoolLogWatcher() {
+      @Override
+      public void onLog(int logLevel, String tag, String log) {
+
+        Map<String, Object> args = new HashMap<>();
+        args.put("type", "string");
+        args.put("value", log);
+
+        Map<String, Object> params = new HashMap<>();
+        switch (logLevel) {
+          case Log.VERBOSE:
+            params.put("type", "verbose");
+            break;
+          case Log.DEBUG:
+            params.put("type", "debug");
+            break;
+          case Log.INFO:
+            params.put("type", "info");
+            break;
+          case Log.WARN:
+            params.put("type", "warn");
+            break;
+          case Log.ERROR:
+            params.put("type", "error");
+            break;
+          case Log.ASSERT:
+            params.put("type", "assert");
+            break;
+        }
+        params.put("args", args);
+        params.put("timestamp", System.currentTimeMillis());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("method", "WMLDebug.runtimeConsoleAPICalled");
+        map.put("params", params);
+        sendMessage(JSON.toJSONString(map));
+      }
+    });
   }
 
   public static WMLDebugBridge getInstance() {
