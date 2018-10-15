@@ -45,16 +45,6 @@ android {
     lintOptions {
         abortOnError false
     }
-
-    externalNativeBuild {
-
-        // Encapsulates your CMake build configurations.
-        cmake {
-
-            // Provides a relative path to your CMake build script.
-            path "CMakeLists.txt"
-        }
-    }
 }
 
 dependencies {
@@ -72,8 +62,9 @@ dependencies {
     provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
 //    debugProvided project(path: ':weex_sdk', configuration: 'debug')
 //    releaseProvided project(path: ':weex_sdk', configuration: 'release')
-    provided "com.taobao.android:windmill:1.0.0.5-SNAPSHOT"
-    provided "com.taobao.android:windmill_basic:1.0.0.5-SNAPSHOT"
+    provided "com.taobao.android:windmill:1.1.0.1-SNAPSHOT"
+    provided "com.taobao.android:windmill_basic:1.1.0.1-SNAPSHOT"
+    provided "com.taobao.android:windmill_runtime:1.1.0.1-SNAPSHOT"
     provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
     provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 
@@ -117,7 +108,7 @@ android.libraryVariants.all { variant ->
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.16.47'
+version '0.18.5'
 
 def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
 def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'
