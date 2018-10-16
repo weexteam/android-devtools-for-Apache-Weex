@@ -200,9 +200,9 @@ public class DebugServerProxy {
                     func.put("deviceId", getDeviceId(mContext));
                     func.put("platform", WXEnvironment.OS);
                     func.put("model", WXEnvironment.SYS_MODEL);
-                    func.put("windmillVersion", WMLEnv.sWindmillVersion);
+                    func.put("windmillVersion", "1.1.1.7");
                     func.put("devtoolVersion", DEVTOOL_VERSION);
-                    func.put("name", WMLEnv.sAppName);
+                    func.put("name", "TB");
 
                     func.put("remoteDebug", WMLBridgeManager.sRemoteDebugMode);
 
