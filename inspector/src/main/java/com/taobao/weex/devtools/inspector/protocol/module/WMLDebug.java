@@ -52,6 +52,9 @@ public class WMLDebug implements ChromeDevtoolsDomain {
             WMLBridgeManager.getInstance().restart(remoteDebug, context);
             LocalBroadcastManager.getInstance(WMLEnv.getApplicationContext()).sendBroadcast(new Intent("remote_debug_windmill"));
         }
+        if (!remoteDebug) {
+            WMLDebugBridge.getInstance().destoryAllDebugAppContext();
+        }
     }
 
     @ChromeDevtoolsMethod

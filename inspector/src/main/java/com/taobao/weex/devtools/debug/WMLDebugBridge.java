@@ -26,6 +26,7 @@ public class WMLDebugBridge implements IWMLBridge {
   private IWMLBridge mOriginBridge;
   private final OkHttpClient mHttpclient = new OkHttpClient();
   private static WMLLogUtils.WMLDevtoolLogWatcher logWatcher;
+  private static ArrayList<String> aliveApp = new ArrayList<>();
 
   private WMLDebugBridge() {
     mOriginBridge = new WMLBridge();
@@ -33,9 +34,11 @@ public class WMLDebugBridge implements IWMLBridge {
       @Override
       public void onLog(int logLevel, String tag, String log) {
 
-        Map<String, Object> args = new HashMap<>();
-        args.put("type", "string");
-        args.put("value", log);
+        ArrayList args = new ArrayList();
+        HashMap<String, Object> args_map = new HashMap();
+        args_map.put("type", "string");
+        args_map.put("value", log);
+        args.add(args_map);
 
         Map<String, Object> params = new HashMap<>();
         switch (logLevel) {
@@ -198,6 +201,7 @@ public class WMLDebugBridge implements IWMLBridge {
   @Override
   public int createAppContext(String appId, String template, Map<String, Object> params) {
 
+    aliveApp.add(appId);
     Map<String, Object> debugParams = new HashMap<>();
     debugParams.put("appId", appId);
     debugParams.put("source", template);
@@ -212,6 +216,7 @@ public class WMLDebugBridge implements IWMLBridge {
   @Override
   public int destoryAppContext(String appId) {
 
+    aliveApp.remove(appId);
     Map<String, Object> params = new HashMap<>();
     params.put("appId", appId);
 
@@ -219,6 +224,20 @@ public class WMLDebugBridge implements IWMLBridge {
     map.put("method", "WMLDebug.destoryAppContext");
     map.put("params", params);
     return sendMessage(JSON.toJSONString(map));
+  }
+
+  public void destoryAllDebugAppContext() {
+    for (String appId : aliveApp) {
+      Map<String, Object> params = new HashMap<>();
+      params.put("appId", appId);
+
+      Map<String, Object> map = new HashMap<>();
+      map.put("method", "WMLDebug.destoryAppContext");
+      map.put("params", params);
+      sendMessage(JSON.toJSONString(map));
+    }
+
+    aliveApp.clear();
   }
 
   @Override
