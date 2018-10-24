@@ -43,7 +43,7 @@ There are two choices to set the dependency, the Choice A is recommanded if you 
   * *A - aar dependency from jcenter*.
   ````
   dependencies {
-          compile 'com.taobao.android:weex_inspector:0.8.0.0'
+          compile 'com.taobao.android:weex_inspector:0.18.12'
   }
   ````
 I strongly recommend you use the latest version since both weex sdk and devtools are developed iteratively and rapidly. See the release version list [here](https://github.com/weexteam/weex_devtools_android/releases). All the release version will publish to the [jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
@@ -57,18 +57,29 @@ I strongly recommend you use the latest version since both weex sdk and devtools
   }
   ````
 
-#### Initialize in your XXXApplication file.
+#### Debug server connection: scan QR code interception
 ````
-    public class MyApplication extends Application {
-      public void onCreate() {
-      super.onCreate();
-      initDebugEnvironment(true, "xxx.xxx.xxx.xxx"/*"DEBUG_SERVER_HOST"*/);
+  if (WXEnvironment.isApkDebugable()) {
+        String devToolUrl = uri.getQueryParameter("_wx_devtool");
+        if (!TextUtils.isEmpty(devToolUrl)) {
+            WXEnvironment.sRemoteDebugProxyUrl = devToolUrl;
+			  	      WXEnvironment.sDebugServerConnectable = true;
+            WXSDKEngine.reload(Globals.getApplication(), false);
+        }
+  }
+````
+
+#### The following broadcast can be received when the debug switch changed.
+````
+  public class RefreshBroadcastReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      if (WXSDKInstance.ACTION_INSTANCE_RELOAD.equals(intent.getAction()) ||
+              WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH.equals(intent.getAction())) {
+        // Do something
       }
-      private void initDebugEnvironment(boolean enable, String host) {
-        WXEnvironment.sRemoteDebugMode = enable;
-        WXEnvironment.sRemoteDebugProxyUrl = "ws://" + host + ":8088/debugProxy/native";
-      }
-}
+    }
+  }
 ````
 
 #### Ship It!
