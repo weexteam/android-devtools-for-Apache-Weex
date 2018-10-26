@@ -1,7 +1,7 @@
 # Weex Devtools接入指南
 [![GitHub release](https://img.shields.io/github/release/weexteam/weex_devtools_android.svg)](https://github.com/weexteam/weex_devtools_android/releases)   [![Codacy Badge](https://api.codacy.com/project/badge/Grade/af0790bf45c9480fb0ec90ad834b89a3)](https://www.codacy.com/app/weex_devtools/weex_devtools_android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=weexteam/weex_devtools_android&amp;utm_campaign=Badge_Grade) 	[![GitHub issues](https://img.shields.io/github/issues/weexteam/weex_devtools_android.svg)](https://github.com/weexteam/weex_devtools_android/issues)  [ ![Download](https://api.bintray.com/packages/alibabaweex/maven/weex_inspector/images/download.svg) ](https://bintray.com/alibabaweex/maven/weex_inspector/_latestVersion)
 
-Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的一款调试神器.其主要功能简介请点击[这里](https://yq.aliyun.com/articles/57651)查看.这篇文章重点介绍Android端的接入问题及注意事项.
+Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)专为weex定制的调试工具.其主要功能简介请点击[这里](https://yq.aliyun.com/articles/57651)查看.这篇文章重点介绍Android端的接入问题及注意事项.
 
 - **Inspector**
  Inspector 用来查看运行状态如`Element` \ `Console log` \ `ScreenCast` \ `BoxModel` \ `DOM Tree` \ `Element Select` \ `DataBase` 等.
@@ -9,7 +9,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 - **Debugger**
  Debugger 用来调试weex bundle和jsframework. 可以设置断点和查看调用栈.
 
-## Android应用接入
+## Android接入
 
 #### 添加依赖
 可以通过Gradle 或者 Maven添加对devtools aar的依赖, 也可以直接对源码依赖. 强烈建议使用最新版本, 因为weex sdk和devtools都在快速的迭代开发中, 新版本会有更多惊喜, 同时也修复老版本中一些问题. 最新的release版本可在[这里](https://github.com/weexteam/weex_devtools_android/releases)查看. 所有的release 版本都会发布到[jcenter repo](https://bintray.com/alibabaweex/maven/weex_inspector).
@@ -41,8 +41,6 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
      compile project(':inspector')
   }
 ```
- 另外weex_inspector中有一部分包是以provided的方式引入, 接入方需要自行解决依赖和版本冲突.
- 
  
  * **需要引用okhttp**
  ```
@@ -52,8 +50,31 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
       ...
   }
  ```
+ 
+#### 调试开关（扫码开启调试/手动开启调试）
 
-##### 版本兼容
+最简单方式就是复用Playground的相关代码,比如扫码和刷新等模块, 但是扫码不是必须的, 它只是与app通信的一种形式, 二维码里的包含DebugServer IP及bundle地址等信息,用于建立App和Debug Server之间的连接及动态加载bundle. 在Playground中给出了两种开启debug模式的范例.
+
+* 范例1: 通过在XXXApplication中设置开关打开调试模式
+```
+public class MyApplication extends Application {
+  public void onCreate() {
+  super.onCreate();
+  initDebugEnvironment(true, "xxx.xxx.xxx.xxx"/*"DEBUG_SERVER_HOST"*/);
+  }
+}
+```
+这种方式最直接, 在代码中直接hardcode了开启调试模式, 如果在SDK初始化之前调用甚至连`WXSDKEngine.reload()`都不需要调用, 接入方如果需要更灵活的策略可以将`initDebugEnvironment(boolean enable, String host)`和`WXSDKEngine.reload()`组合在一起在合适的位置和时机调用即可.（如果不是初始化之前调用，n那么每次调用initDebugEnvironment后必须调用WXSDKEngine.reload()刷新Weex引擎）
+
+* 范例2:通过扫码打开调试模式 <br>
+Playground中较多的使用扫码的方式传递信息, 不仅用这种方式控制Debug模式的开关,而且还通过它来传入bundle的url直接调试. 应当说在开发中这种方式是比较高效的, 省去了修改sdk代码重复编译和安装App的麻烦, 缺点就是调试工具这种方式接入需要App具有扫码和处理特定规则二维码的能力.除了Playground中的方式, 接入方亦可根据业务场景对Debugger和接入方式进行二次开发.
+
+拦截方式：
+````
+
+````
+
+##### 版本匹配
 
 | weex sdk | weex inspector | debug server |
 |----------|----------------|--------------|
@@ -108,28 +129,6 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
   }
 ```
 如果接入方的容器未对该广播做处理, 那么将不支持刷新和调试过程中编辑代码时的watch功能.
-
-#### 接入示例
-最简单方式就是复用Playground的相关代码,比如扫码和刷新等模块, 但是扫码不是必须的, 它只是与app通信的一种形式, 二维码里的包含DebugServer IP及bundle地址等信息,用于建立App和Debug Server之间的连接及动态加载bundle. 在Playground中给出了两种开启debug模式的范例.
-
-* 范例1: 通过在XXXApplication中设置开关打开调试模式
-```
-public class MyApplication extends Application {
-  public void onCreate() {
-  super.onCreate();
-  initDebugEnvironment(true, "xxx.xxx.xxx.xxx"/*"DEBUG_SERVER_HOST"*/);
-  }
-}
-```
-这种方式最直接, 在代码中直接hardcode了开启调试模式, 如果在SDK初始化之前调用甚至连`WXSDKEngine.reload()`都不需要调用, 接入方如果需要更灵活的策略可以将`initDebugEnvironment(boolean enable, String host)`和`WXSDKEngine.reload()`组合在一起在合适的位置和时机调用即可.
-
-* 范例2:通过扫码打开调试模式 <br>
-Playground中较多的使用扫码的方式传递信息, 不仅用这种方式控制Debug模式的开关,而且还通过它来传入bundle的url直接调试. 应当说在开发中这种方式是比较高效的, 省去了修改sdk代码重复编译和安装App的麻烦, 缺点就是调试工具这种方式接入需要App具有扫码和处理特定规则二维码的能力.除了Playground中的方式, 接入方亦可根据业务场景对Debugger和接入方式进行二次开发.
-
-Playground集成的具体代码可参考如下两个文件:
-* 开关控制 , 主要參考對二維碼的處理部分.詳見[WXApplication.java](https://github.com/weexteam/weex_devtools_android/blob/master/playground/app/src/main/java/com/alibaba/weex/WXApplication.java)
-
-* 刷新控制 , 主要參考是容器對ACTION_DEBUG_INSTANCE_REFRESH的處理, 詳見[WXPageActivity.java](https://github.com/weexteam/weex_devtools_android/blob/master/playground/app/src/main/java/com/alibaba/weex/WXPageActivity.java)
 
 #### 牛刀小试
 
