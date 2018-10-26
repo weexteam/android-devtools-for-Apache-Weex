@@ -17,7 +17,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   * *Gradle依赖*.
   ```
   dependencies {
-     compile 'com.taobao.android:weex_inspector:0.10.0.5'
+     compile 'com.taobao.android:weex_inspector:0.18.10'
   }
   ```
   
@@ -27,7 +27,7 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
   <dependency>
     <groupId>com.taobao.android</groupId>
     <artifactId>weex_inspector</artifactId>
-    <version>0.10.0.5</version>
+    <version>0.18.10</version>
     <type>pom</type>
   </dependency>
   ```
@@ -43,18 +43,8 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
 ```
  另外weex_inspector中有一部分包是以provided的方式引入, 接入方需要自行解决依赖和版本冲突.
  
- * **provided方式引用的包**
- ```
- dependencies {
-     provided 'com.google.code.findbugs:jsr305:2.0.1'
-     provided 'com.android.support:appcompat-v7:23.1.1'
-     provided 'com.taobao.android:weex_sdk:0.10.0'
-     provided 'com.alibaba:fastjson:1.1.45+'
-     ...
- }
- ```
  
- * **反射引用的包(0.8.0.0以上版本)**
+ * **需要引用okhttp**
  ```
   dependencies {
      compile 'com.squareup.okhttp:okhttp:2.3.0'
@@ -62,15 +52,6 @@ Weex devtools是实现并扩展了[Chrome Debugging Protocol](https://developer.
       ...
   }
  ```
- 
- 或者
-  ```
-   dependencies {
-      compile 'com.squareup.okhttp3:okhttp:3.4.1'
-      compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'
-       ...
-   }
-  ```
 
 ##### 版本兼容
 
@@ -107,42 +88,7 @@ Weex SDK的WXEnvironment类里有一对静态变量标记了weex当前的调试�
   }
 ```
 
-**规则二 :修改sRemoteDebugMode后一定要调用`WXSDKEngine.reload()`.**
-
-一般來說，在修改了WXEnvironment.sRemoteDebugMode以后调用了`WXSDKEngine.reload()` 方法才能够使Debug模式生效. WXSDKEngine.reload() 用来重置Weex的运行环境上下文, 在切换调试模式时需要调用此方法来创建新的weex运行时和DebugBridge并将所有的JS调用桥接到调试服务器执行. 在reload过程中会调用launchInspector, 这就是SDK控制debug模式最核心一个方法, 其传入参数即为sRemoteDebugMode, 若为true则该方法中尝试以反射的方式获取DebugBridge用来在远端执行JS, 否则在本地运行. 
-
-```
-  private void launchInspector(boolean remoteDebug) {
-    if (WXEnvironment.isApkDebugable()) {
-      try {
-        if (mWxDebugProxy != null) {
-          mWxDebugProxy.stop();
-        }
-        HackedClass<Object> debugProxyClass = WXHack.into("com.taobao.weex.devtools.debug.DebugServerProxy");
-        mWxDebugProxy = (IWXDebugProxy) debugProxyClass.constructor(Context.class, WXBridgeManager.class)
-                .getInstance(WXEnvironment.getApplication(), WXBridgeManager.this);
-        if (mWxDebugProxy != null) {
-          mWxDebugProxy.start();
-          if (remoteDebug) {
-            mWXBridge = mWxDebugProxy.getWXBridge();
-          } else {
-            if (mWXBridge != null && !(mWXBridge instanceof WXBridge)) {
-              mWXBridge = null;
-            }
-          }
-        }
-      } catch (HackAssertionException e) {
-        WXLogUtils.e("launchInspector HackAssertionException ", e);
-      }
-    }
-  }
-```
-
- 只要遵循上面的原理, 开启Debug模式的方式和时机可由接入方灵活实现. 从launchInspector可以看到, SDK对devtools的aar包并无强依赖, 我们的App只需要在Debug包中打包该aar即可, 这样多少可以缓解包大小问题和安全问题.
- 
- **例外：** _若修改WXEnvironment.sRemoteDebugMode的时机在WXBridgeManager初始化和restart和之前则`WXSDKEngine.reload()`可忽略._
-
-**规则三 : 通过响应ACTION_DEBUG_INSTANCE_REFRESH广播及时刷新.**
+**规则二 : 通过响应ACTION_DEBUG_INSTANCE_REFRESH广播及时刷新.**
 
 广播ACTION_DEBUG_INSTANCE_REFRESH在调试模式切换和Chrome调试页面刷新时发出, 主要用来通知当前的weex容器以Debug模式重新加载当前页. 在playground中的处理过程如下:
 ```
@@ -203,7 +149,7 @@ Playground集成的具体代码可参考如下两个文件:
 
 ---
 
-## 背景知识
+## 科普
 
 #### Devtools组件介绍
 Devtools扩展了[Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol), 在客户端和调试服务器之间的采用[JSON-RPC](https://en.wikipedia.org/wiki/JSON-RPC)作为通信机制, 本质上调试过程是两个进程间协同, 相互交换控制权及运行结果的过程. 更多细节还请阅读[Weex Devtools Debugger的技术选型实录](http://www.atatech.org/articles/59284)这篇文章.
@@ -219,28 +165,3 @@ Chrome的V8引擎扮演着bundle javascript runtime的角色. 开启debug模式�
 
 调试的大致过程请参考如下时序图.
 ![debug sequence diagram](https://img.alicdn.com/tps/TB1igLoMVXXXXawapXXXXXXXXXX-786-1610.jpg "debug sequence diagram")
-
-
-#### FAQ
-
-在各业务接入过程中, 陆续发现一些问题, 对高频次的问题解答如下, 开发中以weex debug -V的方式启动Debug Server可以看到server端的log信息, 对照上文中的时序图对于定位问题还是非常有帮助, 建议调试中默认开启server端log.
-
-1. **扫码App在DebugServerProxy中抛出class not found**
-  已知的原因如下:
-    * weex_inspector以provided方式引用的包是否引入成功, 如fastjson等.
-    * weex_inspector以compile方式引用的包是否引入成功, 某些app重新引入com.squareup.okhttp:okhttp:2.3.0和com.squareup.okhttp:okhttp-ws:2.3.0则不再报错.
-    * 混淆规则影响反射.
-<br/>
-2. **playground 扫码调试crash**
-  已知的原因如下:
-  * 系统为android 6+, 崩溃信息提示进程需要android.permission.READ_PHONE_STATE权限, 代码中未做权限检查, 在0.0.2.7版本以后已修复, 不再需要此权限.
-<br/>
-3. **扫码后设备列表页并没有出现我的设备信息.**
-  已知的原因如下:
-  * Debug Server和手机在不同网段, 被防火墙隔离.
-  * 手机连接了PC端的代理, 当前尚不支持.
-  * 多进程连接服务器端的同一端口, 比如在Application的onCreate中初始化sdk, 若多个进程连接服务器端的同一端口则报错, 在0.0.2.3版本以后已支持多进程无此问题.
-<br/>
-4. **调试过程中频繁刷新连接失败, Server端提示重新启动App, 非必现**
-  已知的原因如下:
-  * 多线程操作网络连接引起, 在频繁的即断即连时容易触发. 在0.0.7.1版本已修复.
