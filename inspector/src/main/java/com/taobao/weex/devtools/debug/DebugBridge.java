@@ -89,11 +89,6 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public void refreshInstance(String instanceId, String namespace, String function, WXJSObject[] args) {
-//        mOriginBridge.refreshInstance(instanceId, namespace, function, args);
-    }
-
-    @Override
     public int execJS(String instanceId, String namespace, String function, WXJSObject[] args) {
         ArrayList<Object> array = new ArrayList<>();
         int argsCount = args == null ? 0 : args.length;
@@ -343,11 +338,6 @@ public class DebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callRenderSuccess(String s) {
-        return -1;
-    }
-
-    @Override
     public int callAppendTreeCreateFinish(String instanceId, String ref) {
         return mOriginBridge.callAppendTreeCreateFinish(instanceId, ref);
     }
@@ -467,16 +457,6 @@ public class DebugBridge implements IWXBridge {
     @Override
     public void reportNativeInitStatus(String statusCode, String errorMsg) {
         mOriginBridge.reportNativeInitStatus(statusCode, errorMsg);
-    }
-
-    @Override
-    public void setTimeoutNative(String callbackId, String time) {
-        mOriginBridge.setTimeoutNative(callbackId, time);
-    }
-
-    @Override
-    public void setJSFrmVersion(String version) {
-        mOriginBridge.setJSFrmVersion(version);
     }
 
     public void setSession(SimpleSession session) {
