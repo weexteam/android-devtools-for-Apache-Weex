@@ -419,24 +419,12 @@ public class WxDebug implements ChromeDevtoolsDomain {
                     method,
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
-//            WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeModule(
-//                    instanceId,
-//                    domain,
-//                    method,
-//                    arguments,
-//                    options);
         } else if ("callNativeComponent".equals(syncMethod)) {
             WXDebugBridge.getInstance().callNativeComponent(instanceId,
                     domain,
                     method,
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(arguments),
                     WXWsonJSONSwitch.convertJSONToWsonIfUseWson(options));
-//            WXDebugBridge.getInstance().getWXDebugJsBridge().jsHandleCallNativeComponent(
-//                    instanceId,
-//                    domain,
-//                    method,
-//                    arguments,
-//                    options);
         }
 
         response.method = "WxDebug.syncReturn";

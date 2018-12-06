@@ -113,6 +113,8 @@ public class WMLDebugBridge implements IWMLBridge {
     Map<String, Object> map = new HashMap<>();
     if (TextUtils.equals(frameworkName, WMLConstants.NAME_WINDMILL_WORKER_JS)) {
       map.put("method", "WMLDebug.initRuntimeWorker");
+    } else if (TextUtils.equals(frameworkName, WMLConstants.NAME_WINDMILL_WEB_MODULE_API_JS)) {
+      map.put("method", "WMLDebug.initFrameworkApi");
     } else {
       map.put("method", "WMLDebug.initAppFrameworkWorker");
     }
@@ -248,6 +250,11 @@ public class WMLDebugBridge implements IWMLBridge {
   @Override
   public void dispatchMessage(String clientId, String appId, byte[] params, String callbackId) {
     mOriginBridge.dispatchMessage(clientId, appId, params, callbackId);
+  }
+
+  @Override
+  public byte[] dispatchMessageSync(String s, String s1, byte[] bytes) {
+    return mOriginBridge.dispatchMessageSync(s, s1, bytes);
   }
 
   public void setSession(SimpleSession session) {

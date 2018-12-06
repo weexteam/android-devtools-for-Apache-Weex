@@ -64,9 +64,9 @@ dependencies {
     provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
 //    debugProvided project(path: ':weex_sdk', configuration: 'debug')
 //    releaseProvided project(path: ':weex_sdk', configuration: 'release')
-    provided "com.taobao.android:windmill:1.1.1.13"
-    provided "com.taobao.android:windmill_basic:1.1.1.13"
-    provided "com.taobao.android:windmill_runtime:1.1.1.13"
+    provided "com.taobao.android:windmill:${WINDMILL_SDK_VERSION}"
+    provided "com.taobao.android:windmill_basic:${WINDMILL_SDK_VERSION}"
+    provided "com.taobao.android:windmill_runtime:${WINDMILL_SDK_VERSION}"
     provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
     provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 
@@ -110,7 +110,7 @@ android.libraryVariants.all { variant ->
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.18.10'
+version '0.20.0.1'
 
 def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
 def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'

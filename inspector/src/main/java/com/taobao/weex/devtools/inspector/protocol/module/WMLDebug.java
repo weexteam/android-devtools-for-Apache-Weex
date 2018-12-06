@@ -5,29 +5,27 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKEngine;
-import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.devtools.common.LogUtil;
+import com.taobao.weex.devtools.debug.SocketClient;
 import com.taobao.weex.devtools.debug.WMLDebugBridge;
 import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcPeer;
+import com.taobao.weex.devtools.inspector.jsonrpc.JsonRpcResult;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsMethod;
 import com.taobao.weex.devtools.json.ObjectMapper;
+import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
-import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.windmill.bridge.WMLBridgeManager;
 import com.taobao.windmill.rt.util.WMLEnv;
 
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.nio.charset.Charset;
 import java.util.HashMap;
 
 public class WMLDebug implements ChromeDevtoolsDomain {
 
     private static final String TAG = "WMLDebug";
     private static final HashMap<String, LogLevel> sLevelMap = new HashMap<String, LogLevel>(6);
+    private SocketClient mWebSocketClient;
 
     static {
         sLevelMap.put("all", LogLevel.ALL);
@@ -40,8 +38,8 @@ public class WMLDebug implements ChromeDevtoolsDomain {
 
     private final ObjectMapper mObjectMapper = new ObjectMapper();
 
-    public WMLDebug() {
-
+    public WMLDebug(SocketClient webSocketClient) {
+        this.mWebSocketClient = webSocketClient;
     }
 
     @ChromeDevtoolsMethod
@@ -86,5 +84,36 @@ public class WMLDebug implements ChromeDevtoolsDomain {
         String data = params.optString("data");
         String callbackId = params.optString("callbackId");
         WMLBridgeManager.getInstance().dispatchMessage(appId, clientId, data, callbackId);
+    }
+
+    @ChromeDevtoolsMethod
+    public void dispatchMessageSync(JsonRpcPeer peer, JSONObject params) {
+
+        int id = params.optInt("syncId");
+
+        String appId = params.optString("appId");
+        String clientId = params.optString("clientId");
+        String data = params.optString("data");
+
+        byte[] result = WMLBridgeManager.getInstance().dispatchMessageSync(appId, clientId, data);
+
+        JSONObject response = new JSONObject();
+        JSONObject response_params = new JSONObject();
+        try {
+            response.put("method", "WMLDebug.receiveMessageSync");
+            response.put("id", id);
+
+            response_params.put("appId", appId);
+            response_params.put("data", new String(result));
+            response_params.put("error", "");
+
+            response.put("params", response_params);
+
+            if (mWebSocketClient != null) {
+                mWebSocketClient.sendText(response.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

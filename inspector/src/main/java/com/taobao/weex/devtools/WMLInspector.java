@@ -13,6 +13,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import com.taobao.weex.devtools.common.LogUtil;
+import com.taobao.weex.devtools.debug.SocketClient;
 import com.taobao.weex.devtools.inspector.console.RuntimeReplFactory;
 import com.taobao.weex.devtools.inspector.elements.Document;
 import com.taobao.weex.devtools.inspector.elements.DocumentProviderFactory;
@@ -61,7 +62,7 @@ public class WMLInspector {
    * with additional features, plugins, etc.  See DefaultDumperPluginsBuilder and
    * {@link DefaultInspectorModulesBuilder} for more information.
    * <p>
-   * For simple use cases, consider {@link #initializeWithDefaults(Context)}.
+   * For simple use cases, consider {@link #initializeWithDefaults(Context, SocketClient)}.
    */
   public static InitializerBuilder newInitializerBuilder(Context context) {
     return new InitializerBuilder(context);
@@ -72,11 +73,11 @@ public class WMLInspector {
    * first socket connection is received, allowing this to be safely used for debug builds on
    * even low-end hardware without noticeably affecting performance.
    */
-  public static void initializeWithDefaults(final Context context) {
+  public static void initializeWithDefaults(final Context context, final SocketClient webSocketClient) {
     initialize(new Initializer(context) {
       @Override
       protected Iterable<ChromeDevtoolsDomain> getInspectorModules() {
-        return new DefaultInspectorModulesBuilder(context).finish();
+        return new DefaultInspectorModulesBuilder(context).finish(webSocketClient);
       }
     });
   }
@@ -85,7 +86,7 @@ public class WMLInspector {
    * Start the listening service, providing a custom initializer as per
    * {@link #newInitializerBuilder}.
    *
-   * @see #initializeWithDefaults(Context)
+   * @see #initializeWithDefaults(Context, SocketClient)
    */
   public static void initialize(final Initializer initializer) {
     // Hook activity tracking so that after WeexInspector is attached we can figure out what
@@ -102,15 +103,6 @@ public class WMLInspector {
       LogUtil.w("Automatic activity tracking not available on this API level, caller must invoke " +
           "ActivityTracker methods manually!");
     }
-  }
-
-  public static InspectorModulesProvider defaultInspectorModulesProvider(final Context context) {
-    return new InspectorModulesProvider() {
-      @Override
-      public Iterable<ChromeDevtoolsDomain> get() {
-        return new DefaultInspectorModulesBuilder(context).finish();
-      }
-    };
   }
 
   private static class PluginBuilder<T> {
@@ -226,10 +218,10 @@ public class WMLInspector {
       return this;
     }
 
-    public Iterable<ChromeDevtoolsDomain> finish() {
+    public Iterable<ChromeDevtoolsDomain> finish(SocketClient webSocketClient) {
       provideIfDesired(new Console());
       provideIfDesired(new Debugger());
-      provideIfDesired(new WMLDebug());
+      provideIfDesired(new WMLDebug(webSocketClient));
       DocumentProviderFactory documentModel = resolveDocumentProvider();
       if (documentModel != null) {
         Document document = new Document(documentModel);

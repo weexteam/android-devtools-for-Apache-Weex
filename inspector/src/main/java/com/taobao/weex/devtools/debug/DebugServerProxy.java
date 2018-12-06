@@ -190,7 +190,7 @@ public class DebugServerProxy {
                 new IllegalArgumentException("Context is null").printStackTrace();
                 return;
             }
-            WMLInspector.initializeWithDefaults(mContext);
+            WMLInspector.initializeWithDefaults(mContext, mWebSocketClient);
             mWMLBridge = WMLDebugBridge.getInstance();
             mWMLBridge.setSession(mWebSocketClient);
             mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
@@ -220,7 +220,7 @@ public class DebugServerProxy {
                             if (mWMLBridge != null) {
                                 mWMLBridge.onConnected();
                             }
-                            mDomainModules = new WMLInspector.DefaultInspectorModulesBuilder(mContext).finish();
+                            mDomainModules = new WMLInspector.DefaultInspectorModulesBuilder(mContext).finish(mWebSocketClient);
                             mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
                             WXSDKManager.getInstance().postOnUiThread(
                                     new Runnable() {
