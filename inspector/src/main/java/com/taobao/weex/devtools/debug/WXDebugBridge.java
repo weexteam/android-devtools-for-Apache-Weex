@@ -482,11 +482,6 @@ public class WXDebugBridge implements IWXBridge {
         mWXDebugJsBridge.resetWXBridge(this, className);
     }
 
-    @Override
-    public void fireEventOnDataRenderNode(String s, String s1, String s2, String s3) {
-        mOriginBridge.fireEventOnDataRenderNode(s, s1, s2, s3);
-    }
-
     public void setSession(SimpleSession session) {
         mSession = session;
         if (mSession instanceof SocketClient) {
