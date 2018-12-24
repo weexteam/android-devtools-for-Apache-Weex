@@ -329,8 +329,8 @@ public class WXDebugBridge implements IWXBridge {
     }
 
     @Override
-    public int callLayout(String s, String s1, int i, int i1, int i2, int i3, int i4, int i5, int i6) {
-        return mOriginBridge.callLayout(s, s1, i, i1, i2, i3, i4, i5, i6);
+    public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
+        return mOriginBridge.callLayout(instanceId, ref, top, bottom, left, right, height, width, isRTL, index);
     }
 
 
