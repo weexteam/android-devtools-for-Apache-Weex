@@ -2,6 +2,7 @@ package com.taobao.weex.devtools.inspector.protocol.module;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -21,6 +22,7 @@ import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
+import com.taobao.windmill.rt.util.WMLEnv;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,6 +63,8 @@ public class WxDebug implements ChromeDevtoolsDomain {
                     .setAction(WXSDKInstance.ACTION_DEBUG_INSTANCE_REFRESH)
                     .putExtra("params", null == params ? "" : params.toString())
             );
+            Intent intent = new Intent("debug_windmill_wxrender_reload");
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
 

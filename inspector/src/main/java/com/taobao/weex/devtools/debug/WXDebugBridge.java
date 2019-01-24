@@ -341,7 +341,7 @@ public class WXDebugBridge implements IWXBridge {
 
     @Override
     public int callRenderSuccess(String s) {
-        return -1;
+        return mOriginBridge.callRenderSuccess(s);
     }
 
     @Override
