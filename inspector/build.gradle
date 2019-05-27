@@ -61,7 +61,7 @@ dependencies {
     }
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    provided "com.taobao.android:weex_sdk:${WEEX_SDK_VERSION}"
+    provided "com.taobao.android:weex_sdk:0.25.0.0-SNAPSHOT"
 //    debugProvided project(path: ':weex_sdk', configuration: 'debug')
 //    releaseProvided project(path: ':weex_sdk', configuration: 'release')
     provided "com.taobao.android:windmill:${WINDMILL_SDK_VERSION}"
@@ -110,7 +110,7 @@ android.libraryVariants.all { variant ->
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.21.0.9'
+version '0.24.2.4'
 
 def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
 def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'
