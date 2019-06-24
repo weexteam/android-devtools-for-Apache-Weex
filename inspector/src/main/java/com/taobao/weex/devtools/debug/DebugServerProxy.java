@@ -17,7 +17,6 @@ import com.taobao.weex.bridge.WXBridgeManager;
 import com.taobao.weex.bridge.WXDebugJsBridge;
 import com.taobao.weex.common.IWXBridge;
 import com.taobao.weex.common.IWXDebugConfig;
-import com.taobao.weex.devtools.WMLInspector;
 import com.taobao.weex.devtools.WeexInspector;
 import com.taobao.weex.devtools.common.LogRedirector;
 import com.taobao.weex.devtools.common.Util;
@@ -33,9 +32,6 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
 import com.taobao.weex.utils.WXLogUtils;
-import com.taobao.windmill.bridge.IWMLBridge;
-import com.taobao.windmill.bridge.WMLBridgeManager;
-import com.taobao.windmill.rt.util.WMLEnv;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +56,6 @@ public class DebugServerProxy {
     private WXBridgeManager mWXJsManager;
     private WXDebugJsBridge mWXDebugJsBridge;
     private WXDebugBridge mWXBridge;
-    private WMLDebugBridge mWMLBridge;
     private Context mContext;
 
     public DebugServerProxy(Context context, IWXDebugConfig wxDebugAdapter) {
@@ -184,78 +179,6 @@ public class DebugServerProxy {
         }
     }
 
-    public void startWMLDebug() {
-        synchronized (DebugServerProxy.class) {
-            if (mContext == null) {
-                new IllegalArgumentException("Context is null").printStackTrace();
-                return;
-            }
-            WMLInspector.initializeWithDefaults(mContext, mWebSocketClient);
-            mWMLBridge = WMLDebugBridge.getInstance();
-            mWMLBridge.setSession(mWebSocketClient);
-            mWebSocketClient.connect(mRemoteUrl, new SocketClient.Callback() {
-
-                private String getShakeHandsMessage() {
-                    Map<String, Object> func = new HashMap<>();
-                    func.put("deviceId", getDeviceId(mContext));
-                    func.put("platform", WXEnvironment.OS);
-                    func.put("model", WXEnvironment.SYS_MODEL);
-                    func.put("windmillVersion", "1.1.1.7");
-                    func.put("devtoolVersion", DEVTOOL_VERSION);
-                    func.put("name", "TB");
-
-                    func.put("remoteDebug", WMLBridgeManager.sRemoteDebugMode);
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("method", "WMLDebug.registerDevice");
-                    map.put("params", func);
-                    return JSON.toJSONString(map);
-                }
-
-                @Override
-                public void onSuccess(String response) {
-                    synchronized (DebugServerProxy.class) {
-                        if (mWebSocketClient != null && mWebSocketClient.isOpen()) {
-                            mWebSocketClient.sendText(getShakeHandsMessage());
-                            if (mWMLBridge != null) {
-                                mWMLBridge.onConnected();
-                            }
-                            mDomainModules = new WMLInspector.DefaultInspectorModulesBuilder(mContext).finish(mWebSocketClient);
-                            mMethodDispatcher = new MethodDispatcher(mObjectMapper, mDomainModules);
-                            WXSDKManager.getInstance().postOnUiThread(
-                                    new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(
-                                                    WXEnvironment.sApplication,
-                                                    "debug server connected", Toast.LENGTH_SHORT)
-                                                    .show();
-                                        }
-                                    }, 0);
-                            Log.d(TAG, "connect debugger server success!");
-//                            if (mWXJsManager != null) {
-//                                mWXJsManager.initScriptsFramework(null);
-//                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable cause) {
-                    synchronized (DebugServerProxy.class) {
-                        if (mWMLBridge != null) {
-                            mWMLBridge.onDisConnected();
-                        }
-                        Log.w(TAG, "connect debugger server failure!!");
-                        cause.printStackTrace();
-                    }
-                }
-
-            });
-        }
-    }
-
     public void stop(boolean reload) {
         synchronized (DebugServerProxy.class) {
             if (mWebSocketClient != null) {
@@ -263,7 +186,6 @@ public class DebugServerProxy {
                 mWebSocketClient = null;
             }
             mWXBridge = null;
-            mWMLBridge = null;
             if (reload) {
                 switchLocalRuntime();
             }
@@ -284,13 +206,6 @@ public class DebugServerProxy {
             WXLogUtils.e(TAG, "WXDebugBridge is null!");
         }
         return mWXBridge;
-    }
-
-    public IWMLBridge getWMLBridge() {
-        if (mWMLBridge == null) {
-            WXLogUtils.e(TAG, "WMLDebugBridge is null!");
-        }
-        return mWMLBridge;
     }
 
     public void handleMessage(String message) throws IOException {

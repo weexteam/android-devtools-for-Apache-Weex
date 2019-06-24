@@ -22,7 +22,6 @@ import com.taobao.weex.devtools.json.annotation.JsonProperty;
 import com.taobao.weex.utils.LogLevel;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXWsonJSONSwitch;
-import com.taobao.windmill.rt.util.WMLEnv;
 
 import org.json.JSONException;
 import org.json.JSONObject;
