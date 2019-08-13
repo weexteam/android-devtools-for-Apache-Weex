@@ -493,6 +493,11 @@ public class WXDebugBridge implements IWXBridge {
   }
 
   @Override
+  public void setDeviceDisplay(String s, float v, float v1, float v2) {
+
+  }
+
+  @Override
   public void registerCoreEnv(String key, String value) {
     mOriginBridge.registerCoreEnv(key, value);
   }
@@ -616,5 +621,25 @@ public class WXDebugBridge implements IWXBridge {
 
   public WXDebugJsBridge getWXDebugJsBridge() {
     return mWXDebugJsBridge;
+  }
+
+  @Override
+  public void updateInitFrameworkParams(String s, String s1, String s2) {
+
+  }
+
+  @Override
+  public void setInstanceRenderType(String s, String s1) {
+
+  }
+
+  @Override
+  public void removeInstanceRenderType(String s) {
+
+  }
+
+  @Override
+  public void setPageArgument(String s, String s1, String s2) {
+
   }
 }
