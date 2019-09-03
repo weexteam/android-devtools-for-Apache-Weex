@@ -31,6 +31,7 @@ import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcRequest;
 import com.taobao.weex.devtools.inspector.jsonrpc.protocol.JsonRpcResponse;
 import com.taobao.weex.devtools.inspector.protocol.ChromeDevtoolsDomain;
 import com.taobao.weex.devtools.json.ObjectMapper;
+import com.taobao.weex.inspector.BuildConfig;
 import com.taobao.weex.utils.WXLogUtils;
 
 import org.json.JSONException;
@@ -46,7 +47,7 @@ import static android.os.Build.VERSION_CODES;
 public class DebugServerProxy {
 
     private static final String TAG = "DebugServerProxy";
-    private static final String DEVTOOL_VERSION = "0.16.21";
+    private static final String DEVTOOL_VERSION = BuildConfig.DEVTOOL_VERSIOON;
     private SocketClient mWebSocketClient;
     private ObjectMapper mObjectMapper = new ObjectMapper();
     private MethodDispatcher mMethodDispatcher;

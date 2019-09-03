@@ -4,6 +4,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
+group = 'com.taobao.android'
+description = """weex_inspector"""
+version '0.24.2.10'
+
 buildscript {
 
     repositories {
@@ -28,16 +32,17 @@ repositories {
 
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 28
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         consumerProguardFiles 'proguard-consumer.pro'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "DEVTOOL_VERSIOON", "\"${version}\""
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -67,8 +72,8 @@ dependencies {
     provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
     provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 
-    provided 'com.squareup.okhttp:okhttp:2.3.0'
-    provided 'com.squareup.okhttp:okhttp-ws:2.3.0'
+    provided 'com.squareup.okhttp:okhttp:2.7.5'
+    provided 'com.squareup.okhttp:okhttp-ws:2.7.5'
     provided 'com.android.support:recyclerview-v7:23.1.1'
 }
 
@@ -105,9 +110,7 @@ android.libraryVariants.all { variant ->
 }
 
 
-group = 'com.taobao.android'
-description = """weex_inspector"""
-version '0.24.2.5'
+
 
 def siteUrl = 'https://github.com/weexteam/weex_devtools_android'
 def gitUrl = 'https://github.com/weexteam/weex_devtools_android.git'

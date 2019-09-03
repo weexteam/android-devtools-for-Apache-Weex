@@ -34,6 +34,10 @@ public class OkHttpSocketClient extends SocketClient {
 
   private static final String CLASS_BUFFER = "okio.Buffer";
   private static final String CLASS_BUFFER_SOURCE = "okio.BufferedSource";
+  //okhttp 2.7.5+
+  private static final String CLASS_REQUEST_BODY = "com.squareup.okhttp.RequestBody";
+  private static final String CLASS_MEDIA_TYPE_NEW = "com.squareup.okhttp.MediaType";
+  private static final String CLASS_RESPONSE_BODY = "com.squareup.okhttp.ResponseBody";
 
   static {
     String[] classNames = new String[]{
@@ -46,7 +50,10 @@ public class OkHttpSocketClient extends SocketClient {
         CLASS_REQUEST,
         CLASS_REQUEST_BUILDER,
         CLASS_BUFFER,
-        CLASS_BUFFER_SOURCE
+        CLASS_BUFFER_SOURCE,
+        CLASS_REQUEST_BODY,
+        CLASS_MEDIA_TYPE_NEW,
+        CLASS_RESPONSE_BODY
     };
     for (String className : classNames) {
       sClazzMap.put(className, ReflectionUtil.tryGetClassForName(className));
@@ -64,6 +71,9 @@ public class OkHttpSocketClient extends SocketClient {
 
   private Class mBufferClazz = sClazzMap.get(CLASS_BUFFER);
   private Class mBufferedSourceClazz = sClazzMap.get(CLASS_BUFFER_SOURCE);
+  private Class mRequestBodyClazz = sClazzMap.get(CLASS_REQUEST_BODY);
+  private Class mMediaTypeNewClazz = sClazzMap.get(CLASS_MEDIA_TYPE_NEW);
+  private Class mResponseBodyClazz = sClazzMap.get(CLASS_RESPONSE_BODY);
 
   public OkHttpSocketClient(DebugServerProxy proxy) {
     super(proxy);
@@ -91,9 +101,9 @@ public class OkHttpSocketClient extends SocketClient {
           "setReadTimeout",
           new Class[]{long.class, TimeUnit.class});
 
-      ReflectionUtil.tryInvokeMethod(mWebSocket, connectTimeout, 30, TimeUnit.SECONDS);
-      ReflectionUtil.tryInvokeMethod(mWebSocket, writeTimeout, 30, TimeUnit.SECONDS);
-      ReflectionUtil.tryInvokeMethod(mWebSocket, readTimeout, 0, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, connectTimeout, 0, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, writeTimeout, 0, TimeUnit.SECONDS);
+      ReflectionUtil.tryInvokeMethod(mSocketClient, readTimeout, 0, TimeUnit.SECONDS);
 
       if (!TextUtils.isEmpty(url)) {
         Object requestBuilder = mRequestBuilderClazz.newInstance();
@@ -167,13 +177,23 @@ public class OkHttpSocketClient extends SocketClient {
 
       Method sendMessageMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz,
           "sendMessage", new Class[]{mMediaTypeClazz, mBufferClazz});
+      if (null != sendMessageMethod){
+        Object buffer = mBufferClazz.newInstance();
+        Method writeUtf8 = ReflectionUtil.tryGetMethod(mBufferClazz, "writeUtf8",
+            new Class[]{String.class});
 
-      Object buffer = mBufferClazz.newInstance();
-      Method writeUtf8 = ReflectionUtil.tryGetMethod(mBufferClazz, "writeUtf8",
-          new Class[]{String.class});
+        ReflectionUtil.tryInvokeMethod(mWebSocket, sendMessageMethod, textValue,
+            ReflectionUtil.tryInvokeMethod(buffer, writeUtf8, message));
+      }else {
+        //okhttp 2.7.5+
+        sendMessageMethod = ReflectionUtil.tryGetMethod(mWebSocketClazz,
+            "sendMessage", mRequestBodyClazz);
+        Method createMethod = ReflectionUtil.tryGetMethod(mRequestBodyClazz,
+            "create", mMediaTypeNewClazz,String.class);
+        Object requestObj = ReflectionUtil.tryInvokeMethod(mRequestBodyClazz,createMethod,textValue,message);
+        ReflectionUtil.tryInvokeMethod(mWebSocket,sendMessageMethod,requestObj);
+      }
 
-      ReflectionUtil.tryInvokeMethod(mWebSocket, sendMessageMethod, textValue,
-          ReflectionUtil.tryInvokeMethod(buffer, writeUtf8, message));
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InstantiationException e) {
@@ -205,18 +225,32 @@ public class OkHttpSocketClient extends SocketClient {
       } else if ("onFailure".equals(method.getName())) {
         abort("Websocket onFailure", (IOException) args[0]);
       } else if ("onMessage".equals(method.getName())) {
-        Object bufferedSource = mBufferedSourceClazz.cast(args[0]);
-        Method readUtf8 = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "readUtf8");
+        boolean isNewVersion = false;
+        Object bufferedSource = null;
         try {
-          String message = (String) ReflectionUtil.tryInvokeMethod(bufferedSource, readUtf8);
-          mProxy.handleMessage(message);
-        } catch (Exception e) {
-          if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
-            LogRedirector.w(TAG, "Unexpected I/O exception processing message: " + e);
+          bufferedSource = mBufferedSourceClazz.cast(args[0]);
+        }catch (Throwable e){
+        //  e.printStackTrace();
+          isNewVersion = true;
+        }
+        if (isNewVersion){
+          Object response =  mResponseBodyClazz.cast(args[0]);
+          Method stringMethod = ReflectionUtil.tryGetMethod(mResponseBodyClazz,"string");
+          Object value = ReflectionUtil.tryInvokeMethod(response,stringMethod);
+          mProxy.handleMessage(value.toString());
+        }else {
+          Method readUtf8 = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "readUtf8");
+          try {
+            String message = (String) ReflectionUtil.tryInvokeMethod(bufferedSource, readUtf8);
+            mProxy.handleMessage(message);
+          } catch (Exception e) {
+            if (LogRedirector.isLoggable(TAG, Log.VERBOSE)) {
+              LogRedirector.w(TAG, "Unexpected I/O exception processing message: " + e);
+            }
+          } finally {
+            Method closeMethod = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "close");
+            ReflectionUtil.tryInvokeMethod(bufferedSource, closeMethod);
           }
-        } finally {
-          Method closeMethod = ReflectionUtil.tryGetMethod(mBufferedSourceClazz, "close");
-          ReflectionUtil.tryInvokeMethod(bufferedSource, closeMethod);
         }
       } else if ("onPong".equals(method.getName())) {
 
