@@ -336,7 +336,27 @@ public class WXDebugBridge implements IWXBridge {
     return mOriginBridge.callUpdateAttrs(instanceId, ref, attrs);
   }
 
-  @Override
+    @Override
+    public int callAddChildToRichtext(String s, String s1, String s2, String s3, String s4, HashMap<String, String> hashMap, HashMap<String, String> hashMap1) {
+        return 0;
+    }
+
+    @Override
+    public int callRemoveChildFromRichtext(String s, String s1, String s2, String s3) {
+        return 0;
+    }
+
+    @Override
+    public int callUpdateRichtextStyle(String s, String s1, HashMap<String, String> hashMap, String s2, String s3) {
+        return 0;
+    }
+
+    @Override
+    public int callUpdateRichtextChildAttr(String s, String s1, HashMap<String, String> hashMap, String s2, String s3) {
+        return 0;
+    }
+
+    @Override
   public int callLayout(String instanceId, String ref, int top, int bottom, int left, int right, int height, int width, boolean isRTL, int index) {
     WXLogUtils.e("WXDebugBridge layout", "callLayout " + instanceId + ", " + ref + ", " + top + ", " + bottom + ", " + left + ", " + right + ", " + height + "," + width);
     return mOriginBridge.callLayout(instanceId, ref, top, bottom, left, right, height, width, isRTL, index);
@@ -523,7 +543,37 @@ public class WXDebugBridge implements IWXBridge {
     mWXDebugJsBridge.resetWXBridge(this, className);
   }
 
-  public void setSession(SimpleSession session) {
+    @Override
+    public void setInstanceRenderType(String s, String s1) {
+
+    }
+
+    @Override
+    public void removeInstanceRenderType(String s) {
+
+    }
+
+    @Override
+    public void setPageArgument(String s, String s1, String s2) {
+
+    }
+
+    @Override
+    public void setViewPortWidth(String s, float v) {
+
+    }
+
+    @Override
+    public void reloadPageLayout(String s) {
+
+    }
+
+    @Override
+    public void setDeviceDisplayOfPage(String s, float v, float v1) {
+
+    }
+
+    public void setSession(SimpleSession session) {
     mSession = session;
     if (mSession instanceof SocketClient) {
       String[] temp = ((SocketClient) mSession).getUrl().split("debugProxy/native");
@@ -628,18 +678,9 @@ public class WXDebugBridge implements IWXBridge {
 
   }
 
-  @Override
-  public void setInstanceRenderType(String s, String s1) {
+    @Override
+    public void setLogType(float v, boolean b) {
 
-  }
+    }
 
-  @Override
-  public void removeInstanceRenderType(String s) {
-
-  }
-
-  @Override
-  public void setPageArgument(String s, String s1, String s2) {
-
-  }
 }
