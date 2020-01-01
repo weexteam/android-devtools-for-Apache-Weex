@@ -4,8 +4,6 @@
           package="com.taobao.weex.inspector">
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19"
         tools:overrideLibrary="com.taobao.weappplus_sdk"/>
 
     <application android:allowBackup="false">
