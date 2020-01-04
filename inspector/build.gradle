@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.bintray'
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.24.2.11'
+version '0.28.0'
 
 buildscript {
 
