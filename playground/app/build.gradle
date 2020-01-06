@@ -72,7 +72,7 @@ dependencies {
     /*source dependency*/
     // compile project(':weex_sdk')
 //    compile 'com.taobao.android:weex_sdk:0.15.0.117-SNAPSHOT@aar'
-    compile 'com.taobao.android:weex_sdk:WeexCore-0.1.0-SNAPSHOT@aar'
+    compile 'org.apache.weex:sdk_legacy:0.28.0'
     compile project(':appframework')
 //    compile 'com.squareup.okhttp3:okhttp:3.4.1'
 //    compile 'com.squareup.okhttp3:okhttp-ws:3.4.1'

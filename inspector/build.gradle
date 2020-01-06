@@ -6,16 +6,19 @@ apply plugin: 'com.jfrog.bintray'
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.24.2.11'
+version '0.28.0'
 
 buildscript {
 
     repositories {
         mavenCentral()
-        jcenter()
+        jcenter(){
+            url 'https://maven.aliyun.com/repository/jcenter'
+        }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath "com.github.dcendents:android-maven-gradle-plugin:1.4.1"
     }
@@ -24,16 +27,21 @@ repositories {
 //    flatDir {
 //        dirs 'libs'
 //    }
-    maven { url "http://mvnrepo.alibaba-inc.com/mvn/repository" }
+
+    maven(){
+        url 'https://maven.aliyun.com/repository/google'
+    }
     mavenCentral()
-    jcenter()
+    jcenter(){
+        url 'https://maven.aliyun.com/repository/jcenter'
+    }
 }
 
 
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -56,25 +64,25 @@ android {
 
 dependencies {
     // compile 'commons-cli:commons-cli:1.2'
-    provided 'com.google.code.findbugs:jsr305:2.0.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compileOnly 'com.google.code.findbugs:jsr305:2.0.1'
+    implementation 'com.android.support:appcompat-v7:23.1.1'
     // optional
-    testCompile 'junit:junit:4.12'
-    testCompile('org.robolectric:robolectric:2.4') {
+    testImplementation 'junit:junit:4.12'
+    testImplementation('org.robolectric:robolectric:2.4') {
         exclude module: 'commons-logging'
         exclude module: 'httpclient'
     }
-    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    provided "com.taobao.android:weex_sdk:0.26.0.19"
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.1'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.1'
+    compileOnly "org.apache.weex:sdk_legacy:0.28.0"
 //    debugProvided project(path: ':weex_sdk', configuration: 'debug')
 //    releaseProvided project(path: ':weex_sdk', configuration: 'release')
-    provided "com.alibaba:fastjson:${FAST_JSON_VERSION}"
-    provided "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
+    compileOnly "com.alibaba:fastjson:${FAST_JSON_VERSION}"
+    compileOnly "com.taobao.android.weex_inspection:protocol:${PROTOCOL_VERSION}"
 
-    provided 'com.squareup.okhttp:okhttp:2.7.5'
-    provided 'com.squareup.okhttp:okhttp-ws:2.7.5'
-    provided 'com.android.support:recyclerview-v7:23.1.1'
+    compileOnly 'com.squareup.okhttp:okhttp:2.7.5'
+    compileOnly 'com.squareup.okhttp:okhttp-ws:2.7.5'
+    compileOnly 'com.android.support:recyclerview-v7:23.1.1'
 }
 
 //apply from: rootProject.file('release.gradle')
@@ -103,7 +111,7 @@ android.libraryVariants.all { variant ->
 
     task "fatjar${name}"(type: Jar, dependsOn: ["jar${name}", "tidyCommonsCli${name}", "metainf${name}"]) {
         classifier = 'fatjar'
-        from variant.javaCompile.destinationDir
+        from variant.javaCompileProvider.get().destinationDir
         from "build/commons-cli-tidy-${name}"
         from "build/metainf-${name}"
     }
