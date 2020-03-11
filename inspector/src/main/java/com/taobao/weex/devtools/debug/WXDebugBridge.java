@@ -338,22 +338,22 @@ public class WXDebugBridge implements IWXBridge {
 
     @Override
     public int callAddChildToRichtext(String s, String s1, String s2, String s3, String s4, HashMap<String, String> hashMap, HashMap<String, String> hashMap1) {
-        return 0;
+      return mOriginBridge.callAddChildToRichtext(s,s1,s2,s3,s4,hashMap,hashMap1);
     }
 
     @Override
     public int callRemoveChildFromRichtext(String s, String s1, String s2, String s3) {
-        return 0;
+      return mOriginBridge.callRemoveChildFromRichtext(s,s1,s2,s3);
     }
 
     @Override
     public int callUpdateRichtextStyle(String s, String s1, HashMap<String, String> hashMap, String s2, String s3) {
-        return 0;
+      return mOriginBridge.callUpdateRichtextStyle(s,s1,hashMap,s2,s3);
     }
 
     @Override
     public int callUpdateRichtextChildAttr(String s, String s1, HashMap<String, String> hashMap, String s2, String s3) {
-        return 0;
+      return mOriginBridge.callUpdateRichtextChildAttr(s,s1,hashMap,s2,s3);
     }
 
     @Override
@@ -514,7 +514,7 @@ public class WXDebugBridge implements IWXBridge {
 
   @Override
   public void setDeviceDisplay(String s, float v, float v1, float v2) {
-
+    mOriginBridge.setDeviceDisplay(s,v,v1,v2);
   }
 
   @Override
@@ -545,32 +545,32 @@ public class WXDebugBridge implements IWXBridge {
 
     @Override
     public void setInstanceRenderType(String s, String s1) {
-
+      mOriginBridge.setInstanceRenderType(s,s1);
     }
 
     @Override
     public void removeInstanceRenderType(String s) {
-
+      mOriginBridge.removeInstanceRenderType(s);
     }
 
     @Override
     public void setPageArgument(String s, String s1, String s2) {
-
+      mOriginBridge.setPageArgument(s,s1,s2);
     }
 
     @Override
     public void setViewPortWidth(String s, float v) {
-
+      mOriginBridge.setViewPortWidth(s,v);
     }
 
     @Override
     public void reloadPageLayout(String s) {
-
+      mOriginBridge.reloadPageLayout(s);
     }
 
     @Override
     public void setDeviceDisplayOfPage(String s, float v, float v1) {
-
+      mOriginBridge.setDeviceDisplayOfPage(s,v,v1);
     }
 
     public void setSession(SimpleSession session) {
@@ -675,12 +675,12 @@ public class WXDebugBridge implements IWXBridge {
 
   @Override
   public void updateInitFrameworkParams(String s, String s1, String s2) {
-
+    mOriginBridge.updateInitFrameworkParams(s,s1,s2);
   }
 
     @Override
     public void setLogType(float v, boolean b) {
-
+      mOriginBridge.setLogType(v,b);
     }
 
 }
