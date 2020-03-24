@@ -7,7 +7,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +18,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.inspector.R;
 
-public class PerformanceActivity extends ActionBarActivity {
+public class PerformanceActivity extends AppCompatActivity {
 
   private LinearLayout segmentHost;
 
