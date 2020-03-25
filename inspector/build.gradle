@@ -6,19 +6,24 @@ apply plugin: 'com.jfrog.bintray'
 
 group = 'com.taobao.android'
 description = """weex_inspector"""
-version '0.28.0'
+version '0.28.0-alpha-1'
 
 buildscript {
 
     repositories {
-        mavenCentral()
+        mavenCentral(){
+            url 'https://maven.aliyun.com/repository/central'
+        }
         jcenter(){
             url 'https://maven.aliyun.com/repository/jcenter'
         }
-        google()
+//        google()
+        maven(){
+            url 'https://maven.aliyun.com/repository/google'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.android.tools.build:gradle:3.5.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath "com.github.dcendents:android-maven-gradle-plugin:1.4.1"
     }
@@ -31,7 +36,9 @@ repositories {
     maven(){
         url 'https://maven.aliyun.com/repository/google'
     }
-    mavenCentral()
+    mavenCentral(){
+        url 'https://maven.aliyun.com/repository/central'
+    }
     jcenter(){
         url 'https://maven.aliyun.com/repository/jcenter'
     }
@@ -65,7 +72,7 @@ android {
 dependencies {
     // compile 'commons-cli:commons-cli:1.2'
     compileOnly 'com.google.code.findbugs:jsr305:2.0.1'
-    implementation 'com.android.support:appcompat-v7:23.1.1'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     // optional
     testImplementation 'junit:junit:4.12'
     testImplementation('org.robolectric:robolectric:2.4') {
@@ -82,7 +89,7 @@ dependencies {
 
     compileOnly 'com.squareup.okhttp:okhttp:2.7.5'
     compileOnly 'com.squareup.okhttp:okhttp-ws:2.7.5'
-    compileOnly 'com.android.support:recyclerview-v7:23.1.1'
+    compileOnly 'com.android.support:recyclerview-v7:28.0.0'
 }
 
 //apply from: rootProject.file('release.gradle')
